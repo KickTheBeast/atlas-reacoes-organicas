@@ -89,6 +89,12 @@ window.GUIAS = [
           ['CH₃CO₂Na', { s: 'CCOC(C)=O' }, 'éster'],
           ['PPh₃', { s: 'CC[P+](c1ccccc1)(c1ccccc1)c1ccccc1' }, 'sal de fosfônio (Br⁻); depois Wittig'],
         ] },
+      { k: 'm', titulo: 'Mecanismo com setas',
+        nota: 'As setas mostram o caminho dos elétrons, na ordem em que acontecem.',
+        passos: [
+          { titulo: 'Ataque pela retaguarda (uma só etapa)', texto: 'O par de elétrons do nucleófilo forma a nova ligação com o carbono, ao mesmo tempo em que a ligação C–Br vai inteira para o bromo.',
+            de: '[OH-].CBr', coords: [[-2.3,0],[0,0],[1,0]], setas: [{ de: { par: 0 }, para: { atom: 1 }, lado: -1 }, { de: { lig: [1, 2] }, para: { atom: 2 }, lado: -1 }], para: 'CO.[Br-]' },
+        ] },
       { k: 'l', titulo: 'Para lembrar', itens: [
         'SN2 = substrato pouco impedido + Nu forte + solvente polar aprótico.',
         'Reatividade do R–X: CH₃ > 1º > 2º ≫ 3º (não reage).',
@@ -133,6 +139,16 @@ window.GUIAS = [
           [{ s: '[CH2+]c1ccccc1' }, 'benzílico', 'ressonância com o anel'],
         ],
         nota: 'Quanto mais estável o cátion, mais rápida a SN1 (e a E1).' },
+      { k: 'm', titulo: 'Mecanismo com setas',
+        nota: 'As setas mostram o caminho dos elétrons, na ordem em que acontecem.',
+        passos: [
+          { titulo: '1. Ionização (etapa lenta)', texto: 'A ligação C–Br quebra e os dois elétrons ficam com o bromo: nasce o carbocátion.',
+            de: 'CC(C)(C)Br', coords: [[0,1],[0,0],[0,-1],[-1,0],[1,0]], setas: [{ de: { lig: [1, 4] }, para: { atom: 4 }, lado: -1 }], para: 'C[C+](C)C.[Br-]' },
+          { titulo: '2. Ataque do nucleófilo', texto: 'Um par de elétrons da água ataca o carbono positivo (planar).',
+            de: 'C[C+](C)C.O', coords: [[0,1],[0,0],[-0.87,-0.5],[0.87,-0.5],[2.9,0.3]], setas: [{ de: { par: 4 }, para: { atom: 1 }, lado: 1 }], para: 'CC(C)(C)[OH2+]' },
+          { titulo: '3. Desprotonação', texto: 'Outra molécula de água retira um H⁺ do oxônio e o álcool fica neutro.',
+            de: 'CC(C)(C)[O+]([H])[H].O', coords: [[0,1],[0,0],[0,-1],[-1,0],[1,0],[1.5,0.87],[1.5,-0.87],[3.3,1.3]], setas: [{ de: { par: 7 }, para: { atom: 5 }, lado: 1 }, { de: { lig: [4, 5] }, para: { atom: 4 }, lado: 1 }], para: 'CC(C)(C)O.[OH3+]' },
+        ] },
       { k: 'l', titulo: 'Para lembrar', itens: [
         'SN1 = 3º + solvólise + racêmico.',
         'Passou por cátion? Procure um rearranjo antes do ataque do Nu.',
@@ -172,6 +188,12 @@ window.GUIAS = [
           ['Grupo abandonador ruim (F⁻, ⁺NR₃)', '<b>Hofmann</b>', { s: 'C=C(C)CC' }],
         ],
         nota: 'Substrato: 2-bromo-2-metilbutano. A base volumosa só alcança o H menos impedido.' },
+      { k: 'm', titulo: 'Mecanismo com setas',
+        nota: 'As setas mostram o caminho dos elétrons; tudo acontece de uma vez, com H e Br em posição anti.',
+        passos: [
+          { titulo: 'Eliminação concertada', texto: 'A base retira o H β, os elétrons da ligação C–H formam a ligação π e o bromo sai levando o par da ligação C–Br.',
+            de: '[OH-].[H]CC(C)Br', coords: [[-2.4,1.5],[-0.5,0.87],[0,0],[1,0],[1.5,0.87],[1.5,-0.87]], setas: [{ de: { par: 0 }, para: { atom: 1 }, lado: 1 }, { de: { lig: [1, 2] }, para: { lig: [2, 3] }, lado: -1, curva: 2.4 }, { de: { lig: [3, 5] }, para: { atom: 5 }, lado: -1 }], para: 'C=CC.O.[Br-]' },
+        ] },
       { k: 'l', titulo: 'Para lembrar', itens: [
         'E2 = base forte + H anti + calor.',
         'Zaitsev, a não ser que a base seja volumosa ou o GA seja ruim.',
@@ -212,6 +234,14 @@ window.GUIAS = [
           [{ s: 'CCO' }, { s: 'C=C' }, '1º: ~170 °C (via E2 no oxônio)'],
         ],
         nota: 'Reatividade: 3º > 2º > 1º, a ordem de estabilidade do cátion. O OH vira bom grupo abandonador por protonação (H₂O⁺).' },
+      { k: 'm', titulo: 'Mecanismo com setas',
+        nota: 'As setas mostram o caminho dos elétrons, na ordem em que acontecem.',
+        passos: [
+          { titulo: '1. Ionização (etapa lenta)', texto: 'Igual à SN1: o bromo sai com os elétrons da ligação e forma o carbocátion.',
+            de: 'CC(C)(C)Br', setas: [{ de: { lig: [1, 4] }, para: { atom: 4 }, lado: -1 }], para: 'C[C+](C)C.[Br-]' },
+          { titulo: '2. Perda de H⁺ β', texto: 'O solvente retira um H do carbono vizinho e os elétrons dessa ligação formam a ligação π.',
+            de: '[H]C[C+](C)C.O', coords: [[-0.5,0.87],[0,0],[1,0],[1.5,0.87],[1.5,-0.87],[-2.4,1.5]], setas: [{ de: { par: 5 }, para: { atom: 0 }, lado: 1 }, { de: { lig: [0, 1] }, para: { lig: [1, 2] }, lado: -1, curva: 2.4 }], para: 'C=C(C)C.[OH3+]' },
+        ] },
       { k: 'l', titulo: 'Para lembrar', itens: [
         'E1 = 3º + base fraca + calor.',
         'Mesmos cátions da SN1: cuide do rearranjo.',
@@ -255,6 +285,18 @@ window.GUIAS = [
           ['<b>Sem</b> rearranjo', 'Hg(OAc)₂ · BH₃ · X₂ (bromônio) · H₂/Pd · OsO₄ · mCPBA'],
           ['<b>Com</b> possível rearranjo', 'HX · H₂O/H⁺ (passam por carbocátion)'],
         ] },
+      { k: 'm', titulo: 'Mecanismo com setas',
+        nota: 'As setas mostram o caminho dos elétrons, na ordem em que acontecem.',
+        passos: [
+          { titulo: 'HBr: 1. Protonação da ligação π', texto: 'A ligação π ataca o H e a ligação H–Br vai para o bromo. O H fica no carbono menos substituído e o cátion no mais substituído (Markovnikov).',
+            de: 'C=CC.[H]Br', coords: [[0,0],[1,0],[1.5,-0.87],[0,2.0],[1.1,2.0]], setas: [{ de: { lig: [0, 1] }, para: { atom: 3 }, lado: 1 }, { de: { lig: [3, 4] }, para: { atom: 4 }, lado: 1 }], para: 'C[CH+]C.[Br-]' },
+          { titulo: 'HBr: 2. Captura pelo brometo', texto: 'Um par de elétrons do Br⁻ forma a ligação com o carbocátion.',
+            de: 'C[CH+]C.[Br-]', coords: [[-0.87,-0.5],[0,0],[0.87,-0.5],[0,2.3]], setas: [{ de: { par: 3 }, para: { atom: 1 }, lado: 1 }], para: 'CC(C)Br' },
+          { titulo: 'Br₂: 1. Íon bromônio', texto: 'A ligação π ataca um bromo e a ligação Br–Br quebra: forma-se o íon bromônio em ponte.',
+            de: 'C=C.BrBr', coords: [[0,0],[1,0],[-0.1,2.0],[1.0,2.0]], setas: [{ de: { lig: [0, 1] }, para: { atom: 2 }, lado: 1 }, { de: { lig: [2, 3] }, para: { atom: 3 }, lado: 1 }], para: 'C1C[Br+]1.[Br-]' },
+          { titulo: 'Br₂: 2. Abertura anti', texto: 'O Br⁻ ataca o carbono pelo lado oposto ao bromônio, que abre o anel: adição anti.',
+            de: 'C1C[Br+]1.[Br-]', coords: [[0,0],[1,0],[0.5,0.95],[0.2,-2.2]], setas: [{ de: { par: 3 }, para: { atom: 0 }, lado: 1 }, { de: { lig: [0, 2] }, para: { atom: 2 }, lado: 1 }], para: 'BrCCBr' },
+        ] },
       { k: 'l', titulo: 'Para lembrar', itens: [
         'Markovnikov: o H vai para o carbono que já tem mais H.',
         'Quer álcool Markovnikov sem rearranjo? Oximercuração-desmercuração. Anti-Markovnikov? Hidroboração-oxidação.',
@@ -284,6 +326,12 @@ window.GUIAS = [
           ['HX e H₂O/H⁺ em alcenos', 'Oximercuração e hidroboração'],
           ['Desidratação ácida de álcoois', 'Halogenação (íon bromônio)'],
           ['Solvólise de tosilatos e haletos 2º/3º', 'Hidrogenação, OsO₄, mCPBA'],
+        ] },
+      { k: 'm', titulo: 'Mecanismo com setas',
+        nota: 'A seta mostra o hidrogênio migrando, com seu par de elétrons, para o carbono positivo vizinho.',
+        passos: [
+          { titulo: 'Migração 1,2 de hidreto', texto: 'O par de elétrons da ligação C–H se desloca para o carbono vizinho positivo: a carga passa de 2º para 3º, mais estável.',
+            de: 'C[CH+]C([H])(C)C', coords: [[-0.87,-0.5],[0,0],[1,0],[1,1],[2,0],[1,-1]], setas: [{ de: { lig: [2, 3] }, para: { atom: 1 }, lado: 1 }], para: 'CC[C+](C)C' },
         ] },
       { k: 'l', titulo: 'Para lembrar', itens: [
         'Pergunta-chave: o carbono vizinho ao cátion tem um H ou CH₃ que levaria a um cátion mais estável?',

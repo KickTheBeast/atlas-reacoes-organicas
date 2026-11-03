@@ -46,6 +46,15 @@
   }
 
   // ---------- estruturas ----------
+  // As setas de elétrons só animam enquanto o esquema está na tela (poupa bateria)
+  // (a animação SMIL do elétron é reiniciada junto com a do CSS e pausada quando sai da tela)
+  const setaAnim = (el, ligada) => {
+    const sv = el.querySelector('svg');
+    if (ligada) { sv && sv.setCurrentTime && sv.setCurrentTime(0); sv && sv.unpauseAnimations && sv.unpauseAnimations(); }
+    else sv && sv.pauseAnimations && sv.pauseAnimations();
+    el.classList.toggle('anima', ligada);
+  };
+  const ioSetas = 'IntersectionObserver' in window ? new IntersectionObserver((es) => es.forEach((e) => setaAnim(e.target, e.isIntersecting)), { threshold: 0.35 }) : null;
   function hidrata(raiz) {
     raiz.querySelectorAll('.tile[data-m]').forEach((el) => {
       if (!S) return;
@@ -54,6 +63,7 @@
       if (!svg) { el.classList.replace('carrega', 'erro'); el.textContent = 'estrutura indisponível'; return; }
       el.classList.remove('carrega');
       el.innerHTML = svg;
+      if (svg.includes('seta-c')) { el.classList.add('com-setas'); ioSetas ? ioSetas.observe(el) : el.classList.add('anima'); }
       const w = parseFloat((/viewBox='[\d.\-]+ [\d.\-]+ ([\d.]+)/.exec(svg) || [])[1]) || 160;
       el.style.setProperty('--w', Math.round(w));
     });
@@ -170,6 +180,8 @@
 
   const tabelaPadrao = (b) => `<div class="cartao tabela sobe"><h3 class="tb-titulo">${esc(b.t)}</h3><div class="tb-wrap"><table class="tb"><thead><tr>${b.cols.map((c) => `<th>${c}</th>`).join('')}</tr></thead><tbody>${b.rows.map((l) => `<tr>${l.map((c, i) => (i === 0 ? '<th scope="row">' : '<td>') + celulaHtml(c) + (i === 0 ? '</th>' : '</td>')).join('')}</tr>`).join('')}</tbody></table></div><div class="tb-dica" hidden>deslize para ver mais <span class="nudge">→</span></div>${b.nota ? `<p class="tb-nota">${esc(b.nota)}</p>` : ''}</div>`;
 
+  const mecHtml = (b) => `<div class="cartao mec sobe"><h3 class="tb-titulo">${esc(b.t)}</h3>${b.nota ? `<p class="mec-nota">${esc(b.nota)}</p>` : ''}
+    <div class="mec-passos">${b.passos.map((p, i) => `<div class="passo sobe" style="--i:${i}"><div class="n">${i + 1}</div><h4>${esc(p.t.replace(/^\d+\.\s*/, ''))}</h4><p>${esc(p.x)}</p><div class="lado">${tile(p.r, 0)}<span class="vai">→</span>${tile(p.p, 1)}</div></div>`).join('')}</div></div>`;
   const tabelaHtml = (b) => (b.cols.length === 3 && b.cols[0] === 'Fator' ? fatoresHtml(b) : b.cols.length === 2 && b.cols[0] === 'Propriedade' ? kvHtml(b) : tabelaPadrao(b));
 
   function telaGuia(id) {
@@ -179,6 +191,7 @@
     const primeira = g.id === 'decisao' ? g.bl.find((b) => b.k === 't') : null;
     const blocos = g.bl.map((b) => b.k === 'l'
       ? `<div class="cartao dicas sobe"><h3 class="tb-titulo">${esc(b.t)}</h3><ul>${b.itens.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>`
+      : b.k === 'm' ? mecHtml(b)
       : (b === primeira ? seletorHtml(b) : '') + tabelaHtml(b)).join('');
     const ver = g.cats.filter((c) => nomes.mec[c]).map((c) => `<a class="btn" href="#/mec/${c}">Ver reações de ${esc(nomes.mec[c])}<span class="n">${D.categorias.find((x) => x.id === c).n}</span></a>`).join('');
     return {
@@ -656,7 +669,7 @@
     const tl = t.closest('.tile');
     if (tl && tl.querySelector('svg') && !zoom.contains(tl)) abreZoom(tl);
   });
-  function abreZoom(tl) { zoomConteudo.innerHTML = tl.innerHTML; zoomConteudo.style.setProperty('--w', tl.style.getPropertyValue('--w') || 200); zoom.hidden = false;
+  function abreZoom(tl) { zoomConteudo.innerHTML = tl.innerHTML; zoomConteudo.classList.toggle('anima', tl.classList.contains('com-setas')); zoomConteudo.style.setProperty('--w', tl.style.getPropertyValue('--w') || 200); zoom.hidden = false;
     if (usaMotion) { M.animate(zoom, { opacity: [0, 1] }, { duration: 0.2 }); M.animate(zoomConteudo, { opacity: [0, 1], scale: [0.8, 1] }, { type: 'spring', stiffness: 340, damping: 24 }); } }
   function fechaZoom() { zoom.hidden = true; zoomConteudo.innerHTML = ''; }
   zoom.addEventListener('click', fechaZoom);

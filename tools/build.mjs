@@ -13,6 +13,7 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import initRDKit from '@rdkit/rdkit';
 import sharp from 'sharp';
+import { lerMolblock, posicoesAtomos, marcarSetas } from './setas.mjs';
 
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FONTE = path.join(raiz, 'fonte');
@@ -70,6 +71,20 @@ function classeDe(style) {
 const svgPorSmiles = new Map();
 const svgs = {};
 const falhas = [];
+const OPCOES_SVG = JSON.stringify({
+  width: -1, height: -1, fixedBondLength: 26, bondLineWidth: 1.8, padding: 0.06,
+  clearBackground: false, baseFontSize: 0.6, additionalAtomLabelPadding: 0.1,
+  comicMode: false, addStereoAnnotation: false,
+});
+function limpaSvg(s) {
+  return s
+    .replace(/^[\s\S]*?<!-- END OF HEADER -->\s*/, '')
+    .replace(/<\/svg>\s*$/, '')
+    .replace(/<rect[^>]*\/>\s*/, '')
+    .replace(/ class='[^']*'/g, '')
+    .replace(/ style='([^']*)'/g, (_, st) => ` class='${classeDe(st)}'`)
+    .replace(/\s+/g, ' ');
+}
 function desenhar(smiles) {
   if (svgPorSmiles.has(smiles)) return svgPorSmiles.get(smiles);
   const id = 'm' + svgPorSmiles.size.toString(36);
@@ -78,21 +93,42 @@ function desenhar(smiles) {
   try { mol = RDKit.get_mol(smiles); } catch { mol = null; }
   if (!mol || !mol.is_valid()) { falhas.push(smiles); svgs[id] = null; mol?.delete(); return id; }
   try { mol.normalize_depiction(); } catch { /* segue com as coordenadas padrão */ }
-  let s = mol.get_svg_with_highlights(JSON.stringify({
-    width: -1, height: -1, fixedBondLength: 26, bondLineWidth: 1.8, padding: 0.06,
-    clearBackground: false, baseFontSize: 0.6, additionalAtomLabelPadding: 0.1,
-    comicMode: false, addStereoAnnotation: false,
-  }));
+  const s = mol.get_svg_with_highlights(OPCOES_SVG);
   mol.delete();
   const vb = /viewBox='([^']+)'/.exec(s)?.[1] || '0 0 200 150';
-  const corpo = s
-    .replace(/^[\s\S]*?<!-- END OF HEADER -->\s*/, '')
-    .replace(/<\/svg>\s*$/, '')
-    .replace(/<rect[^>]*\/>\s*/, '')
-    .replace(/ class='[^']*'/g, '')
-    .replace(/ style='([^']*)'/g, (_, st) => ` class='${classeDe(st)}'`)
-    .replace(/\s+/g, ' ');
-  svgs[id] = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${vb}'>${corpo}</svg>`;
+  svgs[id] = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${vb}'>${limpaSvg(s)}</svg>`;
+  return id;
+}
+
+// Estrutura com setas de elétrons (animáveis), posicionadas pelas coordenadas reais dos átomos.
+const avisosSetas = [];
+function desenharComSetas(smiles, setas, coords) {
+  const chave = 'setas|' + smiles + '|' + JSON.stringify(setas) + JSON.stringify(coords || null);
+  if (svgPorSmiles.has(chave)) return svgPorSmiles.get(chave);
+  const id = 'm' + svgPorSmiles.size.toString(36);
+  svgPorSmiles.set(chave, id);
+  let mol = RDKit.get_mol(smiles, JSON.stringify({ removeHs: false }));
+  if (!mol || !mol.is_valid()) { falhas.push(smiles); svgs[id] = null; mol?.delete(); return id; }
+  mol.set_new_coords();
+  if (coords) { // disposição escolhida à mão: troca as coordenadas no molblock e recarrega
+    const l = mol.get_molblock().split('\n');
+    const n = parseInt(l[3].slice(0, 3));
+    if (coords.length !== n) avisosSetas.push(`${smiles}: ${coords.length} coordenadas para ${n} átomos`);
+    for (let k = 0; k < Math.min(n, coords.length); k++) {
+      l[4 + k] = (coords[k][0] * 1.5).toFixed(4).padStart(10) + (coords[k][1] * 1.5).toFixed(4).padStart(10) + '    0.0000' + l[4 + k].slice(30);
+    }
+    mol.delete();
+    mol = RDKit.get_mol(l.join('\n'), JSON.stringify({ removeHs: false }));
+  } else mol.normalize_depiction();
+  const mb = lerMolblock(mol.get_molblock());
+  const s = mol.get_svg_with_highlights(OPCOES_SVG);
+  mol.delete();
+  const { pos, rotulados } = posicoesAtomos(s, mb);
+  const { svg: marcas, ext, avisos } = marcarSetas(pos, rotulados, mb.ligacoes, setas);
+  avisos.forEach((a) => avisosSetas.push(`${smiles}: ${a}`));
+  const [vx, vy, vw, vh] = (/viewBox='([^']+)'/.exec(s)?.[1] || '0 0 200 150').split(/\s+/).map(Number);
+  const x0 = Math.min(vx, ext[0] - 8), y0 = Math.min(vy, ext[1] - 8), x1 = Math.max(vx + vw, ext[2] + 8), y1 = Math.max(vy + vh, ext[3] + 8);
+  svgs[id] = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${x0.toFixed(1)} ${y0.toFixed(1)} ${(x1 - x0).toFixed(1)} ${(y1 - y0).toFixed(1)}'>${limpaSvg(s)}${marcas}</svg>`;
   return id;
 }
 
@@ -244,7 +280,8 @@ const celula = (c) => Array.isArray(c) ? c.map(celula) : (c && typeof c === 'obj
 const guias = GUIAS.map((g) => ({
   id: g.id, curto: g.curto, topo: g.topo || '', t: g.titulo, sub: g.sub, cats: g.cats, intro: g.intro,
   esq: { r: g.esquema.r.map(desenhar), rg: g.esquema.rg, cd: g.esquema.cd, p: g.esquema.p.map(desenhar), leg: g.esquema.leg },
-  bl: g.blocos.map((b) => b.k === 'l' ? { k: 'l', t: b.titulo, itens: b.itens } :
+  bl: g.blocos.map((b) => b.k === 'l' ? { k: 'l', t: b.titulo, itens: b.itens } : b.k === 'm' ?
+    { k: 'm', t: b.titulo, nota: b.nota || '', passos: b.passos.map((p) => ({ t: p.titulo, x: p.texto, r: desenharComSetas(p.de, p.setas, p.coords), p: desenhar(p.para) })) } :
     { k: 't', t: b.titulo, cols: b.cols, rows: b.rows.map((l) => l.map(celula)), nota: b.nota || '', ord: b.ordens || null }),
 }));
 
@@ -294,6 +331,7 @@ for (const [nome, t] of [['icone-192.png', 192], ['icone-512.png', 512], ['apple
 const kb = (s) => Math.round(Buffer.byteLength(s) / 1024);
 console.log(`build ${build}: ${reacoes.length} reações, ${svgPorSmiles.size} estruturas`);
 console.log(`dados.json ${kb(dadosTxt)} KB · svgs.json ${kb(svgsTxt)} KB · estilos ${estilos.size}`);
+if (avisosSetas.length) console.log('AVISOS DE SETAS:', avisosSetas);
 console.log(`SMILES que o RDKit não leu (${falhas.length}):`, falhas.slice(0, 40));
 console.log('Nu:', dados.nucleofilos.map((x) => `${x.nome}=${x.n}`).join(' | '));
 console.log('El:', dados.eletrofilos.map((x) => `${x.nome}=${x.n}`).join(' | '));
