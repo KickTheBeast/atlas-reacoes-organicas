@@ -231,21 +231,32 @@ a.etq{transition:transform .15s}a.etq:active{transform:scale(.92)}
 .sel-info{margin:6px 0 0;font-size:.85rem;color:var(--mut);line-height:1.45}
 .sel-info b{color:var(--ink)}
 
-/* easter egg: créditos em tela cheia */
+/* easter egg: créditos em tela cheia (cartaz em papel) */
 .rodape .avatar{display:block;width:54px;height:54px;padding:0;border:1px solid var(--bd);background:#fff;margin:0 auto 10px;border-radius:50%;overflow:hidden;transition:transform .2s}
 .rodape .avatar:active{transform:scale(.9)}
 .avatar img{display:block;width:100%;height:100%;object-fit:contain;padding:5px}
-.creditos{position:fixed;inset:0;z-index:70;background:#fff;color:#111;touch-action:none;display:flex;align-items:center;justify-content:center;text-align:center;padding:max(24px,env(safe-area-inset-top)) 24px max(24px,env(safe-area-inset-bottom));cursor:pointer}
-.cr-conteudo{display:flex;flex-direction:column;align-items:center;gap:clamp(10px,3vh,26px);width:100%;max-width:480px}
-.cr-peq{margin:0;font:900 clamp(15px,4.4vw,20px)/1 Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif;letter-spacing:.22em;text-transform:uppercase}
-.dv-caixa{width:min(88vw,450px);touch-action:none}
+.creditos{position:fixed;inset:0;z-index:70;background:#f6f3ec;color:#111;touch-action:none;user-select:none;-webkit-user-select:none;display:flex;align-items:center;justify-content:center;text-align:center;padding:max(18px,env(safe-area-inset-top)) 20px max(18px,env(safe-area-inset-bottom));overflow:hidden}
+.cr-defs{position:absolute;width:0;height:0}
+.cr-papel{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.cr-conteudo{position:relative;display:flex;flex-direction:column;align-items:center;gap:clamp(6px,1.6vh,16px);width:100%;max-width:480px}
+.cr-topo{position:relative;display:flex;flex-direction:column;align-items:center;width:100%}
+.cr-peq{margin:0;font:900 clamp(14px,4vw,19px)/1 Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif;letter-spacing:.24em;text-transform:uppercase}
+.cr-mutano{margin:2px 0 0;font:900 clamp(68px,24vw,116px)/.92 Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif;letter-spacing:-.005em;transform:rotate(-3deg);filter:url(#cr-fio)}
+.cr-mutano div{display:inline-block}
+.cr-zz{display:block;width:min(78vw,340px);height:16px;margin-top:2px;transform:rotate(-3deg);overflow:visible}
+.cr-zz path{fill:none;stroke:#ee1c25;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+.dv-caixa{width:min(78vw,400px);touch-action:none}
 .dv{display:block;width:100%;height:auto;overflow:visible}
 .dv .v-red{fill:var(--vermelho,#f60507);stroke:none}
 .dv .v-traco{fill:none;stroke:#111}
-.rawr{position:absolute;z-index:5;pointer-events:none;white-space:nowrap;font:900 clamp(34px,11vw,64px)/1 Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif;text-transform:uppercase;letter-spacing:.02em}
-.cr-img{display:block;width:min(86vw,440px);max-height:52vh;object-fit:contain;mix-blend-mode:multiply;-webkit-user-drag:none;user-select:none}
-.cr-msg{margin:0;font:900 clamp(30px,9.4vw,52px)/1.04 Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif;text-transform:uppercase;letter-spacing:.01em}
-.cr-fechar{position:absolute;right:max(10px,env(safe-area-inset-right));top:calc(10px + var(--top));width:56px;height:56px;display:grid;place-items:center}
+.cr-img{display:block;width:min(78vw,400px);max-height:44vh;object-fit:contain;mix-blend-mode:multiply;-webkit-user-drag:none}
+.cr-msg{margin:0;font:900 clamp(26px,8.4vw,46px)/1.04 Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif;text-transform:uppercase;letter-spacing:.01em}
+.cr-contagem{display:flex;align-items:center;justify-content:center;gap:16px;min-height:60px}
+.cr-tally{width:min(52vw,220px);height:auto;overflow:visible;filter:url(#cr-fio)}
+.t-risco{fill:none;stroke:#111;stroke-width:4.4;stroke-linecap:round}
+.cr-n{font:900 34px/1 Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif;letter-spacing:.02em;min-width:2.4ch;text-align:left;display:inline-block}
+.cr-marco{margin:0;min-height:1.2em;font:900 15px/1.2 Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif;letter-spacing:.08em;opacity:0}
+.cr-fechar{position:absolute;right:max(10px,env(safe-area-inset-right));top:calc(10px + var(--top));width:56px;height:56px;display:grid;place-items:center;z-index:3}
 .cr-fechar svg{width:30px;height:30px;fill:none;stroke:#111;stroke-width:4.5;stroke-linecap:round}
 
 /* busca */

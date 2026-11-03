@@ -446,18 +446,25 @@
     const tr = (g) => V.tracos.filter((t) => t.g === g).map((t) => `<path class="v-traco" d="${t.d}" stroke-width="${t.w}"/>`).join('');
     const parte = (nome) => `<path class="v-red" d="${V.vermelho[nome]}" fill-rule="evenodd"/>`;
     return `<svg class="dv" viewBox="0 0 ${V.w} ${V.h}" role="img" aria-label="Dinossauro vermelho" fill="none" stroke="#111" stroke-linecap="round" stroke-linejoin="round" style="--vermelho:${V.cor}">
-      <g class="dv-par"><g class="dv-raiz">
+      <g class="dv-par"><g class="dv-baixa"><g class="dv-raiz">
         ${parte('corpo')}
         <g class="p-cauda">${parte('cauda')}${tr('cauda')}</g>
         <g class="p-braco">${parte('braco')}${tr('braco')}</g>
         <g class="g-corpo">${tr('corpo')}${tr('bracoE')}</g>
         <g class="g-espinhos">${tr('espinhos')}</g>
         <g class="g-garras">${tr('garrasE')}${tr('garrasD')}</g>
-        <g class="p-cabeca">${parte('cabeca')}${tr('cabeca')}
-          <g class="dv-olho"><ellipse cx="500" cy="104" rx="10" ry="4.6" fill="#ffd9e0" stroke="none"/><circle class="dv-pupila" cx="502" cy="104" r="2.6" fill="#111" stroke="none"/></g>
-        </g>
-      </g></g></svg>`;
+        <g class="p-cabeca">${parte('cabeca')}${tr('cabeca')}</g>
+      </g></g></g></svg>`;
   }
+
+  // Título em estilo de cartaz: FEITO POR / MUTANO grande com zigue-zague vermelho
+  const zigue = (() => { let d = 'M4 17'; for (let k = 0; k < 13; k++) d += ` L${4 + 24 * (k + 1)} ${k % 2 ? 17 : 5}`; return d; })();
+  const CABECALHO = `<div class="cr-topo"><p class="cr-peq">Feito por</p><h2 class="cr-mutano">MUTANO</h2><svg class="cr-zz" viewBox="0 0 320 22" preserveAspectRatio="none" aria-hidden="true"><path d="${zigue}"/></svg></div>`;
+  const FILTROS = `<svg class="cr-defs" width="0" height="0" aria-hidden="true"><defs>
+    <filter id="cr-fio" x="-5%" y="-10%" width="110%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="5" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="G" yChannelSelector="R"/></filter>
+    <filter id="cr-papel" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="2"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 -.18"/></filter></defs></svg>
+    <svg class="cr-papel" preserveAspectRatio="none" aria-hidden="true"><rect width="100%" height="100%" filter="url(#cr-papel)" opacity=".55"/></svg>`;
+  const MARCOS = { 10: '10 CARINHOS. AGORA SOMOS AMIGOS.', 25: 'PROVA DE ORGÂNICA II? PODE VIR.', 50: 'MUTANO APROVA.', 100: 'LENDA DO CARINHO.' };
 
   function abreCreditos(ev) {
     if (creditosEl) return;
@@ -471,110 +478,139 @@
 
   function montaCreditos(V, origem) {
     const gsap = window.gsap, SplitText = window.SplitText;
+    let n = guarda.ler('atlas.carinhos', 0);
     const el = document.createElement('div');
     el.className = 'creditos';
     el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Créditos');
-    el.innerHTML = `<button class="cr-fechar" aria-label="Fechar"><svg viewBox="0 0 40 40"><path d="M8 9 L32 31 M31 8 L9 33" /></svg></button>
-      <div class="cr-conteudo"><p class="cr-peq">Feito por Mutano</p><div class="dv-caixa">${dinoSvg(V)}</div><h2 class="cr-msg">Boa prova de<br>Química Orgânica II</h2></div>`;
+    el.innerHTML = `${FILTROS}<button class="cr-fechar" aria-label="Fechar"><svg viewBox="0 0 40 40"><path d="M8 9 L32 31 M31 8 L9 33" /></svg></button>
+      <div class="cr-conteudo">${CABECALHO}
+        <div class="dv-caixa">${dinoSvg(V)}</div>
+        <h2 class="cr-msg">Boa prova de<br>Química Orgânica II</h2>
+        <div class="cr-contagem"><svg class="cr-tally" viewBox="0 0 240 60" aria-hidden="true"><g class="tally"></g></svg><span class="cr-n">×${n}</span></div>
+        <p class="cr-marco" aria-live="polite"></p>
+      </div>`;
     document.body.appendChild(el);
     creditosEl = el;
     document.body.style.overflow = 'hidden';
     const q = (s) => el.querySelector(s), qa = (s) => [...el.querySelectorAll(s)];
-    const caixa = q('.cr-conteudo'), raiz = q('.dv-raiz'), par = q('.dv-par');
-    const vermelhos = qa('.v-red'), tracos = qa('.v-traco'), espinhos = qa('.g-espinhos .v-traco'), garras = qa('.g-garras .v-traco');
-    const pupila = q('.dv-pupila'), olho = q('.dv-olho');
+    const caixa = q('.cr-conteudo'), raiz = q('.dv-raiz'), par = q('.dv-par'), baixa = q('.dv-baixa');
+    const vermelhos = qa('.v-red'), tracos = qa('.v-traco');
+    const cauda = q('.p-cauda'), cabeca = q('.p-cabeca'), braco = q('.p-braco');
     const PIV = { cauda: '190 340', cabeca: '410 130', braco: '462 230', base: '300 630', centro: '300 420' };
     const raio = Math.hypot(Math.max(origem[0], innerWidth - origem[0]), Math.max(origem[1], innerHeight - origem[1]));
-    const split = SplitText.create(q('.cr-msg'), { type: 'chars', mask: 'chars', aria: 'auto' });
+    const splitMsg = SplitText.create(q('.cr-msg'), { type: 'chars', mask: 'chars', aria: 'auto' });
+    const splitNome = SplitText.create(q('.cr-mutano'), { type: 'chars', aria: 'auto' });
+    const zz = q('.cr-zz path'), peq = q('.cr-peq'), contagem = q('.cr-contagem');
+
+    // ---- contagem em risquinhos de cinco ----
+    const tally = q('.tally');
+    const MAXR = 40;
+    const risco = (k) => {
+      const grupo = Math.floor(k / 5), pos = k % 5, x0 = 10 + (grupo % 5) * 46, y0 = 6 + Math.floor(grupo / 5) * 28;
+      const d = pos < 4 ? `M${x0 + pos * 8} ${y0 + 2} l${(k % 3) - 1} 21` : `M${x0 - 5} ${y0 + 20} L${x0 + 30} ${y0 + 5}`;
+      const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      p.setAttribute('d', d); p.setAttribute('class', 't-risco');
+      tally.appendChild(p);
+      return p;
+    };
+    const iniciais = [];
+    for (let k = 0; k < Math.min(n, MAXR); k++) iniciais.push(risco(k));
+    const numEl = q('.cr-n'), numEstado = { v: n };
+    const mostraNum = () => { numEl.textContent = '×' + Math.round(numEstado.v); };
 
     // ---- entrada ----
-    gsap.set(vermelhos, { opacity: 0, scale: 0.84, svgOrigin: PIV.centro });
+    gsap.set(vermelhos, { opacity: 0, scale: 0.86, svgOrigin: PIV.centro });
     gsap.set(tracos, { drawSVG: '0%' });
-    gsap.set(olho, { opacity: 0 });
-    gsap.set(q('.cr-peq'), { opacity: 0, letterSpacing: '0.7em' });
-    gsap.set(split.chars, { yPercent: 115, opacity: 0 });
+    gsap.set(splitNome.chars, { yPercent: 130, rotation: () => gsap.utils.random(-14, 14), opacity: 0 });
+    gsap.set(zz, { drawSVG: '0%' });
+    gsap.set(peq, { opacity: 0, letterSpacing: '0.7em' });
+    gsap.set(splitMsg.chars, { yPercent: 115, opacity: 0 });
+    gsap.set([contagem, ...iniciais], { opacity: 0 });
+    gsap.set(iniciais, { drawSVG: '0%' });
     const intro = gsap.timeline({ onComplete: idle });
     intro
       .fromTo(el, { clipPath: `circle(0px at ${origem[0]}px ${origem[1]}px)` }, { clipPath: `circle(${raio + 40}px at ${origem[0]}px ${origem[1]}px)`, duration: 0.85, ease: 'power3.inOut' })
-      .to(vermelhos, { opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.6)', stagger: 0.09 }, 0.4)
-      .to(tracos, { drawSVG: '100%', duration: () => gsap.utils.random(0.28, 0.6), ease: 'power1.inOut', stagger: { each: 0.032, from: 'start' } }, 0.95)
-      .to(olho, { opacity: 1, duration: 0.25 }, 1.9)
-      .to(q('.cr-peq'), { opacity: 1, letterSpacing: '0.22em', duration: 0.9, ease: 'power3.out' }, 0.7)
-      .to(split.chars, { yPercent: 0, opacity: 1, duration: 0.7, ease: 'back.out(1.8)', stagger: { each: 0.024, from: 'start' } }, 1.35);
+      .to(peq, { opacity: 1, letterSpacing: '0.24em', duration: 0.9, ease: 'power3.out' }, 0.55)
+      .to(splitNome.chars, { yPercent: 0, rotation: 0, opacity: 1, duration: 0.85, ease: 'back.out(2.2)', stagger: { each: 0.06, from: 'start' } }, 0.6)
+      .to(zz, { drawSVG: '100%', duration: 0.7, ease: 'power2.inOut' }, 1.05)
+      .to(vermelhos, { opacity: 1, scale: 1, duration: 0.85, ease: 'back.out(1.5)', stagger: 0.09 }, 0.8)
+      .to(tracos, { drawSVG: '100%', duration: () => gsap.utils.random(0.28, 0.6), ease: 'power1.inOut', stagger: { each: 0.03, from: 'start' } }, 1.3)
+      .to(splitMsg.chars, { yPercent: 0, opacity: 1, duration: 0.7, ease: 'back.out(1.8)', stagger: { each: 0.022, from: 'start' } }, 1.75)
+      .to(contagem, { opacity: 1, duration: 0.3 }, 2.1)
+      .to(iniciais, { opacity: 1, drawSVG: '100%', duration: 0.3, stagger: 0.02, ease: 'power2.out' }, 2.15);
 
-    // ---- vida: respira, balança o rabo, pisca, os traços "fervem" como em desenho animado ----
-    let vivo = false, fervura, piscaCall;
+    // ---- vida: respira, balança o rabo e a cabeça; as linhas "fervem" como em desenho animado ----
+    let vivo = false, fervura;
     const idleTL = gsap.timeline({ paused: true });
     function idle() {
       vivo = true;
-      idleTL.clear();
       idleTL.to(raiz, { scaleY: 1.013, svgOrigin: PIV.base, duration: 2.4, ease: 'sine.inOut', repeat: -1, yoyo: true }, 0)
-        .to(q('.p-cauda'), { rotation: 3, svgOrigin: PIV.cauda, duration: 2.1, ease: 'sine.inOut', repeat: -1, yoyo: true }, 0)
-        .fromTo(q('.p-cabeca'), { rotation: -1.4 }, { rotation: 1.4, svgOrigin: PIV.cabeca, duration: 3, ease: 'sine.inOut', repeat: -1, yoyo: true }, 0)
-        .fromTo(q('.p-braco'), { rotation: -3 }, { rotation: 4, svgOrigin: PIV.braco, duration: 1.9, ease: 'sine.inOut', repeat: -1, yoyo: true }, 0)
+        .to(cauda, { rotation: 3, svgOrigin: PIV.cauda, duration: 2.1, ease: 'sine.inOut', repeat: -1, yoyo: true }, 0)
+        .fromTo(cabeca, { rotation: -1.4 }, { rotation: 1.4, svgOrigin: PIV.cabeca, duration: 3, ease: 'sine.inOut', repeat: -1, yoyo: true }, 0)
+        .fromTo(braco, { rotation: -3 }, { rotation: 4, svgOrigin: PIV.braco, duration: 1.9, ease: 'sine.inOut', repeat: -1, yoyo: true }, 0)
         .play();
-      const ferve = () => { gsap.set(tracos, { x: () => gsap.utils.random(-0.8, 0.8), y: () => gsap.utils.random(-0.8, 0.8) }); fervura = gsap.delayedCall(0.17, ferve); };
+      const ferve = () => { gsap.set(tracos, { x: () => gsap.utils.random(-0.7, 0.7), y: () => gsap.utils.random(-0.7, 0.7) }); fervura = gsap.delayedCall(0.18, ferve); };
       ferve();
-      const pisca = () => { gsap.fromTo(olho, { scaleY: 1 }, { scaleY: 0.08, svgOrigin: '500 104', duration: 0.07, yoyo: true, repeat: 1 }); piscaCall = gsap.delayedCall(gsap.utils.random(2.2, 5), pisca); };
-      piscaCall = gsap.delayedCall(2, pisca);
     }
 
-    // ---- segue o dedo: o bicho inclina para o lado e a pupila acompanha ----
-    const px = gsap.quickTo(par, 'x', { duration: 0.8, ease: 'power3' }), py = gsap.quickTo(par, 'y', { duration: 0.8, ease: 'power3' });
-    const pr = gsap.quickTo(par, 'rotation', { duration: 1, ease: 'power3', svgOrigin: PIV.base });
-    const ppx = gsap.quickTo(pupila, 'x', { duration: 0.35, ease: 'power2' }), ppy = gsap.quickTo(pupila, 'y', { duration: 0.35, ease: 'power2' });
-    const segue = (e) => {
+    // ---- inclina de leve para o lado do dedo ----
+    const px = gsap.quickTo(par, 'x', { duration: 0.9, ease: 'power3' }), py = gsap.quickTo(par, 'y', { duration: 0.9, ease: 'power3' });
+    const pr = gsap.quickTo(par, 'rotation', { duration: 1.1, ease: 'power3', svgOrigin: PIV.base });
+    el.addEventListener('pointermove', (e) => {
       const nx = (e.clientX / innerWidth - 0.5) * 2, ny = (e.clientY / innerHeight - 0.5) * 2;
-      px(nx * 9); py(ny * 5); pr(nx * 1.4); ppx(nx * 3); ppy(ny * 1.6);
-    };
+      px(nx * 7); py(ny * 4); pr(nx * 1.1);
+    });
 
-    // ---- rugido ----
-    const GRITOS = ['RAWR!', 'GRRR', 'BOA PROVA!', 'NÃO CHORE.', 'SN2!', 'ISSO AÍ.', 'E2!', 'VAI DAR.'];
-    let ultimoRugido = 0, tlRugido = null;
-    const rugido = (x, y) => {
-      const agora = performance.now();
-      if (!vivo || agora - ultimoRugido < 450) return;
-      ultimoRugido = agora;
-      navigator.vibrate && navigator.vibrate([18, 24, 18]);
-      tlRugido && tlRugido.progress(1).kill();
-      const tl = (tlRugido = gsap.timeline());
-      tl.to(raiz, { scaleY: 0.94, scaleX: 1.035, svgOrigin: PIV.base, duration: 0.09, ease: 'power2.in' })
-        .to(raiz, { scaleY: 1.05, scaleX: 0.975, duration: 0.14, ease: 'power2.out' })
-        .to(raiz, { scaleY: 1, scaleX: 1, duration: 0.9, ease: 'elastic.out(1,0.3)' })
-        .to(q('.p-cabeca'), { rotation: -7, svgOrigin: PIV.cabeca, duration: 0.12, ease: 'power2.out' }, 0.05)
-        .to(q('.p-cabeca'), { rotation: 0, duration: 0.8, ease: 'elastic.out(1,0.25)' }, 0.2)
-        .to(q('.p-braco'), { rotation: 16, svgOrigin: PIV.braco, duration: 0.1, ease: 'power2.out' }, 0.05)
-        .to(q('.p-braco'), { rotation: 0, duration: 0.9, ease: 'elastic.out(1,0.2)' }, 0.18)
-        .to(q('.p-cauda'), { rotation: 11, svgOrigin: PIV.cauda, duration: 0.1 }, 0.05)
-        .to(q('.p-cauda'), { rotation: -8, duration: 0.16 }, 0.15)
-        .to(q('.p-cauda'), { rotation: 0, duration: 0.9, ease: 'elastic.out(1,0.2)' }, 0.31)
-        .fromTo(garras, { x: -3 }, { x: 3, duration: 0.04, repeat: 9, yoyo: true, ease: 'none' }, 0.05)
-        .fromTo(espinhos, { y: 0 }, { y: -7, duration: 0.09, repeat: 1, yoyo: true, stagger: 0.035, ease: 'power2.out' }, 0.05)
-        .fromTo(olho, { scale: 1 }, { scale: 1.7, svgOrigin: '500 104', duration: 0.12, repeat: 1, yoyo: true }, 0.05)
-        .fromTo(caixa, { x: 0, y: 0 }, { x: () => gsap.utils.random(-5, 5), y: () => gsap.utils.random(-3, 3), duration: 0.035, repeat: 9, yoyo: true, onComplete: () => gsap.set(caixa, { x: 0, y: 0 }) }, 0.05);
-      const g = document.createElement('span');
-      g.className = 'rawr'; g.textContent = GRITOS[(Math.random() * GRITOS.length) | 0];
-      g.style.left = x + 'px'; g.style.top = y + 'px';
-      g.style.color = Math.random() < 0.5 ? '#111' : '#f60507';
-      el.appendChild(g);
-      gsap.timeline({ onComplete: () => g.remove() })
-        .fromTo(g, { scale: 0, rotation: gsap.utils.random(-25, 25), xPercent: -50, yPercent: -50 }, { scale: 1, duration: 0.35, ease: 'back.out(3)' })
-        .to(g, { y: -40, opacity: 0, duration: 0.5, ease: 'power1.in' }, '+=0.35');
+    // ---- carinho: o dinossauro se abaixa, o rabo abana mais rápido, e volta devagar ----
+    let segurando = false, ultimoToque = 0, marcoTimer;
+    const abaixa = () => {
+      segurando = true;
+      gsap.to(baixa, { y: 10, scaleY: 0.95, scaleX: 1.015, svgOrigin: PIV.base, duration: 0.5, ease: 'power2.out', overwrite: 'auto' });
+      gsap.to(cabeca, { y: 12, x: 4, duration: 0.55, ease: 'power2.out', overwrite: 'auto' });
+      gsap.to(braco, { y: 3, duration: 0.5, ease: 'power2.out', overwrite: 'auto' });
+      gsap.to(idleTL, { timeScale: 2.6, duration: 0.5, ease: 'power2.out', overwrite: 'auto' });
     };
-    el.addEventListener('pointerdown', (e) => { if (!e.target.closest('.cr-fechar')) rugido(e.clientX, e.clientY); });
-    el.addEventListener('pointermove', segue);
+    const levanta = () => {
+      if (!segurando) return;
+      segurando = false;
+      gsap.to(baixa, { y: 0, scaleY: 1, scaleX: 1, duration: 1.2, ease: 'elastic.out(1,0.5)', overwrite: 'auto' });
+      gsap.to(cabeca, { y: 0, x: 0, duration: 1.1, ease: 'elastic.out(1,0.45)', overwrite: 'auto' });
+      gsap.to(braco, { y: 0, duration: 1, ease: 'elastic.out(1,0.45)', overwrite: 'auto' });
+      gsap.to(idleTL, { timeScale: 1, duration: 1.2, ease: 'power2.inOut', overwrite: 'auto' });
+    };
+    const conta = () => {
+      n++; guarda.gravar('atlas.carinhos', n);
+      navigator.vibrate && navigator.vibrate(10);
+      if (n <= MAXR) { const p = risco(n - 1); gsap.fromTo(p, { drawSVG: '0%' }, { drawSVG: '100%', duration: 0.3, ease: 'power2.out' }); }
+      gsap.to(numEstado, { v: n, duration: 0.45, ease: 'power2.out', onUpdate: mostraNum });
+      gsap.fromTo(numEl, { scale: 1.45, rotation: gsap.utils.random(-6, 6) }, { scale: 1, rotation: 0, duration: 0.7, ease: 'elastic.out(1,0.4)' });
+      if (MARCOS[n]) {
+        const m = q('.cr-marco'); m.textContent = MARCOS[n];
+        gsap.fromTo(m, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4 });
+        clearTimeout(marcoTimer); marcoTimer = setTimeout(() => gsap.to(m, { opacity: 0, duration: 0.5 }), 2600);
+      }
+    };
+    el.addEventListener('pointerdown', (e) => {
+      if (!vivo || e.target.closest('.cr-fechar')) return;
+      const agora = performance.now();
+      abaixa();
+      if (agora - ultimoToque > 140) { ultimoToque = agora; conta(); }
+      window.addEventListener('pointerup', levanta, { once: true });
+      window.addEventListener('pointercancel', levanta, { once: true });
+    });
 
     // ---- saída: desfaz o desenho e o círculo fecha de volta no ícone ----
     let fechando = false;
     const fecha = () => {
       if (fechando) return; fechando = true;
-      vivo = false; fervura && fervura.kill(); piscaCall && piscaCall.kill(); idleTL.kill(); tlRugido && tlRugido.kill();
+      vivo = false; fervura && fervura.kill(); idleTL.kill(); gsap.killTweensOf([baixa, cabeca, braco, par]);
       gsap.set(tracos, { x: 0, y: 0 });
-      gsap.timeline({ onComplete: () => { split.revert(); el.remove(); creditosEl = null; document.body.style.overflow = ''; } })
-        .to(tracos, { drawSVG: '0%', duration: 0.3, ease: 'power2.in', stagger: { each: 0.012, from: 'end' } }, 0)
-        .to(split.chars, { yPercent: -115, opacity: 0, duration: 0.35, ease: 'power2.in', stagger: { each: 0.012, from: 'end' } }, 0)
-        .to(q('.cr-peq'), { opacity: 0, letterSpacing: '0.7em', duration: 0.3 }, 0)
-        .to(vermelhos, { scale: 0.86, opacity: 0, duration: 0.35, ease: 'power2.in', stagger: 0.04 }, 0.15)
+      gsap.timeline({ onComplete: () => { splitMsg.revert(); splitNome.revert(); el.remove(); creditosEl = null; document.body.style.overflow = ''; } })
+        .to(tracos, { drawSVG: '0%', duration: 0.3, ease: 'power2.in', stagger: { each: 0.011, from: 'end' } }, 0)
+        .to([...splitMsg.chars, ...splitNome.chars], { yPercent: -115, opacity: 0, duration: 0.35, ease: 'power2.in', stagger: { each: 0.012, from: 'end' } }, 0)
+        .to(zz, { drawSVG: '0%', duration: 0.3, ease: 'power2.in' }, 0)
+        .to([peq, contagem, q('.cr-marco')], { opacity: 0, duration: 0.25 }, 0)
+        .to(vermelhos, { scale: 0.88, opacity: 0, duration: 0.35, ease: 'power2.in', stagger: 0.04 }, 0.15)
         .to(el, { clipPath: `circle(0px at ${origem[0]}px ${origem[1]}px)`, duration: 0.6, ease: 'power3.inOut' }, 0.4);
     };
     el.querySelector('.cr-fechar').addEventListener('click', (e) => { e.stopPropagation(); fecha(); });
@@ -586,8 +622,8 @@
     if (creditosEl && creditosEl.className === 'creditos') return;
     const el = document.createElement('div');
     el.className = 'creditos';
-    el.innerHTML = `<button class="cr-fechar" aria-label="Fechar"><svg viewBox="0 0 40 40"><path d="M8 9 L32 31 M31 8 L9 33" /></svg></button>
-      <div class="cr-conteudo"><p class="cr-peq">Feito por Mutano</p><img class="cr-img" src="dino.png?v=${BUILD}" alt="Dinossauro vermelho"><h2 class="cr-msg">Boa prova de<br>Química Orgânica II</h2></div>`;
+    el.innerHTML = `${FILTROS}<button class="cr-fechar" aria-label="Fechar"><svg viewBox="0 0 40 40"><path d="M8 9 L32 31 M31 8 L9 33" /></svg></button>
+      <div class="cr-conteudo">${CABECALHO}<img class="cr-img" src="dino.png?v=${BUILD}" alt="Dinossauro vermelho"><h2 class="cr-msg">Boa prova de<br>Química Orgânica II</h2></div>`;
     document.body.appendChild(el);
     creditosEl = el;
     document.body.style.overflow = 'hidden';
