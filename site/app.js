@@ -2,7 +2,7 @@
 // Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
 (() => {
   'use strict';
-  const BUILD = '9a15bba75a';
+  const BUILD = '549f916bf5';
   const $ = (s) => document.querySelector(s);
   const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
   const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
@@ -80,7 +80,7 @@
 
   // ---------- telas ----------
   function telaAulas() {
-    const stats = `<div class="stats"><div><b>${D.reacoes.length}</b><span>reações</span></div><div><b>${D.aulas.filter((a) => a.id !== '00').length}</b><span>aulas</span></div><div><b>${D.categorias.length}</b><span>mecanismos</span></div></div>`;
+    const stats = `<div class="stats"><div><b data-n="${D.reacoes.length}">${D.reacoes.length}</b><span>reações</span></div><div><b data-n="${D.aulas.filter((a) => a.id !== '00').length}">${D.aulas.filter((a) => a.id !== '00').length}</b><span>aulas</span></div><div><b data-n="${D.categorias.length}">${D.categorias.length}</b><span>mecanismos</span></div></div>`;
     const hex = '<svg class="hex" viewBox="0 0 100 100"><path d="M50 8 L86 29 L86 71 L50 92 L14 71 L14 29 Z"/></svg><svg class="hex" viewBox="0 0 100 100"><path d="M50 8 L86 29 L86 71 L50 92 L14 71 L14 29 Z"/></svg>';
     const itens = D.aulas.map((a, i) => `<a class="aula sobe" style="--i:${i + 2}" href="#/aula/${a.id}"><div class="num">${a.id === '00' ? 'Ex.' : rotuloAula(a.id)}</div><div class="tx"><b>${esc(a.nome)}</b><small>${plural(a.n, 'reação', 'reações')}</small></div>${SETA_IR}</a>`).join('');
     return {
@@ -92,7 +92,7 @@
         <div class="sec"><h3>Por aula</h3><span>${D.aulas.length} aulas</span></div>${itens}
         <a class="aula sobe" style="--i:${D.aulas.length + 3}" href="#/todas"><div class="num">∑</div><div class="tx"><b>Todas as reações</b><small>${plural(D.reacoes.length, 'reação', 'reações')}</small></div>${SETA_IR}</a>
         <div class="rodape">Versão ${BUILD}<br><button data-verificar>Verificar atualização</button></div>`,
-      depois: montaInstalar,
+      depois: () => { montaInstalar(); contaAte(tela); },
     };
   }
 
@@ -274,11 +274,12 @@
     titulo.textContent = t.prof === 0 && TITULOS[t.aba] && hash.split('/').length < 3 ? (t.aba === 'aulas' ? 'Atlas Orgânico' : TITULOS[t.aba]) : t.titulo;
     voltar.hidden = t.prof === 0;
     document.title = (t.titulo === 'Atlas Orgânico' ? '' : t.titulo + ' · ') + 'Atlas de Reações Orgânicas';
-    tela.innerHTML = `<div class="tela ${dir}">${t.html}</div>`;
+    tela.innerHTML = `<div class="tela ${usaMotion ? '' : dir}">${t.html}</div>`;
     window.scrollTo(0, 0);
     hidrata(tela);
     t.depois && t.depois();
     marcaAba();
+    animaTela(dir);
   }
 
   function marcaAba() {
@@ -287,8 +288,7 @@
     if (!on) { pilula.style.opacity = 0; return; }
     // offsetLeft/offsetWidth não sofrem com a animação de entrada da dock (scale)
     pilula.style.opacity = 1;
-    pilula.style.width = `${on.offsetWidth}px`;
-    pilula.style.transform = `translateX(${on.offsetLeft}px)`;
+    movePilula(on.offsetLeft, on.offsetWidth);
   }
   window.addEventListener('resize', marcaAba);
   window.addEventListener('hashchange', mostra);
@@ -301,64 +301,78 @@
   window.addEventListener('hashchange', () => { window.__navegou = true; });
   $('#buscar').addEventListener('click', () => { location.hash = '#/busca'; });
 
-  // ---------- pó (desintegração em partículas) ----------
-  // O elemento some varrido da esquerda para a direita enquanto vira partículas que sobem e se dispersam.
-  function poeira(el, { tempo = 1000, aoFim } = {}) {
-    if (reduzido || !el) { aoFim && aoFim(); return; }
-    const r = el.getBoundingClientRect();
-    const pad = 70, dpr = Math.min(devicePixelRatio || 1, 2);
-    const W = r.width + pad * 2, H = r.height + pad * 2;
-    const cv = document.createElement('canvas');
-    cv.width = W * dpr; cv.height = H * dpr;
-    cv.style.cssText = `position:fixed;left:${r.left - pad}px;top:${r.top - pad}px;width:${W}px;height:${H}px;pointer-events:none;z-index:60`;
-    document.body.appendChild(cv);
-    const ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
-    const css = getComputedStyle(document.documentElement);
-    const cor = (v, f) => (css.getPropertyValue(v) || f).trim();
-    const paleta = [cor('--card', '#fff'), cor('--card', '#fff'), cor('--ink', '#10201b'), cor('--ac', '#14806a'), cor('--ac', '#14806a'), cor('--mut', '#5b6e67')];
-    const ps = [];
-    let frente = -0.15, t0 = performance.now(), ultimo = frente;
-    const varrer = 0.72; // parte do tempo em que a frente atravessa o elemento
-    const mascara = (f) => {
-      const m = `linear-gradient(90deg, transparent ${(f * 100).toFixed(1)}%, #000 ${(f * 100 + 16).toFixed(1)}%)`;
-      el.style.webkitMaskImage = el.style.maskImage = m;
+  // ---------- Motion (animações com a biblioteca Motion, a API do Framer) ----------
+  // Se a biblioteca não carregar (ou o sistema pedir menos movimento), tudo continua visível e funcional.
+  const M = window.Motion;
+  const usaMotion = !!(M && M.animate && M.inView) && !reduzido;
+  if (usaMotion) document.documentElement.classList.add('mo');
+  const MOLA = { type: 'spring', stiffness: 300, damping: 26 };
+
+  // Cada bloco sobe e aparece quando entra na tela (em cascata na primeira dobra)
+  let t0Render = performance.now();
+  function entrada(el, i) {
+    el.dataset.mo = '1';
+    el.classList.add('pre');
+    const atraso = performance.now() - t0Render > 450 ? 0 : Math.min(i, 14) * 0.045;
+    M.inView(el, () => {
+      const fim = () => { el.classList.remove('pre'); el.style.opacity = ''; el.style.transform = ''; };
+      M.animate(el, { opacity: [0, 1], y: [24, 0], scale: [0.97, 1] }, { ...MOLA, stiffness: 260, delay: atraso }).then(fim, fim);
+    }, { margin: '0px 0px -5% 0px' });
+  }
+  if (usaMotion) {
+    new MutationObserver(() => {
+      t0Render = performance.now();
+      tela.querySelectorAll('.sobe:not([data-mo])').forEach((el, i) => entrada(el, i));
+    }).observe(tela, { childList: true, subtree: true });
+  }
+
+  // A tela inteira desliza (para a frente ou para trás) com mola
+  function animaTela(dir) {
+    const el = tela.firstElementChild;
+    if (!usaMotion || !el) return;
+    const fim = () => { el.style.opacity = ''; el.style.transform = ''; };
+    M.animate(el, { opacity: [0, 1], x: [dir === 'frente' ? 40 : dir === 'tras' ? -40 : 0, 0], y: [dir ? 0 : 14, 0] }, { ...MOLA, stiffness: 320, damping: 30 }).then(fim, fim);
+    // Estruturas do esquema aparecem uma a uma, com um quique
+    const tiles = el.querySelectorAll('.esquema .tile');
+    if (tiles.length) M.animate(tiles, { opacity: [0, 1], scale: [0.55, 1] }, { type: 'spring', stiffness: 380, damping: 18, delay: M.stagger(0.09, { startDelay: 0.3 }) });
+  }
+
+  // A pílula da dock desliza com mola até a aba escolhida
+  function movePilula(x, w) {
+    if (usaMotion && pilula.dataset.pos) M.animate(pilula, { x, width: w }, { type: 'spring', stiffness: 420, damping: 30 });
+    else { pilula.style.width = `${w}px`; pilula.style.transform = `translateX(${x}px)`; }
+    pilula.dataset.pos = '1';
+  }
+
+  // Estrela com quique
+  function pulaEstrela(svg) {
+    if (!usaMotion || !svg) return;
+    M.animate(svg, { scale: [0.45, 1], rotate: [-28, 0] }, { duration: 0.55, ease: [0.3, 1.7, 0.5, 1] });
+  }
+
+  // Item removido dos Salvos recolhe e desliza para fora
+  function saiItem(item) {
+    if (!item) return;
+    const fim = () => {
+      item.remove();
+      const n = document.querySelectorAll('#itens .item').length;
+      const c = $('#contagem'); if (c) c.textContent = plural(n, 'reação', 'reações');
+      if (!n) $('#itens').innerHTML = vazio('Toque na estrela de uma reação para guardá-la aqui.');
     };
-    mascara(frente);
-    const quadro = (agora) => {
-      const dt = Math.min(48, agora - (quadro.t || agora)); quadro.t = agora;
-      const p = Math.min(1, (agora - t0) / (tempo * varrer));
-      frente = -0.15 + p * 1.3;
-      mascara(frente);
-      // novas partículas na faixa varrida
-      const x0 = Math.max(0, ultimo) * r.width, x1 = Math.min(1, Math.max(0, frente + 0.08)) * r.width;
-      if (x1 > x0 && ps.length < 1100) {
-        const n = Math.ceil(((x1 - x0) * r.height) / 38);
-        for (let i = 0; i < n; i++) {
-          ps.push({
-            x: pad + x0 + Math.random() * (x1 - x0), y: pad + Math.random() * r.height,
-            vx: 0.25 + Math.random() * 1.7, vy: -(0.1 + Math.random() * 1.3),
-            s: 1.1 + Math.random() * 2.6, vida: 650 + Math.random() * 650, nasc: agora,
-            c: paleta[(Math.random() * paleta.length) | 0], fase: Math.random() * 6.28,
-          });
-        }
-      }
-      ultimo = frente;
-      ctx.clearRect(0, 0, W, H);
-      let vivos = 0;
-      for (const q of ps) {
-        const k = (agora - q.nasc) / q.vida;
-        if (k >= 1) continue;
-        vivos++;
-        q.x += q.vx * dt / 16 + Math.sin(agora / 180 + q.fase) * 0.25;
-        q.y += q.vy * dt / 16 - k * 0.5;
-        ctx.globalAlpha = (1 - k) * (1 - k) * 0.95;
-        ctx.fillStyle = q.c;
-        ctx.fillRect(q.x, q.y, q.s, q.s);
-      }
-      if (p < 1 || vivos) requestAnimationFrame(quadro);
-      else { cv.remove(); aoFim && aoFim(); }
-    };
-    requestAnimationFrame(quadro);
+    if (!usaMotion) { setTimeout(mostra, 260); return; }
+    const h = item.offsetHeight;
+    item.style.overflow = 'hidden';
+    M.animate(item, { opacity: [1, 0], x: [0, 80], scale: [1, 0.96], height: [`${h}px`, '0px'], marginBottom: ['9px', '0px'] }, { duration: 0.4, ease: [0.4, 0, 0.2, 1] }).then(fim, fim);
+  }
+
+  // Números do cartão de topo contando
+  function contaAte(raiz) {
+    raiz.querySelectorAll('[data-n]').forEach((el) => {
+      const n = +el.dataset.n;
+      if (!usaMotion) { el.textContent = n; return; }
+      el.textContent = 0;
+      M.animate(0, n, { duration: 1.1, ease: [0.16, 1, 0.3, 1], onUpdate: (v) => { el.textContent = Math.round(v); } });
+    });
   }
 
   // ---------- cliques ----------
@@ -370,39 +384,22 @@
       const on = alternarSalvo(+sv.dataset.salvar);
       sv.classList.toggle('on', on); sv.setAttribute('aria-pressed', on);
       sv.classList.remove('pop'); void sv.offsetWidth; sv.classList.add('pop');
-      if (rotaAtual === '#/salvos' && !on) {
-        const item = sv.closest('.item');
-        poeira(item, { aoFim: () => {
-          item.remove();
-          const n = document.querySelectorAll('#itens .item').length;
-          const c = $('#contagem'); if (c) c.textContent = plural(n, 'reação', 'reações');
-          if (!n) $('#itens').innerHTML = vazio('Toque na estrela de uma reação para guardá-la aqui.');
-        } });
-      }
+      if (on) pulaEstrela(sv.querySelector('svg'));
+      if (rotaAtual === '#/salvos' && !on) saiItem(sv.closest('.item'));
       return;
     }
     const sd = t.closest('[data-salvar-d]');
-    if (sd) { const on = alternarSalvo(+sd.dataset.salvarD); sd.classList.toggle('on', on); sd.querySelector('span').textContent = on ? 'Salvo' : 'Salvar'; return; }
+    if (sd) { const on = alternarSalvo(+sd.dataset.salvarD); sd.classList.toggle('on', on); sd.querySelector('span').textContent = on ? 'Salvo' : 'Salvar'; if (on) pulaEstrela(sd.querySelector('svg')); return; }
     if (t.closest('[data-compartilhar]')) { navigator.share({ title: document.title, url: location.href }).catch(() => {}); return; }
     const ir = t.closest('[data-ir]'); if (ir) { location.hash = ir.dataset.ir; return; }
-    const heroEl = t.closest('.hero');
-    if (heroEl && !heroEl.dataset.poeira) {
-      heroEl.dataset.poeira = '1';
-      heroEl.style.opacity = '1'; heroEl.style.animation = 'none';
-      poeira(heroEl, { tempo: 1500, aoFim: () => {
-        heroEl.style.webkitMaskImage = heroEl.style.maskImage = '';
-        heroEl.style.animation = 'renasce .8s cubic-bezier(.2,.8,.2,1) both';
-        setTimeout(() => { delete heroEl.dataset.poeira; }, 900);
-      } });
-      return;
-    }
     if (t.closest('[data-instalar]') && promptInstalar) { promptInstalar.prompt(); promptInstalar.userChoice.finally(() => { promptInstalar = null; $('#instalar').innerHTML = ''; }); return; }
     if (t.closest('[data-fechar-instalar]')) { guarda.gravar('atlas.instalar', true); $('#instalar').innerHTML = ''; return; }
     if (t.closest('[data-verificar]')) { verifica(true); return; }
     const tl = t.closest('.tile');
     if (tl && tl.querySelector('svg') && !zoom.contains(tl)) abreZoom(tl);
   });
-  function abreZoom(tl) { zoomConteudo.innerHTML = tl.innerHTML; zoomConteudo.style.setProperty('--w', tl.style.getPropertyValue('--w') || 200); zoom.hidden = false; }
+  function abreZoom(tl) { zoomConteudo.innerHTML = tl.innerHTML; zoomConteudo.style.setProperty('--w', tl.style.getPropertyValue('--w') || 200); zoom.hidden = false;
+    if (usaMotion) { M.animate(zoom, { opacity: [0, 1] }, { duration: 0.2 }); M.animate(zoomConteudo, { opacity: [0, 1], scale: [0.8, 1] }, { type: 'spring', stiffness: 340, damping: 24 }); } }
   function fechaZoom() { zoom.hidden = true; zoomConteudo.innerHTML = ''; }
   zoom.addEventListener('click', fechaZoom);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fechaZoom(); });
@@ -416,6 +413,7 @@
     avisoTexto.textContent = txt;
     avisoOk.hidden = !botao; avisoX.hidden = !botao;
     aviso.hidden = false;
+    if (usaMotion) M.animate(aviso, { opacity: [0, 1], y: [44, 0], scale: [0.94, 1] }, { type: 'spring', stiffness: 320, damping: 22 });
     aviso.style.animation = 'none'; void aviso.offsetWidth; aviso.style.animation = '';
     if (!botao) tempoAviso = setTimeout(() => (aviso.hidden = true), 2600);
   }

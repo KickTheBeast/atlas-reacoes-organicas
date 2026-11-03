@@ -263,10 +263,11 @@ const svgsTxt = JSON.stringify(svgs);
 const css = fs.readFileSync(path.join(FONTE, 'app/style.css'), 'utf8') +
   '\n/* estilos das estruturas (gerado) */\n' + [...estilos].map(([st, c]) => `.${c}{${st}}`).join('') + '\n';
 const js = fs.readFileSync(path.join(FONTE, 'app/app.js'), 'utf8');
+const motionJs = fs.readFileSync(path.join(raiz, 'tools/node_modules/motion/dist/motion.js'), 'utf8');
 const swFonte = fs.readFileSync(path.join(FONTE, 'app/sw.js'), 'utf8');
 const htmlFonte = fs.readFileSync(path.join(FONTE, 'app/index.template.html'), 'utf8');
 
-const build = crypto.createHash('sha1').update(dadosTxt).update(svgsTxt).update(css).update(js).update(swFonte).update(htmlFonte)
+const build = crypto.createHash('sha1').update(dadosTxt).update(svgsTxt).update(css).update(js).update(motionJs).update(swFonte).update(htmlFonte)
   .digest('hex').slice(0, 10);
 
 const V = `?v=${build}`;
@@ -276,6 +277,7 @@ const write = (nome, txt) => fs.writeFileSync(path.join(SITE, nome), txt);
 write('index.html', html);
 write('app.js', js.replaceAll('__BUILD__', build));
 write('style.css', css);
+write('motion.js', motionJs);
 write('dados.json', dadosTxt);
 write('svgs.json', svgsTxt);
 write('sw.js', sw);

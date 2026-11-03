@@ -279,8 +279,15 @@ mark{background:color-mix(in srgb,#f4b400 40%,transparent);color:inherit;border-
 .atomo b{position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-6px;border-radius:50%;background:var(--ac);box-shadow:0 0 14px var(--ac);animation:pulsa 1.4s ease-in-out infinite}
 @keyframes pulsa{50%{transform:scale(1.25)}}
 
-/* pó: o cartão do topo renasce depois de se desfazer */
-.hero{cursor:pointer}
-@keyframes renasce{from{opacity:0;transform:scale(.96) translateY(8px);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+/* com Motion carregado, as entradas ficam por conta da biblioteca */
+html.mo .sobe{animation:none;opacity:1}
+html.mo .sobe.pre,.pre{opacity:0}
+html.mo .tela,html.mo .tela.frente,html.mo .tela.tras{animation:none}
+html.mo .esquema .tile{animation:none}
+html.mo .zoom,html.mo .zoom-conteudo{animation:none}
+html.mo .aviso{animation:none}
+html.mo .estrela.pop svg{animation:none}
+html.mo .pilula{transition:opacity .2s}
+html.mo .item,html.mo .aula,html.mo .ficha,html.mo .guia-link,html.mo .nav-det a{transition-property:border-color,background-color,box-shadow}
 
 @media (prefers-reduced-motion:reduce){.seta .e{display:none}*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0ms!important;transition-duration:.01ms!important}.hex{animation:none}}
