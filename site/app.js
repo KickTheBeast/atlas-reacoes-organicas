@@ -2,7 +2,7 @@
 // Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
 (() => {
   'use strict';
-  const BUILD = 'e1462e9ae2';
+  const BUILD = '798dc0cafd';
   const $ = (s) => document.querySelector(s);
   const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
   const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
@@ -628,10 +628,11 @@
   // Acessórios do Mutaninho (desenhados nas coordenadas do dinossauro). Ganham-se acertando 100% num simulado.
   const ACESSORIOS = [{
     id: 'oculos', slot: 'rosto', nome: 'Óculos de sol', como: 'Acerte 100% em um simulado', vb: '436 76 100 48',
-    arte: `<path d="M481 91 L452 86" stroke="#111" stroke-width="4" stroke-linecap="round" fill="none"/>
-      <path d="M481 90 L526 87 Q529 104 518 111 Q500 117 487 109 Q479 101 481 90 Z" fill="#111" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
-      <path d="M479 89.5 L528 86.5" stroke="#111" stroke-width="4.6" stroke-linecap="round" fill="none"/>
-      <path d="M489 97 L498 93.5 M500.5 99 L504 97.5" stroke="#f6f3ec" stroke-width="3" stroke-linecap="round" fill="none" opacity=".92"/>`,
+    arte: `<path d="M479 91 L452 86" stroke="#111" stroke-width="4" stroke-linecap="round" fill="none"/>
+      <g transform="translate(478 88)"><path d="M0 3 L26 0 Q28 14 20 20 Q10 24 3 18 Q-2 11 0 3 Z" fill="#111" stroke="#111" stroke-width="3" stroke-linejoin="round"/><path d="M5 9 L12 7 M14 12 L17 11" stroke="#f6f3ec" stroke-width="2.6" stroke-linecap="round" fill="none" opacity=".92"/></g>
+      <g transform="translate(538 88) scale(-1 1)"><path d="M0 3 L26 0 Q28 14 20 20 Q10 24 3 18 Q-2 11 0 3 Z" fill="#111" stroke="#111" stroke-width="3" stroke-linejoin="round"/><path d="M5 9 L12 7 M14 12 L17 11" stroke="#f6f3ec" stroke-width="2.6" stroke-linecap="round" fill="none" opacity=".92"/></g>
+      <path d="M502 90 Q508 87 514 89" stroke="#111" stroke-width="3.6" stroke-linecap="round" fill="none"/>
+      <path d="M477 89.5 L539 86.5" stroke="#111" stroke-width="4" stroke-linecap="round" fill="none"/>`,
   }];
   const lerAcess = () => { const a = guarda.ler('atlas.acessorios', null); return a && Array.isArray(a.tem) ? a : { tem: [], uso: [] }; };
   function ganhaAcessorio(id) {
