@@ -330,7 +330,7 @@
     const erradas = sessaoS.resp.filter((x) => !x.ok);
     $('#sess-prog').style.width = '100%'; $('#sess-cont').textContent = 'Resultado';
     const nota = (pct / 10).toFixed(1).replace('.', ',');
-    const novo = sessaoS.acertos === n ? ganhaAcessorio('oculos') : null; // 100%: ganha um acessório para o Mutaninho
+    const novo = sessaoS.acertos === n ? sorteiaAcessorio() : null; // 100%: ganha um acessório para o Mutaninho
     const premio = novo ? `<div class="premio"><svg viewBox="${novo.vb}" aria-hidden="true">${novo.arte}</svg><div><b>Você ganhou: ${esc(novo.nome)}!</b><small>Está na loja do Mutaninho.</small></div><button class="btn" data-loja-abrir>Ver</button></div>` : '';
     palco.innerHTML = `<div class="resumo"><div class="resumo-anel" id="anel-fim"></div><h3 class="resumo-t">Nota ${nota}</h3>
       <p class="resumo-s">${sessaoS.acertos} de ${n} certas · ${min} min</p>

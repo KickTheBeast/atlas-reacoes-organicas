@@ -627,14 +627,28 @@
 
   // Acessórios do Mutaninho (desenhados nas coordenadas do dinossauro). Ganham-se acertando 100% num simulado.
   const ACESSORIOS = [{
-    id: 'oculos', slot: 'rosto', nome: 'Óculos de sol', como: 'Acerte 100% em um simulado', vb: '436 76 100 48',
+    id: 'oculos', slot: 'rosto', nome: 'Óculos de sol', como: 'Ganhe em um simulado 100%', vb: '436 76 100 48',
     arte: `<path d="M479 91 L452 86" stroke="#111" stroke-width="4" stroke-linecap="round" fill="none"/>
       <g transform="translate(478 88)"><path d="M0 3 L26 0 Q28 14 20 20 Q10 24 3 18 Q-2 11 0 3 Z" fill="#111" stroke="#111" stroke-width="3" stroke-linejoin="round"/><path d="M5 9 L12 7 M14 12 L17 11" stroke="#f6f3ec" stroke-width="2.6" stroke-linecap="round" fill="none" opacity=".92"/></g>
       <g transform="translate(538 88) scale(-1 1)"><path d="M0 3 L26 0 Q28 14 20 20 Q10 24 3 18 Q-2 11 0 3 Z" fill="#111" stroke="#111" stroke-width="3" stroke-linejoin="round"/><path d="M5 9 L12 7 M14 12 L17 11" stroke="#f6f3ec" stroke-width="2.6" stroke-linecap="round" fill="none" opacity=".92"/></g>
       <path d="M502 90 Q508 87 514 89" stroke="#111" stroke-width="3.6" stroke-linecap="round" fill="none"/>
       <path d="M477 89.5 L539 86.5" stroke="#111" stroke-width="4" stroke-linecap="round" fill="none"/>`,
+  }, {
+    id: 'gorro', slot: 'cabeca', nome: 'Gorro de Natal', como: 'Ganhe em um simulado 100%', vb: '432 28 100 72',
+    arte: `<path d="M486 48 Q462 32 446 50" stroke="#111" stroke-width="15" fill="none" stroke-linecap="round"/>
+      <path d="M486 48 Q462 32 446 50" stroke="#d93a2f" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <path d="M454 86 Q458 58 484 46 Q502 42 511 54 Q517 66 514 82 Z" fill="#d93a2f" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M449 84 Q482 89 518 79 L520 87 Q484 97 449 92 Z" fill="#f6f3ec" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+      <circle cx="444" cy="52" r="8.5" fill="#f6f3ec" stroke="#111" stroke-width="3"/>`,
+  }, {
+    id: 'bone', slot: 'cabeca', nome: 'Boné', como: 'Ganhe em um simulado 100%', vb: '432 50 120 50',
+    arte: `<path d="M456 85 Q456 60 485 59 Q514 60 515 82 Z" fill="#f2c230" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M485 59 Q480 70 482 84" stroke="#111" stroke-width="2" fill="none" stroke-linecap="round" opacity=".6"/>
+      <circle cx="485" cy="58.5" r="3" fill="#111"/>
+      <path d="M508 80 Q532 78 545 87 Q526 90 507 88 Z" fill="#111" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M458 83 Q486 90 514 81" stroke="#111" stroke-width="3" fill="none" stroke-linecap="round"/>`,
   }];
-  const lerAcess = () => { const a = guarda.ler('atlas.acessorios', null); return a && Array.isArray(a.tem) ? a : { tem: ['oculos'], uso: ['oculos'] }; }; // o óculos vem liberado de início; os próximos acessórios serão ganhos nos simulados
+  const lerAcess = () => { const a = guarda.ler('atlas.acessorios', null); return a && Array.isArray(a.tem) ? a : { tem: [], uso: [] }; };
   function ganhaAcessorio(id) {
     const a = lerAcess(); if (a.tem.includes(id)) return null;
     a.tem.push(id);
@@ -643,6 +657,8 @@
     guarda.gravar('atlas.acessorios', a);
     return ac;
   }
+  // sorteia um acessório que ainda não é seu
+  const sorteiaAcessorio = () => { const a = lerAcess(), falta = ACESSORIOS.filter((x) => !a.tem.includes(x.id)); return falta.length ? ganhaAcessorio(falta[Math.floor(Math.random() * falta.length)].id) : null; };
   const arteAcess = (uso) => uso.map((id) => { const a = ACESSORIOS.find((x) => x.id === id); return a ? `<g class="acc" data-acc="${id}">${a.arte}</g>` : ''; }).join('');
 
   function dinoSvg(V, op = {}) {
@@ -752,6 +768,7 @@
     gsap.set([contagem, ...iniciais], { opacity: 0 });
     gsap.set(iniciais, { drawSVG: '0%' });
     const accs = [...cabeca.querySelectorAll('.acc')]; gsap.set(accs, { opacity: 0 });
+    const btnLoja = q('.cr-lojabtn'); gsap.set(btnLoja, { autoAlpha: 0, y: 18 });
     const intro = gsap.timeline({ onComplete: () => { idle(); if (abrirLoja) abreLoja(); } });
     intro
       .fromTo(el, { clipPath: `circle(0px at ${origem[0]}px ${origem[1]}px)` }, { clipPath: `circle(${raio + 40}px at ${origem[0]}px ${origem[1]}px)`, duration: 0.85, ease: 'power3.inOut' })
@@ -763,7 +780,8 @@
       .to(splitMsg.chars, { yPercent: 0, opacity: 1, duration: 0.7, ease: 'back.out(1.8)', stagger: { each: 0.022, from: 'start' } }, 1.75)
       .fromTo(accs, { y: -46, rotation: -10, svgOrigin: '490 100' }, { y: 0, opacity: 1, rotation: 0, duration: 0.8, ease: 'bounce.out' }, 2.4)
       .to(contagem, { opacity: 1, duration: 0.3 }, 2.1)
-      .to(iniciais, { opacity: 1, drawSVG: '100%', duration: 0.3, stagger: 0.02, ease: 'power2.out' }, 2.15);
+      .to(iniciais, { opacity: 1, drawSVG: '100%', duration: 0.3, stagger: 0.02, ease: 'power2.out' }, 2.15)
+      .to(btnLoja, { autoAlpha: 1, y: 0, duration: 0.55, ease: 'back.out(2.2)', clearProps: 'all' }, '>+0.05'); // a loja é a última a aparecer
 
     // ---- vida: respira, balança o rabo e a cabeça; as linhas "fervem" como em desenho animado ----
     let vivo = false, fervura;
@@ -829,7 +847,7 @@
     let loja = null;
     const cartaoLoja = (a) => {
       const u = lerAcess(), tem = u.tem.includes(a.id), usando = u.uso.includes(a.id);
-      return `<div class="cl-card${tem ? '' : ' trava'}"><div class="cl-prev">${dinoSvg(V, { vb: '408 50 192 112', uso: [a.id] })}${tem ? '' : `<span class="cl-lock">${CADEADO}</span>`}</div>
+      return `<div class="cl-card${tem ? '' : ' trava'}"><div class="cl-prev">${dinoSvg(V, { vb: '408 34 192 128', uso: [a.id] })}${tem ? '' : `<span class="cl-lock">${CADEADO}</span>`}</div>
         <b>${a.nome}</b><small>${tem ? (usando ? 'Vestido agora' : 'Na sua coleção') : a.como}</small>
         ${tem ? `<button class="cl-btn${usando ? ' on' : ''}" data-vestir="${a.id}">${usando ? 'Tirar' : 'Vestir'}</button>` : ''}</div>`;
     };
