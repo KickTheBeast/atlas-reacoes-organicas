@@ -634,7 +634,7 @@
       <path d="M502 90 Q508 87 514 89" stroke="#111" stroke-width="3.6" stroke-linecap="round" fill="none"/>
       <path d="M477 89.5 L539 86.5" stroke="#111" stroke-width="4" stroke-linecap="round" fill="none"/>`,
   }];
-  const lerAcess = () => { const a = guarda.ler('atlas.acessorios', null); return a && Array.isArray(a.tem) ? a : { tem: ['oculos'], uso: ['oculos'] }; }; // BRANCH DE TESTE: óculos já liberado
+  const lerAcess = () => { const a = guarda.ler('atlas.acessorios', null); return a && Array.isArray(a.tem) ? a : { tem: ['oculos'], uso: ['oculos'] }; }; // o óculos vem liberado de início; os próximos acessórios serão ganhos nos simulados
   function ganhaAcessorio(id) {
     const a = lerAcess(); if (a.tem.includes(id)) return null;
     a.tem.push(id);
