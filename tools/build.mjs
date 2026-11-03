@@ -25,6 +25,7 @@ const arquivos = fs.readdirSync(path.join(FONTE, 'dados')).filter((f) => f.endsW
 arquivos.sort((a, b) => (a === 'reactions.js' ? -1 : b === 'reactions.js' ? 1 : a.localeCompare(b)));
 for (const f of arquivos) vm.runInContext(fs.readFileSync(path.join(FONTE, 'dados', f), 'utf8'), ctx, { filename: f });
 const { REACTIONS, CATEGORIES } = ctx.window;
+const window_ESTEREO = ctx.window.ESTEREO || [];
 const ctxG = { window: {} };
 vm.createContext(ctxG);
 vm.runInContext(fs.readFileSync(path.join(FONTE, 'guias/guias.js'), 'utf8'), ctxG, { filename: 'guias.js' });
@@ -48,6 +49,38 @@ function idAula(txt) {
   const m = /Aula\s+(\d+)([ab]?)/i.exec(txt || '');
   if (!m) return '00';
   return m[1].padStart(2, '0') + m[2].toLowerCase();
+}
+
+// ---------- estereoquímica validada ----------
+// Cada estrutura com { s, cip | ez } só é usada se o RDKit confirmar o R/S (ou E/Z) pedido.
+function etiquetas(RDKit, smiles) {
+  const mol = RDKit.get_mol(smiles);
+  if (!mol || !mol.is_valid()) { mol?.delete(); return null; }
+  const t = JSON.parse(mol.get_stereo_tags());
+  mol.delete();
+  return { cip: t.CIP_atoms.map(([, l]) => l.replace(/[()]/g, '').toUpperCase()), ez: t.CIP_bonds.map((x) => String(x[x.length - 1]).replace(/[()]/g, '').toUpperCase()) };
+}
+const estereoAvisos = [];
+function resolveEstereo(RDKit, spec, contexto) {
+  if (typeof spec === 'string') return spec;
+  const marcas = [...spec.s.matchAll(/@@?|[\/\\]/g)].map((m) => [m.index, m[0]]);
+  const quer = spec.cip ? [...spec.cip].sort().join('') : null;
+  for (let mask = 0; mask < (1 << marcas.length); mask++) {
+    let s = '', ult = 0;
+    marcas.forEach(([pos, tok], k) => {
+      s += spec.s.slice(ult, pos);
+      let novo = tok;
+      if (mask & (1 << k)) novo = tok === '@' ? '@@' : tok === '@@' ? '@' : tok === '/' ? '\\' : '/';
+      s += novo; ult = pos + tok.length;
+    });
+    s += spec.s.slice(ult);
+    const e = etiquetas(RDKit, s);
+    if (!e) continue;
+    if (quer && e.cip.slice().sort().join('') === quer && !spec.ez) return s;
+    if (spec.ez && e.ez.length && e.ez.every((x) => x === spec.ez) && (!quer || e.cip.slice().sort().join('') === quer)) return s;
+  }
+  estereoAvisos.push(`${contexto}: nenhum desenho de ${spec.s} bate com ${spec.cip ? spec.cip.join(',') : spec.ez}`);
+  return null;
 }
 
 // ---------- RDKit ----------
@@ -214,6 +247,14 @@ function classificar(r) {
 }
 
 // ---------- monta dados ----------
+// aplica a estereoquímica validada (fonte/dados/estereo.js) às reações correspondentes
+for (const o of window_ESTEREO) {
+  const r = REACTIONS.find((x) => idAula(x.aula) === o.a && x.nome.startsWith(o.n));
+  if (!r) { estereoAvisos.push(`reação não encontrada: ${o.a} / ${o.n}`); continue; }
+  const rr = o.r.map((s) => resolveEstereo(RDKit, s, o.n)), pp = o.p.map((s) => resolveEstereo(RDKit, s, o.n));
+  if (rr.includes(null) || pp.includes(null)) continue;
+  r.reactants = rr; r.products = pp; r.estereo = true;
+}
 const slideIni = (s) => parseInt(/\d+/.exec(s || '')?.[0] || '0', 10);
 const ordenadas = REACTIONS.map((r, i) => ({ r, i, aula: idAula(r.aula) })).sort((a, b) =>
   a.aula.localeCompare(b.aula) || slideIni(a.r.slides) - slideIni(b.r.slides) || a.i - b.i);
@@ -240,10 +281,11 @@ reacoes.forEach((r) => (cAula[r.a] = (cAula[r.a] || 0) + 1));
 const lista = (mapa, cont) => [...mapa].filter(([id]) => cont[id]).map(([id, nome]) => ({ id, nome, n: cont[id] })).sort((a, b) => (a.id === 'outros') - (b.id === 'outros') || b.n - a.n);
 
 // ---------- guias ----------
-const celula = (c) => Array.isArray(c) ? c.map(celula) : (c && typeof c === 'object' && c.s ? { s: desenhar(c.s) } : c);
+const smiles = (x, ctx) => (typeof x === 'string' ? x : resolveEstereo(RDKit, x, ctx) || x.s);
+const celula = (c) => Array.isArray(c) ? c.map(celula) : (c && typeof c === 'object' && c.s ? { s: desenhar(smiles(c, 'guia')) } : c);
 const guias = GUIAS.map((g) => ({
   id: g.id, curto: g.curto, topo: g.topo || '', t: g.titulo, sub: g.sub, cats: g.cats, intro: g.intro,
-  esq: { r: g.esquema.r.map(desenhar), rg: g.esquema.rg, cd: g.esquema.cd, p: g.esquema.p.map(desenhar), leg: g.esquema.leg },
+  esq: { r: g.esquema.r.map((x) => desenhar(smiles(x, g.id))), rg: g.esquema.rg, cd: g.esquema.cd, p: g.esquema.p.map((x) => desenhar(smiles(x, g.id))), leg: g.esquema.leg },
   bl: g.blocos.map((b) => b.k === 'l' ? { k: 'l', t: b.titulo, itens: b.itens } :
     { k: 't', t: b.titulo, cols: b.cols, rows: b.rows.map((l) => l.map(celula)), nota: b.nota || '', ord: b.ordens || null }),
 }));
@@ -260,14 +302,16 @@ const dados = {
 };
 const dadosTxt = JSON.stringify(dados);
 const svgsTxt = JSON.stringify(svgs);
-const css = fs.readFileSync(path.join(FONTE, 'app/style.css'), 'utf8') +
+const escuro = fs.readFileSync(path.join(FONTE, 'app/escuro.css'), 'utf8');
+const temaEscuro = `@media (prefers-color-scheme:dark){:root:not([data-tema="claro"]){${escuro}}}\n:root[data-tema="escuro"]{${escuro}}\n`;
+const css = fs.readFileSync(path.join(FONTE, 'app/style.css'), 'utf8') + temaEscuro +
   '\n/* estilos das estruturas (gerado) */\n' + [...estilos].map(([st, c]) => `.${c}{${st}}`).join('') + '\n';
-const js = fs.readFileSync(path.join(FONTE, 'app/app.js'), 'utf8');
+const js = fs.readFileSync(path.join(FONTE, 'app/app.js'), 'utf8').replace('/*@@estudo*/', () => fs.readFileSync(path.join(FONTE, 'app/estudo.js'), 'utf8'));
 const motionJs = fs.readFileSync(path.join(raiz, 'tools/node_modules/motion/dist/motion.js'), 'utf8');
 const swFonte = fs.readFileSync(path.join(FONTE, 'app/sw.js'), 'utf8');
 const htmlFonte = fs.readFileSync(path.join(FONTE, 'app/index.template.html'), 'utf8');
 
-const build = crypto.createHash('sha1').update(dadosTxt).update(svgsTxt).update(css).update(js).update(motionJs).update(fs.readFileSync(path.join(FONTE, 'app/dino.png'))).update(fs.readFileSync(path.join(FONTE, 'app/dino-vetor.json'))).update(fs.readFileSync(path.join(raiz, 'tools/node_modules/gsap/dist/gsap.min.js'))).update(swFonte).update(htmlFonte)
+const build = crypto.createHash('sha1').update(dadosTxt).update(svgsTxt).update(css).update(js).update(motionJs).update(fs.readFileSync(path.join(FONTE, 'app/dino.png'))).update(fs.readFileSync(path.join(FONTE, 'app/icone.svg'))).update(fs.readFileSync(path.join(FONTE, 'app/escuro.css'))).update(fs.readFileSync(path.join(FONTE, 'app/estudo.js'))).update(fs.readFileSync(path.join(FONTE, 'app/dino-vetor.json'))).update(fs.readFileSync(path.join(raiz, 'tools/node_modules/gsap/dist/gsap.min.js'))).update(swFonte).update(htmlFonte)
   .digest('hex').slice(0, 10);
 
 const V = `?v=${build}`;

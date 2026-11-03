@@ -1,0 +1,41 @@
+/* Modo escuro. Este arquivo é escrito UMA vez e o build o aplica de duas formas:
+   - automático, quando o sistema está no escuro (e o usuário não forçou "claro");
+   - manual, quando o usuário escolheu "escuro" no rodapé. */
+--bg:#090f0d;--card:#101916;--ink:#e8f1ed;--mut:#9bb1a8;--faint:#6b8178;--bd:#1c2a25;--bd2:#2a3b35;
+--ac:#5adbb7;--ac-ink:#04201a;--ac-soft:color-mix(in srgb,#5adbb7 14%,#101916);
+--nu:#8db4ff;--nu-soft:#16264a;--el:#ffb27a;--el-soft:#3d2512;--mec:#c9a6ff;--mec-soft:#281d40;
+--tile:#fff;--aviso:#1b2a25;
+--sombra:0 0 0 1px rgba(255,255,255,.035),0 10px 28px rgba(0,0,0,.42);
+--c-sn2:#8db4ff;--c-sn1:#c9a6ff;--c-e1:#ff9a8a;--c-e2:#ffb27a;--c-adicao-alcenos:#6fdc9a;--c-adicao-eletrofilica:#5ad6d6;
+--c-rearranjos:#ff8fcf;--c-eliminacao-alfa-carbenos:#f4c542;--c-radicais:#a9bddb;--c-reducao-alcinos:#6ac4f0;--c-mecanismos-gerais:#9bb1a8;
+color-scheme:dark;
+
+& body{background:radial-gradient(120% 55% at 50% -8%,#10231c 0%,var(--bg) 62%) fixed}
+& *{scrollbar-color:#2a3b35 transparent}
+& .topo{background:color-mix(in srgb,var(--bg) 78%,transparent)}
+
+/* superfícies com um leve brilho no topo, em vez de sombra pesada */
+& .cartao,& .item,& .aula,& .ficha,& .busca-falsa{background:linear-gradient(180deg,color-mix(in srgb,#fff 2.6%,var(--card)),var(--card))}
+& .chip{background:color-mix(in srgb,#fff 2%,var(--card))}
+& .chip.on{background:var(--ac);color:var(--ac-ink)}
+
+/* estruturas: continuam em fundo branco com traço preto, como no claro (só ganham um respiro nas bordas) */
+& .tile{border-color:transparent;box-shadow:0 1px 0 rgba(255,255,255,.04),0 6px 16px rgba(0,0,0,.35)}
+
+& .hero{background:linear-gradient(135deg,#147a63,#08241e 72%);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 16px 40px rgba(0,0,0,.5)}
+& .guia-link{background:linear-gradient(135deg,#137761,#0a2c25);box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 10px 26px rgba(0,0,0,.4)}
+
+/* dock de vidro */
+& .abas{background:rgba(17,27,23,.64);border-color:rgba(255,255,255,.09);box-shadow:0 16px 36px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08)}
+& .abas::before{background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,0) 55%)}
+& .abas a.on{color:var(--ac)}
+& .pilula{background:color-mix(in srgb,var(--ac) 16%,transparent)}
+
+& .tb .ok{color:#5fd68a}& .tb .no{color:#ff8a72}
+& .tb tbody tr:nth-child(even) td,& .tb tbody tr:nth-child(even) th{background:color-mix(in srgb,#fff 3%,var(--card))}
+& .fav{background:color-mix(in srgb,#2ea05a 17%,var(--card))}
+& .des{background:color-mix(in srgb,#d9482b 15%,var(--card))}
+& .btn.on{background:color-mix(in srgb,#f4b400 16%,var(--card));border-color:#a97c00;color:#ffd966}
+& .rodape .avatar{background:#f2efe7;border-color:var(--bd2)}
+& .aviso{background:var(--aviso);border:1px solid var(--bd2)}
+& .instalar{background:var(--ac-soft)}

@@ -15,21 +15,94 @@
   const plural = (n, a, b) => `${n} ${n === 1 ? a : b}`;
   const rotuloAula = (id) => id === '00' ? 'Exemplos' : id.replace(/^0/, '');
 
+  // ---------- tema ----------
+  const aplicaTema = (t) => {
+    const raiz = document.documentElement;
+    if (t === 'claro' || t === 'escuro') raiz.dataset.tema = t; else delete raiz.dataset.tema;
+    const escuro = t === 'escuro' || (t !== 'claro' && matchMedia('(prefers-color-scheme: dark)').matches);
+    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => { m.removeAttribute('media'); m.setAttribute('content', escuro ? '#090f0d' : '#f4f7f5'); });
+  };
+
   // ---------- armazenamento (nunca quebra se o navegador bloquear) ----------
   const guarda = {
     ler(k, pad) { try { const v = localStorage.getItem(k); return v == null ? pad : JSON.parse(v); } catch { return pad; } },
     gravar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* sem armazenamento */ } },
   };
   let salvos = new Set(guarda.ler('atlas.salvos', []));
+  const atualizaBadgeSalvos = () => { const b = document.getElementById('salvos-n'); if (b) { b.textContent = salvos.size || ''; b.hidden = !salvos.size; } };
   const alternarSalvo = (id) => {
     salvos.has(id) ? salvos.delete(id) : salvos.add(id);
-    guarda.gravar('atlas.salvos', [...salvos]);
+    guarda.gravar('atlas.salvos', [...salvos]); atualizaBadgeSalvos();
     return salvos.has(id);
   };
 
   // ---------- dados ----------
   let D = null, S = null, guiaPorId = new Map(), porId = new Map(), nomes = { aula: {}, mec: {}, nu: {}, el: {} }, texto = new Map();
   const get = (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
+
+  // ---------- busca: sinônimos e tolerância a erros de digitação ----------
+  const compacto = (t) => norm(t).replace(/[-()'’]/g, '').replace(/\s+/g, ' ').trim();
+  const textoC = new Map();
+  let vocab = null;
+  const SINONIMOS = [
+    ['terc-butila', 't-butila', 'tercbutil', 't-bu', 'tbu', 'tert-butil', 'tert-butyl', 'terc-butil', 't-butil'],
+    ['brometo', 'bromide'], ['cloreto', 'chloride'], ['iodeto', 'iodide'],
+    ['etóxido', 'etoxido', 'etona', 'eto-', 'etoh'], ['metóxido', 'metoxido', 'ome', 'meo-'],
+    ['hidróxido', 'hidroxido', 'hidroxila', 'oh-', 'naoh', 'koh'],
+    ['álcool', 'alcool', 'alcohol'], ['alceno', 'olefina', 'alkene'], ['alcino', 'alkyne'],
+    ['carbocátion', 'carbocation', 'cátion', 'carbocatiao'],
+    ['nucleófilo', 'nucleofilo', 'nu-', 'nuc'], ['eletrófilo', 'eletrofilo', 'electrofilo'],
+    ['markovnikov', 'markownikoff', 'markovnikoff'], ['zaitsev', 'saytzeff', 'zaitsef', 'saytsev', 'zaitzev'], ['hofmann', 'hoffman'],
+    ['sn1', 'snl', 'unimolecular'], ['sn2', 'bimolecular'], ['e1', 'eliminação unimolecular'], ['e2', 'eliminação bimolecular'],
+    ['epóxido', 'epoxido', 'oxirano', 'epoxide'], ['halidrina', 'haloidrina', 'halohydrin'],
+    ['bromônio', 'bromonio', 'halônio', 'halonio'], ['mcpba', 'peroxiácido', 'peroxiacido', 'perácido', 'peracido'],
+    ['ósmio', 'osmio', 'oso4', 'osmium'], ['ozonólise', 'ozonolise', 'o3', 'ozonolysis'],
+    ['hidroboração', 'hidroboracao', 'borano', 'bh3', 'hydroboration'], ['oximercuração', 'oximercuracao', 'mercúrio', 'mercurio', 'hg(oac)2'],
+    ['hidrogenação', 'hidrogenacao', 'lindlar', 'pd/c'], ['carbeno', 'carbene', 'metileno', 'carbenoide'],
+    ['radical', 'radicalar', 'radicais'], ['inversão', 'inversao', 'walden'], ['racemização', 'racemizacao', 'racêmico', 'racemico', 'racêmica'],
+    ['grupo abandonador', 'grupo de saída', 'grupo de saida', 'leaving group'], ['solvólise', 'solvolise', 'solvolysis'],
+    ['tosilato', 'tosila', 'ots', 'tosylate', 'tscl'], ['rearranjo', 'rearranjos', 'migração', 'migracao', 'hidreto'],
+    ['cianeto', 'cn-', 'nacn', 'kcn'], ['dmso', 'dimetilsulfóxido'], ['thf', 'tetraidrofurano', 'tetrahidrofurano'],
+    ['desidratação', 'desidratacao', 'dehidratacao'], ['halogenação', 'halogenacao', 'bromação', 'bromacao', 'cloração', 'cloracao'],
+    ['estereoquímica', 'estereoquimica', 'estéreo', 'stereo'], ['enantiômero', 'enantiomero', 'enantiomeros'],
+  ];
+  const sinMap = new Map();
+  SINONIMOS.forEach((g) => { const cs = g.map(compacto); cs.forEach((c) => sinMap.set(c, [...new Set([...(sinMap.get(c) || []), ...cs])])); });
+  const casa = (id, tok) => {
+    if (texto.get(id).includes(tok)) return true;
+    const c = compacto(tok), tc = ' ' + textoC.get(id);
+    const alt = sinMap.get(c);
+    return alt ? alt.some((x) => tc.includes(' ' + x)) : tc.includes(c);
+  };
+  function distancia(a, b, max) { // Levenshtein com corte
+    if (Math.abs(a.length - b.length) > max) return max + 1;
+    let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+    for (let i = 1; i <= a.length; i++) {
+      const cur = [i]; let menor = i;
+      for (let j = 1; j <= b.length; j++) { const v = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); cur.push(v); menor = Math.min(menor, v); }
+      if (menor > max) return max + 1;
+      prev = cur;
+    }
+    return prev[b.length];
+  }
+  function corrige(tok) {
+    if (tok.length < 4) return tok;
+    if (!vocab) { vocab = new Map(); D.reacoes.forEach((r) => (texto.get(r.i).match(/[a-z0-9]{4,}/g) || []).forEach((w) => vocab.set(w, (vocab.get(w) || 0) + 1))); }
+    const max = tok.length >= 8 ? 2 : 1;
+    let melhor = tok, md = max + 1, mc = 0;
+    for (const [w, n] of vocab) { const d = distancia(tok, w, max); if (d < md || (d === md && n > mc)) { melhor = w; md = d; mc = n; } }
+    return md <= max ? melhor : tok;
+  }
+
+  // ---------- filtros combinados (aula + mecanismo + nucleófilo + eletrófilo) ----------
+  let filtrosSel = { a: '', c: '', nu: '', el: '' };
+  const passaFiltros = (r) => (!filtrosSel.a || r.a === filtrosSel.a) && (!filtrosSel.c || r.c.includes(filtrosSel.c)) && (!filtrosSel.nu || r.nu.includes(filtrosSel.nu)) && (!filtrosSel.el || r.el.includes(filtrosSel.el));
+  const filtrosAtivos = () => Object.values(filtrosSel).some(Boolean);
+  const selFiltro = (k, rotulo, lista) => `<label class="fsel"><span>${rotulo}</span><select data-filtro="${k}"><option value="">Todos</option>${lista.map(([v, n]) => `<option value="${esc(v)}"${filtrosSel[k] === v ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select></label>`;
+  const filtrosHtml = () => `<details class="filtros-av"${filtrosAtivos() ? ' open' : ''}><summary>Filtros${filtrosAtivos() ? ' <b>•</b>' : ''}</summary><div class="fgrade">
+    ${selFiltro('a', 'Aula', D.aulas.map((x) => [x.id, 'Aula ' + rotuloAula(x.id)]))}${selFiltro('c', 'Mecanismo', D.categorias.map((x) => [x.id, x.nome]))}
+    ${selFiltro('nu', 'Nucleófilo', D.nucleofilos.map((x) => [x.id, x.nome]))}${selFiltro('el', 'Eletrófilo', D.eletrofilos.map((x) => [x.id, x.nome]))}
+    </div>${filtrosAtivos() ? '<button class="chip limpar" data-limpar-filtros>Limpar filtros</button>' : ''}</details>`;
 
   function prepara(d) {
     D = d;
@@ -43,6 +116,8 @@
       r.n, r.rg, r.cd, r.nt.replace(/<[^>]+>/g, ' '), 'aula ' + r.a, nomes.aula[r.a],
       ...r.c.map((x) => nomes.mec[x]), ...r.nu.map((x) => nomes.nu[x]), ...r.el.map((x) => nomes.el[x]),
     ].join(' '))));
+    d.reacoes.forEach((r) => textoC.set(r.i, compacto(texto.get(r.i))));
+    vocab = null;
   }
 
   // ---------- estruturas ----------
@@ -67,12 +142,13 @@
   // ---------- peças de tela ----------
   const etq = (tipo, id, link) => {
     const nome = nomes[tipo][id]; if (!nome) return '';
-    return link ? `<a class="etq ${tipo}" href="#/${tipo}/${id}">${esc(nome)}</a>` : `<span class="etq ${tipo}">${esc(nome)}</span>`;
+    const cor = tipo === 'mec' ? ` c-${id}` : '';
+    return link ? `<a class="etq ${tipo}${cor}" href="#/${tipo}/${id}">${esc(nome)}</a>` : `<span class="etq ${tipo}${cor}">${esc(nome)}</span>`;
   };
   function itemHtml(r, i) {
     const on = salvos.has(r.i);
-    return `<div class="item sobe" style="--i:${i}"><a href="#/r/${r.i}">
-      <div class="linha">Aula ${rotuloAula(r.a)}${r.s ? `<em>slides ${esc(r.s)}</em>` : ''}</div>
+    return `<div class="item sobe c-${r.c[0] || 'mecanismos-gerais'}" data-c="1" style="--i:${i}"><a href="#/r/${r.i}">
+      <div class="linha">Aula ${rotuloAula(r.a)}${r.s ? `<em>slides ${esc(r.s)}</em>` : ''}${dominada(r.i) ? '<span class="selo dom" title="Dominada">✓</span>' : ''}${comNota(r.i) ? '<span class="selo nota" title="Tem anotação">✎</span>' : ''}</div>
       <b>${esc(r.n)}</b><div class="etqs">${r.c.slice(0, 3).map((c) => etq('mec', c)).join('')}</div></a>
       <button class="estrela${on ? ' on' : ''}" data-salvar="${r.i}" aria-label="${on ? 'Remover dos salvos' : 'Salvar'}" aria-pressed="${on}">${STAR}</button></div>`;
   }
@@ -80,9 +156,9 @@
 
   // ---------- telas ----------
   function telaAulas() {
-    const stats = `<div class="stats"><div><b data-n="${D.reacoes.length}">${D.reacoes.length}</b><span>reações</span></div><div><b data-n="${D.aulas.filter((a) => a.id !== '00').length}">${D.aulas.filter((a) => a.id !== '00').length}</b><span>aulas</span></div><div><b data-n="${D.categorias.length}">${D.categorias.length}</b><span>mecanismos</span></div></div>`;
+    const stats = `<div class="stats"><div><b data-n="${D.reacoes.length}">${D.reacoes.length}</b><span>reações</span></div><div><b data-n="${D.aulas.filter((a) => a.id !== '00').length}">${D.aulas.filter((a) => a.id !== '00').length}</b><span>aulas</span></div><div><b data-n="${progressoGeral().dom}">${progressoGeral().dom}</b><span>dominadas</span></div></div>`;
     const hex = '<svg class="hex" viewBox="0 0 100 100"><path d="M50 8 L86 29 L86 71 L50 92 L14 71 L14 29 Z"/></svg><svg class="hex" viewBox="0 0 100 100"><path d="M50 8 L86 29 L86 71 L50 92 L14 71 L14 29 Z"/></svg>';
-    const itens = D.aulas.map((a, i) => `<a class="aula sobe" style="--i:${i + 2}" href="#/aula/${a.id}"><div class="num">${a.id === '00' ? 'Ex.' : rotuloAula(a.id)}</div><div class="tx"><b>${esc(a.nome)}</b><small>${plural(a.n, 'reação', 'reações')}</small></div>${SETA_IR}</a>`).join('');
+    const itens = D.aulas.map((a, i) => `<a class="aula sobe" style="--i:${i + 2}" href="#/aula/${a.id}"><div class="num">${a.id === '00' ? 'Ex.' : rotuloAula(a.id)}</div><div class="tx"><b>${esc(a.nome)}</b><small>${plural(a.n, 'reação', 'reações')}${progressoAula(a.id).dom ? ` · ${progressoAula(a.id).dom} dominadas` : ''}</small><span class="mini-prog"><i style="width:${progressoAula(a.id).pct.toFixed(0)}%"></i></span></div>${SETA_IR}</a>`).join('');
     return {
       titulo: 'Atlas Orgânico', aba: 'aulas', prof: 0,
       html: `<section class="hero sobe">${hex}<h2>Reações de Química Orgânica II</h2><p>Toda a matéria, organizada para estudar.</p>${stats}</section>
@@ -91,8 +167,9 @@
         <a class="guia-link sobe" style="--i:2" href="#/mec"><span class="gl-ic">vs</span><span class="gl-tx"><b>Guias rápidos de mecanismos</b><small>SN1, SN2, E1, E2, alcenos e mais</small></span>${SETA_IR}</a>
         <div class="sec"><h3>Por aula</h3><span>${D.aulas.length} aulas</span></div>${itens}
         <a class="aula sobe" style="--i:${D.aulas.length + 3}" href="#/todas"><div class="num">∑</div><div class="tx"><b>Todas as reações</b><small>${plural(D.reacoes.length, 'reação', 'reações')}</small></div>${SETA_IR}</a>
+        <div class="tema" role="group" aria-label="Tema"><button data-tema="auto">Auto</button><button data-tema="claro">Claro</button><button data-tema="escuro">Escuro</button></div>
         <div class="rodape"><button class="avatar" data-creditos aria-label="Créditos">${DINO_AVATAR}</button><br>Versão ${BUILD}<br><button data-verificar>Verificar atualização</button></div>`,
-      depois: () => { montaInstalar(); contaAte(tela); },
+      depois: () => { montaInstalar(); contaAte(tela); marcaTema(); },
     };
   }
 
@@ -108,7 +185,7 @@
     return {
       titulo: info[0], aba: tipo, prof: 0,
       html: `<h2 class="titulo-lista sobe">${info[0]}</h2><p class="sub-lista sobe" style="--i:1">${info[1]}</p>${nota}${guias}
-        <div class="grade">${lista.map((x, i) => `<a class="ficha k-${tipo} sobe" style="--i:${i + 2}" href="#/${tipo}/${x.id}"><b>${esc(x.nome)}</b><small>${x.n}</small></a>`).join('')}</div>`,
+        <div class="grade">${lista.map((x, i) => `<a class="ficha k-${tipo}${tipo === 'mec' ? ' c-' + x.id : ''} sobe" style="--i:${i + 2}" href="#/${tipo}/${x.id}"><b>${esc(x.nome)}</b><small>${x.n}</small></a>`).join('')}</div>`,
     };
   }
 
@@ -199,7 +276,7 @@
     let base, nome, aba, prof = 1, sub = '';
     if (tipo === 'aula') { base = D.reacoes.filter((r) => r.a === id); nome = 'Aula ' + rotuloAula(id); sub = nomes.aula[id] || ''; aba = 'aulas'; }
     else if (tipo === 'todas') { base = D.reacoes; nome = 'Todas as reações'; aba = 'aulas'; }
-    else if (tipo === 'salvos') { base = D.reacoes.filter((r) => salvos.has(r.i)); nome = 'Salvos'; aba = 'salvos'; prof = 0; sub = 'Suas reações favoritas, mesmo offline.'; }
+    else if (tipo === 'salvos') { base = D.reacoes.filter((r) => salvos.has(r.i)); nome = 'Salvos'; aba = 'estudar'; prof = 1; sub = 'Suas reações favoritas, mesmo offline.'; }
     else { base = D.reacoes.filter((r) => r[{ mec: 'c', nu: 'nu', el: 'el' }[tipo]].includes(id)); nome = nomes[tipo][id] || 'Reações'; aba = tipo; }
     if (!nome) return null;
     // filtros: por mecanismo dentro de uma aula; por aula nos demais
@@ -208,18 +285,20 @@
     base.forEach((r) => (porAula ? [r.a] : r.c).forEach((k) => cont.set(k, (cont.get(k) || 0) + 1)));
     const chaveFiltro = tipo + ':' + id;
     if (!filtroAtual || filtroAtual.chave !== chaveFiltro) filtroAtual = { chave: chaveFiltro, v: null };
-    const chips = [...cont].sort((a, b) => (porAula ? a[0].localeCompare(b[0]) : b[1] - a[1]));
+    const chips = tipo === 'todas' ? [] : [...cont].sort((a, b) => (porAula ? a[0].localeCompare(b[0]) : b[1] - a[1]));
     return {
       titulo: nome, aba, prof,
       html: `<h2 class="titulo-lista sobe">${esc(nome)}</h2>
         <p class="sub-lista sobe" style="--i:1">${sub ? esc(sub) + ' · ' : ''}<span id="contagem"></span></p>
         ${tipo === 'mec' ? guiaLink(id) : ''}
+        ${tipo === 'todas' ? `<div class="sobe" style="--i:2" id="filtros-av">${filtrosHtml()}</div>` : ''}
         ${chips.length > 1 ? `<div class="filtros sobe" style="--i:2" id="filtros"><button class="chip on" data-f="">Todas</button>${chips.map(([k, n]) => `<button class="chip" data-f="${esc(k)}">${esc(porAula ? 'Aula ' + rotuloAula(k) : nomes.mec[k] || k)}<i>${n}</i></button>`).join('')}</div>` : ''}
         <div id="itens"></div>`,
       depois: () => {
         const pinta = () => {
           const f = filtroAtual.v;
-          const l = f ? base.filter((r) => (porAula ? r.a === f : r.c.includes(f))) : base;
+          let l = f ? base.filter((r) => (porAula ? r.a === f : r.c.includes(f))) : base;
+          if (tipo === 'todas') l = l.filter(passaFiltros);
           $('#contagem').textContent = plural(l.length, 'reação', 'reações');
           $('#itens').innerHTML = l.length ? l.map(itemHtml).join('') : vazio(tipo === 'salvos' ? 'Toque na estrela de uma reação para guardá-la aqui.' : 'Nada por aqui.');
           ultimaLista = l.map((r) => r.i);
@@ -253,34 +332,43 @@
         ${navigator.share ? '<button class="btn" data-compartilhar>Compartilhar</button>' : ''}</div>
         <div class="cartao sobe" style="--i:4"><div class="esquema">${lado(r.r)}${seta(r.rg, r.cd)}${lado(r.p, n0)}</div></div>
         ${r.nt ? `<div class="cartao sobe" style="--i:5"><p class="notas">${r.nt}</p></div>` : ''}
+        ${estudoDetalheHtml(r)}
         ${mec}
         <div class="nav-det">${nav(ant, '<span class="nudge-e">←</span> Anterior')}${nav(prox, 'Próxima <span class="nudge">→</span>')}</div></article>`,
+      depois: estudoDetalheDepois,
     };
   }
 
   function telaBusca() {
     return {
       titulo: 'Buscar', aba: undefined, prof: 1,
-      html: `<div class="campo"><input id="q" type="search" placeholder="Ex.: SN2, bromônio, Zaitsev, epóxido…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"></div><div id="resultados"></div>`,
+      html: `<div class="campo"><input id="q" type="search" placeholder="Ex.: SN2, t-BuBr, Zaitsev, epóxido…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"></div><div id="filtros-av">${filtrosHtml()}</div><div id="resultados"></div>`,
       depois: () => {
         const q = $('#q'), out = $('#resultados');
         const sugest = ['SN2', 'SN1', 'E2', 'Zaitsev', 'Markovnikov', 'carbeno', 'bromônio', 'epóxido', 'rearranjo', 'Hammond'];
         const vazioInicial = () => { out.innerHTML = `<div class="sec"><h3>Sugestões</h3></div><div class="filtros" style="flex-wrap:wrap;overflow:visible">${sugest.map((s) => `<button class="chip" data-sug="${s}">${s}</button>`).join('')}</div>`; };
         let t;
+        const filtra = (tok) => D.reacoes.filter((r) => tok.every((k) => casa(r.i, k)) && passaFiltros(r));
         const buscar = () => {
-          const tok = norm(q.value).split(/\s+/).filter(Boolean);
-          if (!tok.length) return vazioInicial();
-          const res = D.reacoes.filter((r) => tok.every((k) => texto.get(r.i).includes(k)));
+          let tok = norm(q.value).split(/\s+/).filter(Boolean), aviso = '';
+          if (!tok.length && !filtrosAtivos()) return vazioInicial();
+          let res = filtra(tok);
+          if (!res.length && tok.length) { // tolerância a erro de digitação: troca cada palavra pela mais parecida do atlas
+            const certo = tok.map((k) => (D.reacoes.some((r) => casa(r.i, k)) ? k : corrige(k)));
+            if (certo.join(' ') !== tok.join(' ')) { const r2 = filtra(certo); if (r2.length) { res = r2; aviso = `<p class="didyou">Mostrando resultados para “<b>${esc(certo.join(' '))}</b>”</p>`; } }
+          }
           ultimaLista = res.map((r) => r.i);
-          out.innerHTML = `<div class="sec"><h3>Resultados</h3><span>${plural(res.length, 'reação', 'reações')}</span></div>` + (res.length ? res.slice(0, 80).map(itemHtml).join('') + (res.length > 80 ? `<p class="vazio">Mostrando 80 de ${res.length}. Refine a busca.</p>` : '') : vazio('Nada encontrado. Tente outra palavra.'));
+          out.innerHTML = `<div class="sec"><h3>Resultados</h3><span>${plural(res.length, 'reação', 'reações')}</span></div>${aviso}` + (res.length ? res.slice(0, 80).map(itemHtml).join('') + (res.length > 80 ? `<p class="vazio">Mostrando 80 de ${res.length}. Refine a busca.</p>` : '') : vazio('Nada encontrado. Tente outra palavra.'));
         };
+        buscaAtual = buscar;
         q.addEventListener('input', () => { clearTimeout(t); t = setTimeout(buscar, 90); });
         out.addEventListener('click', (e) => { const s = e.target.closest('[data-sug]'); if (s) { q.value = s.dataset.sug; buscar(); } });
-        vazioInicial();
+        if (filtrosAtivos()) buscar(); else vazioInicial();
         q.focus({ preventScroll: true });
       },
     };
   }
+  let buscaAtual = null;
 
   // ---------- instalar (atalho na tela inicial) ----------
   let promptInstalar = null;
@@ -305,11 +393,15 @@
     if (a === 'aula') return telaLista('aula', b);
     if (a === 'todas') return telaLista('todas');
     if (a === 'salvos') return telaLista('salvos');
+    if (a === 'estudar') return telaEstudar();
+    if (a === 'cartoes') return telaCartoes();
+    if (a === 'simulado') return telaSimulado();
+    if (a === 'notas') return telaNotas();
     if (a === 'r') return telaDetalhe(b);
     if (a === 'busca') return telaBusca();
     return null;
   }
-  const TITULOS = { aulas: 'Aulas', mec: 'Mecanismos', nu: 'Nucleófilos', el: 'Eletrófilos', salvos: 'Salvos' };
+  const TITULOS = { aulas: 'Aulas', mec: 'Mecanismos', nu: 'Nucleófilos', el: 'Eletrófilos', salvos: 'Salvos', estudar: 'Estudar' };
 
   function mostra() {
     if (!D) return;
@@ -350,6 +442,8 @@
   });
   window.addEventListener('hashchange', () => { window.__navegou = true; });
   $('#buscar').addEventListener('click', () => { location.hash = '#/busca'; });
+  $('#salvosbtn').addEventListener('click', () => { location.hash = '#/salvos'; });
+  atualizaBadgeSalvos();
 
   // ---------- Motion (animações com a biblioteca Motion, a API do Framer) ----------
   // Se a biblioteca não carregar (ou o sistema pedir menos movimento), tudo continua visível e funcional.
@@ -632,6 +726,19 @@
     document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape' && creditosEl === el) { fecha(); document.removeEventListener('keydown', esc); } });
   }
 
+  const marcaTema = () => { const t = guarda.ler('atlas.tema', 'auto'); document.querySelectorAll('.tema [data-tema]').forEach((b) => b.classList.toggle('on', b.dataset.tema === t)); };
+  aplicaTema(guarda.ler('atlas.tema', 'auto'));
+  matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => aplicaTema(guarda.ler('atlas.tema', 'auto')));
+
+  document.addEventListener('change', (e) => {
+    const s = e.target.closest && e.target.closest('[data-filtro]');
+    if (!s) return;
+    filtrosSel[s.dataset.filtro] = s.value;
+    const h = rotaAtual.split('/')[1];
+    if (h === 'busca' && buscaAtual) { $('#filtros-av').innerHTML = filtrosHtml(); buscaAtual(); const d = $('#filtros-av details'); if (d) d.open = true; }
+    else if (h === 'todas') { mostra(); }
+  });
+
   // ---------- cliques ----------
   document.addEventListener('click', (e) => {
     const t = e.target;
@@ -651,6 +758,9 @@
     const ir = t.closest('[data-ir]'); if (ir) { location.hash = ir.dataset.ir; return; }
     if (t.closest('[data-instalar]') && promptInstalar) { promptInstalar.prompt(); promptInstalar.userChoice.finally(() => { promptInstalar = null; $('#instalar').innerHTML = ''; }); return; }
     if (t.closest('[data-fechar-instalar]')) { guarda.gravar('atlas.instalar', true); $('#instalar').innerHTML = ''; return; }
+    if (t.closest('[data-limpar-filtros]')) { filtrosSel = { a: '', c: '', nu: '', el: '' }; const h = rotaAtual.split('/')[1]; if (h === 'busca' && buscaAtual) { $('#filtros-av').innerHTML = filtrosHtml(); buscaAtual(); } else mostra(); return; }
+    const tb = t.closest('.tema [data-tema]');
+    if (tb) { guarda.gravar('atlas.tema', tb.dataset.tema); aplicaTema(tb.dataset.tema); marcaTema(); return; }
     if (t.closest('[data-verificar]')) { verifica(true); return; }
     if (t.closest('[data-creditos]')) { abreCreditos(e); return; }
     const tl = t.closest('.tile');
@@ -697,6 +807,8 @@
   setInterval(() => verifica(false), 5 * 60 * 1000);
 
   if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+
+  /*@@estudo*/
 
   // ---------- início ----------
   tela.innerHTML = '<div class="tela"><div class="carregando"><div class="atomo"><i style="--r:0deg"><s></s></i><i style="--r:60deg"><s></s></i><i style="--r:120deg"><s></s></i><b></b></div><p>Carregando…</p></div></div>';
