@@ -14,6 +14,7 @@ import { fileURLToPath } from 'node:url';
 import initRDKit from '@rdkit/rdkit';
 import sharp from 'sharp';
 import { lerMolblock, posicoesAtomos, marcarSetas } from './setas.mjs';
+import { resolveCids } from './cid.mjs';
 
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FONTE = path.join(raiz, 'fonte');
@@ -291,6 +292,26 @@ for (const o of window_ESTEREO) {
   if (rr.includes(null) || pp.includes(null)) continue;
   r.reactants = rr; r.products = pp; r.estereo = true;
 }
+// Links 3D (PubChem) para as moléculas com estereoquímica das reações marcadas
+const temEstereo = (s) => /@|[\/\\]/.test(s);
+const molsEstereo = [];
+REACTIONS.filter((r) => r.estereo).forEach((r) => [...r.reactants, ...r.products].forEach((s) => { if (temEstereo(s)) molsEstereo.push(s); }));
+const cidDe = await resolveCids(RDKit, [...new Set(molsEstereo)], path.join(FONTE, 'dados/cid-cache.json'));
+const semCid = [];
+REACTIONS.filter((r) => r.estereo).forEach((r) => {
+  const vistos = new Set(), d3 = [];
+  [['Reagente', r.reactants], ['Produto', r.products]].forEach(([rot, l]) => l.forEach((s) => {
+    if (!temEstereo(s)) return;
+    const x = cidDe(s);
+    if (!x) { semCid.push(s); return; }
+    if (vistos.has(x.cid)) return;
+    vistos.add(x.cid); d3.push({ c: x.cid, t: x.titulo, k: rot });
+  }));
+  r.d3 = d3;
+  // as notas antigas diziam que os desenhos não tinham estereoquímica: já não é verdade
+  r.notas = (r.notas || '').replace(/\s*[^.]*(A estereoquímica dos desenhos foi omitida|O SMILES não distingue E\/Z|o SMILES não tem estereoquímica)[^.]*\./g, '').trim();
+});
+if (semCid.length) console.log('Sem CID no PubChem (sem link 3D):', [...new Set(semCid)]);
 const slideIni = (s) => parseInt(/\d+/.exec(s || '')?.[0] || '0', 10);
 const ordenadas = REACTIONS.map((r, i) => ({ r, i, aula: idAula(r.aula) })).sort((a, b) =>
   a.aula.localeCompare(b.aula) || slideIni(a.r.slides) - slideIni(b.r.slides) || a.i - b.i);
@@ -300,7 +321,7 @@ const reacoes = ordenadas.map(({ r, aula }, n) => {
   const sv = (arr) => (arr || []).map(desenhar);
   const o = {
     i: n + 1, a: aula, s: r.slides || '', n: r.nome, c: r.categories || [], nu, el,
-    rg: r.reagents || '', cd: r.conditions || '',
+    rg: r.reagents || '', cd: r.conditions || '', d3: r.d3 || undefined,
     r: sv(r.reactants), p: sv(r.products), nt: r.notas || '',
     m: (r.mecanismo || []).map((m) => ({ t: m.titulo, x: m.texto, s: sv(m.smiles) })),
   };

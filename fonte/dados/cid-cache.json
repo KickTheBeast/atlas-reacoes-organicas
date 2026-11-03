@@ -1,0 +1,138 @@
+{
+ "CCCCCC[C@@H](C)Br": {
+  "cid": 12216026,
+  "titulo": "sec-Octyl bromide, (-)-"
+ },
+ "CCCCCC[C@H](C)O": {
+  "cid": 2723888,
+  "titulo": "(+)-2-Octanol"
+ },
+ "CCC[C@@](C)(Br)CC": {
+  "cid": 87473731,
+  "titulo": "(s)-3-Bromo-3-methylhexane"
+ },
+ "CCC[C@](C)(O)CC": {
+  "cid": 6999791,
+  "titulo": "3-Hexanol, 3-methyl-, (R)-"
+ },
+ "CCC[C@@](C)(O)CC": {
+  "cid": 6993476,
+  "titulo": "(3S)-3-methylhexan-3-ol"
+ },
+ "CCCCCC[C@@H](C)O": {
+  "cid": 80080,
+  "titulo": "(R)-2-Octanol"
+ },
+ "C[C@@H](Br)C(=O)O": {
+  "cid": 6992152,
+  "titulo": "(2R)-2-Bromopropanoic acid"
+ },
+ "CCCCCC[C@H](C)Br": {
+  "cid": 12216025,
+  "titulo": "sec-Octyl bromide, (+)-"
+ },
+ "CCCCCC[C@@H](C)OCC": {
+  "cid": 40523743,
+  "titulo": "(2R)-2-ethoxyoctane"
+ },
+ "CCCCCC[C@@H](C)OS(=O)(=O)c1ccc(C)cc1": {
+  "cid": 7832377,
+  "titulo": "[(2R)-octan-2-yl] 4-methylbenzenesulfonate"
+ },
+ "CCCCCC[C@H](C)OCC": {
+  "cid": 40523770,
+  "titulo": "Ethyl 1-methylheptyl ether"
+ },
+ "C/C=C/c1ccccc1": {
+  "cid": 252325,
+  "titulo": "trans-beta-METHYLSTYRENE"
+ },
+ "C/C=C\\c1ccccc1": {
+  "cid": 252324,
+  "titulo": "beta-Methylstyrene, cis-"
+ },
+ "Br[C@H](c1ccccc1)[C@@H](Br)c1ccccc1": {
+  "cid": 2753450,
+  "titulo": "meso-1,2-Dibromo-1,2-diphenylethane"
+ },
+ "Br/C(=C/c1ccccc1)c1ccccc1": {
+  "cid": 11821296,
+  "titulo": "[(E)-1-bromo-2-phenylethenyl]benzene"
+ },
+ "CC[C@H](C)Br": {
+  "cid": 12236140,
+  "titulo": "2-Bromobutane, (S)-"
+ },
+ "CC[C@@H](C)S": {
+  "cid": 444090,
+  "titulo": "(2R)-butane-2-thiol"
+ },
+ "C/C=C\\C": {
+  "cid": 5287573,
+  "titulo": "cis-2-BUTENE"
+ },
+ "C[C@@H]1C[C@@H]1C": {
+  "cid": 252321,
+  "titulo": "Cis-1,2-dimethylcyclopropane"
+ },
+ "C[C@@H]1[C@H](C)C1(Br)Br": {
+  "cid": 12678392,
+  "titulo": "cis-1,1-Dibromo-2,3-dimethylcyclopropane"
+ },
+ "CC/C=C\\CC": {
+  "cid": 643783,
+  "titulo": "cis-3-Hexene"
+ },
+ "CCC/C=C/CCC": {
+  "cid": 5357253,
+  "titulo": "4-Octene, (4E)-"
+ },
+ "CC/C=C/CC": {
+  "cid": 638066,
+  "titulo": "trans-3-Hexene"
+ },
+ "Br[C@@H]1CCC[C@H]1Br": {
+  "cid": 12601463,
+  "titulo": "trans-1,2-Dibromocyclopentane"
+ },
+ "Br[C@H]1CCC[C@@H]1Br": {
+  "cid": 21122219,
+  "titulo": "trans-1,2-Dibromocyclopentane, 97%"
+ },
+ "C/C=C/C": {
+  "cid": 62695,
+  "titulo": "trans-2-BUTENE"
+ },
+ "C[C@H](Br)[C@@H](C)Br": {
+  "cid": 98508,
+  "titulo": "Butane, 2,3-dibromo-, (R*,S*)-"
+ },
+ "C[C@@H](Br)[C@@H](C)Br": {
+  "cid": 6430975,
+  "titulo": "Butane, 2,3-dibromo-, threo"
+ },
+ "C[C@H](Br)[C@H](C)Br": {
+  "cid": 23270428,
+  "titulo": "rel-(2S,3S)-2,3-dibromobutane"
+ },
+ "C[C@@H](O)[C@@H](C)O": {
+  "cid": 225936,
+  "titulo": "(2R,3R)-Butanediol"
+ },
+ "C[C@H](O)[C@H](C)O": {
+  "cid": 439888,
+  "titulo": "(+)-2,3-Butanediol"
+ },
+ "C[C@H](O)[C@@H](C)O": {
+  "cid": 220010,
+  "titulo": "Meso-2,3-Butanediol"
+ },
+ "O[C@@H]1CCCC[C@@H]1O": {
+  "cid": 92903,
+  "titulo": "cis-1,2-Cyclohexanediol"
+ },
+ "C[C@H](O)C(=O)O": {
+  "cid": 107689,
+  "titulo": "L-Lactic Acid"
+ }
+}

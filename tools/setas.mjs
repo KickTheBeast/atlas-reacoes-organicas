@@ -159,13 +159,8 @@ export function marcarSetas(pos, rotulados, ligacoes, setas) {
     const N = [E[0] - t[0] * 3.6, E[1] - t[1] * 3.6];            // reentrância na traseira: ponta mais elegante
     const f = (v) => v.map((x) => x.toFixed(1)).join(' ');
     const d = `M${f(S)} Q${f(C)} ${f(B)}`;
-    const T = 6.5;                                                // duração do ciclo (igual ao CSS)
-    svg += `<path class="seta-c" pathLength="1" style="--i:${idx}" d="${d}" fill="none" stroke="${AZUL}" stroke-width="1.9" stroke-linecap="round"/>` +
-           `<path class="seta-h" style="--i:${idx}" d="M${f(E)} L${f(P1)} L${f(N)} L${f(P2)} Z" fill="${AZUL}" stroke="${AZUL}" stroke-width=".5" stroke-linejoin="round"/>` +
-           `<circle class="seta-r" style="--i:${idx}" cx="${E[0].toFixed(1)}" cy="${E[1].toFixed(1)}" r="4" fill="none" stroke="${AZUL}" stroke-width="1.1"/>` +
-           `<circle class="seta-e" r="2.3" fill="${AZUL}" opacity="0">` +
-           `<animateMotion dur="${T}s" begin="${idx}s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.02;.17;1" keyPoints="0;0;1;1" keySplines="0 0 1 1;.65 0 .35 1;0 0 1 1" path="${d}"/>` +
-           `<animate attributeName="opacity" dur="${T}s" begin="${idx}s" repeatCount="indefinite" values="0;0;.95;.95;0;0" keyTimes="0;.02;.04;.17;.2;1"/></circle>`;
+    svg += `<path class="seta-c" pathLength="1" d="${d}" fill="none" stroke="${AZUL}" stroke-width="1.9" stroke-linecap="round"/>` +
+           `<path class="seta-h" d="M${f(E)} L${f(P1)} L${f(N)} L${f(P2)} Z" fill="${AZUL}" stroke="${AZUL}" stroke-width=".5" stroke-linejoin="round"/>`;
     [S, E, C].forEach(toca);
   });
   return { svg, ext, avisos };

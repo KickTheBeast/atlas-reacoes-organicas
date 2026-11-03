@@ -121,15 +121,88 @@
   }
 
   // ---------- estruturas ----------
-  // As setas de elétrons só animam enquanto o esquema está na tela (poupa bateria)
-  // (a animação SMIL do elétron é reiniciada junto com a do CSS e pausada quando sai da tela)
-  const setaAnim = (el, ligada) => {
-    const sv = el.querySelector('svg');
-    if (ligada) { sv && sv.setCurrentTime && sv.setCurrentTime(0); sv && sv.unpauseAnimations && sv.unpauseAnimations(); }
-    else sv && sv.pauseAnimations && sv.pauseAnimations();
-    el.classList.toggle('anima', ligada);
-  };
-  const ioSetas = 'IntersectionObserver' in window ? new IntersectionObserver((es) => es.forEach((e) => setaAnim(e.target, e.isIntersecting)), { threshold: 0.35 }) : null;
+  // ---------- setas de elétrons animadas (Motion) ----------
+  // Cada seta é desenhada em ordem: um cometa de elétrons corre pela curva, o traço o acompanha, a ponta estala
+  // e uma onda sai dela. No fim, o produto "se forma" com um brilho. Só roda enquanto está na tela.
+  const SETA_AZUL = '#1f63d6', SVGNS = 'http://www.w3.org/2000/svg';
+  const ctrlSetas = new WeakMap();
+  function paraSetas(tile) {
+    const c = ctrlSetas.get(tile);
+    if (c) { c.parar(); ctrlSetas.delete(tile); }
+  }
+  function rodaSetas(tile) {
+    if (!usaMotion) return;
+    paraSetas(tile);
+    const svg = tile.querySelector('svg');
+    if (!svg) return;
+    const cs = [...svg.querySelectorAll('.seta-c')], hs = [...svg.querySelectorAll('.seta-h')];
+    if (!cs.length) return;
+    const passo = tile.closest('.passo'), prod = passo ? passo.querySelectorAll('.tile')[1] : null, vai = passo ? passo.querySelector('.vai') : null;
+    const ease = [0.65, 0, 0.35, 1];
+    let ativo = true;
+    const vivos = [], extras = [];
+    const reg = (a) => { vivos.push(a); return a; };
+    const esperar = (s) => new Promise((ok) => { const t = setTimeout(ok, s * 1000); vivos.push({ stop: () => { clearTimeout(t); ok(); } }); });
+    const restaura = () => {
+      extras.splice(0).forEach((e) => e.remove());
+      cs.forEach((c) => { c.style.strokeDashoffset = ''; c.style.opacity = ''; });
+      hs.forEach((h) => { h.style.opacity = ''; h.style.transform = ''; });
+      if (prod) { prod.style.transform = ''; prod.style.boxShadow = ''; }
+      tile.classList.remove('rodando');
+    };
+    const novo = (tag, attrs) => { const e = document.createElementNS(SVGNS, tag); Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, v)); svg.appendChild(e); extras.push(e); return e; };
+
+    async function desenha(i) {
+      const c = cs[i], h = hs[i], len = c.getTotalLength();
+      const dur = Math.min(1.15, Math.max(0.62, len / 110));
+      // cometa de elétrons: a cabeça brilha e deixa uma cauda que desbota
+      const pts = Array.from({ length: 7 }, (_, k) => novo('circle', { class: 'seta-d', r: (3.1 - k * 0.38).toFixed(2), fill: SETA_AZUL, opacity: '0' }));
+      const mover = (t) => pts.forEach((p, k) => {
+        const tt = t - k * 0.04;
+        if (tt <= 0) { p.setAttribute('opacity', 0); return; }
+        const q = c.getPointAtLength(len * Math.min(1, tt));
+        p.setAttribute('cx', q.x.toFixed(2)); p.setAttribute('cy', q.y.toFixed(2));
+        p.setAttribute('opacity', ((0.95 - k * 0.13) * (t > 0.97 ? Math.max(0, (1 - t) / 0.03) : 1)).toFixed(2));
+      });
+      c.style.strokeDashoffset = 1;
+      await Promise.all([reg(M.animate(0, 1, { duration: dur, ease, onUpdate: mover })), reg(M.animate(c, { strokeDashoffset: [1, 0] }, { duration: dur, ease }))]);
+      if (!ativo) return;
+      pts.forEach((p) => p.remove());
+      // ponta que estala + onda no ponto de chegada
+      const fim = c.getPointAtLength(len);
+      const onda = novo('circle', { class: 'seta-onda', cx: fim.x.toFixed(2), cy: fim.y.toFixed(2), r: 4, fill: 'none', stroke: SETA_AZUL, 'stroke-width': 1.2, opacity: 0 });
+      onda.style.transformBox = 'fill-box'; onda.style.transformOrigin = 'center';
+      h.style.transformBox = 'fill-box'; h.style.transformOrigin = 'center';
+      await Promise.all([
+        reg(M.animate(h, { opacity: [0, 1], scale: [0.15, 1.5, 1] }, { duration: 0.5, ease: [0.2, 1.4, 0.4, 1] })),
+        reg(M.animate(onda, { opacity: [0.75, 0], scale: [0.4, 3.2] }, { duration: 0.65, ease: 'easeOut' })),
+      ]);
+      onda.remove();
+    }
+    async function ciclo() {
+      while (ativo) {
+        restaura();
+        tile.classList.add('rodando');
+        cs.forEach((c) => { c.style.strokeDashoffset = 1; });
+        hs.forEach((h) => { h.style.opacity = 0; });
+        await esperar(0.55);
+        for (let i = 0; i < cs.length && ativo; i++) { await desenha(i); await esperar(0.12); }
+        if (!ativo) return;
+        // o produto se forma: pulso de luz e a seta "→" avança
+        if (prod) reg(M.animate(prod, { scale: [1, 1.06, 1], boxShadow: ['0 0 0 0 rgba(30,154,82,0)', '0 0 0 7px rgba(30,154,82,.3)', '0 0 0 0 rgba(30,154,82,0)'] }, { duration: 0.95, ease: 'easeOut' }));
+        if (vai) reg(M.animate(vai, { scale: [1, 1.5, 1] }, { duration: 0.6 }));
+        await esperar(3.6);
+        if (!ativo) return;
+        await Promise.all([reg(M.animate([...cs, ...hs], { opacity: [1, 0] }, { duration: 0.5 }))]);
+        await esperar(0.5);
+      }
+    }
+    const ctrl = { parar() { ativo = false; vivos.forEach((a) => { try { if (a.stop) a.stop(); else if (a.cancel) a.cancel(); } catch { /* já terminou */ } }); restaura(); } };
+    ctrlSetas.set(tile, ctrl);
+    ciclo();
+  }
+  const setaAnim = (el, ligada) => (ligada ? rodaSetas(el) : paraSetas(el));
+  const ioSetas = 'IntersectionObserver' in window ? new IntersectionObserver((es) => es.forEach((e) => setaAnim(e.target, e.isIntersecting)), { threshold: 0.4 }) : null;
   function hidrata(raiz) {
     raiz.querySelectorAll('.tile[data-m]').forEach((el) => {
       if (!S) return;
@@ -138,7 +211,7 @@
       if (!svg) { el.classList.replace('carrega', 'erro'); el.textContent = 'estrutura indisponível'; return; }
       el.classList.remove('carrega');
       el.innerHTML = svg;
-      if (svg.includes('seta-c')) { el.classList.add('com-setas'); ioSetas ? ioSetas.observe(el) : el.classList.add('anima'); }
+      if (svg.includes('seta-c')) { el.classList.add('com-setas'); if (ioSetas) ioSetas.observe(el); }
       const w = parseFloat((/viewBox='[\d.\-]+ [\d.\-]+ ([\d.]+)/.exec(svg) || [])[1]) || 160;
       el.style.setProperty('--w', Math.round(w));
     });
@@ -258,7 +331,7 @@
   const tabelaPadrao = (b) => `<div class="cartao tabela sobe"><h3 class="tb-titulo">${esc(b.t)}</h3><div class="tb-wrap"><table class="tb"><thead><tr>${b.cols.map((c) => `<th>${c}</th>`).join('')}</tr></thead><tbody>${b.rows.map((l) => `<tr>${l.map((c, i) => (i === 0 ? '<th scope="row">' : '<td>') + celulaHtml(c) + (i === 0 ? '</th>' : '</td>')).join('')}</tr>`).join('')}</tbody></table></div><div class="tb-dica" hidden>deslize para ver mais <span class="nudge">→</span></div>${b.nota ? `<p class="tb-nota">${esc(b.nota)}</p>` : ''}</div>`;
 
   const mecHtml = (b) => `<div class="cartao mec sobe"><h3 class="tb-titulo">${esc(b.t)}</h3>${b.nota ? `<p class="mec-nota">${esc(b.nota)}</p>` : ''}
-    <div class="mec-passos">${b.passos.map((p, i) => `<div class="passo sobe" style="--i:${i}"><div class="n">${i + 1}</div><h4>${esc(p.t.replace(/^\d+\.\s*/, ''))}</h4><p>${esc(p.x)}</p><div class="lado">${tile(p.r, 0)}<span class="vai">→</span>${tile(p.p, 1)}</div></div>`).join('')}</div></div>`;
+    <div class="mec-passos">${b.passos.map((p, i) => `<div class="passo sobe" style="--i:${i}"><div class="n">${i + 1}</div><h4><span>${esc(p.t.replace(/^\d+\.\s*/, ''))}</span>${p.r ? `<button class="rep-btn" data-repetir aria-label="Repetir a animação"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4.5V9h4.5"/></svg></button>` : ''}</h4><p>${esc(p.x)}</p><div class="lado">${tile(p.r, 0)}<span class="vai">→</span>${tile(p.p, 1)}</div></div>`).join('')}</div></div>`;
   const tabelaHtml = (b) => (b.cols.length === 3 && b.cols[0] === 'Fator' ? fatoresHtml(b) : b.cols.length === 2 && b.cols[0] === 'Propriedade' ? kvHtml(b) : tabelaPadrao(b));
 
   function telaGuia(id) {
@@ -344,6 +417,9 @@
         <div class="acoes sobe" style="--i:3"><button class="btn${on ? ' on' : ''}" data-salvar-d="${r.i}">${STAR}<span>${on ? 'Salvo' : 'Salvar'}</span></button>
         ${navigator.share ? '<button class="btn" data-compartilhar>Compartilhar</button>' : ''}</div>
         <div class="cartao sobe" style="--i:4"><div class="esquema">${lado(r.r)}${seta(r.rg, r.cd)}${lado(r.p, n0)}</div></div>
+        ${r.d3 && r.d3.length ? `<div class="cartao v3d sobe" style="--i:5"><div class="v3d-t"><svg viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12L4 7.5M12 12v9"/></svg><b>Ver em 3D</b></div>
+          <p class="v3d-s">Abre o PubChem, com o modelo 3D interativo (precisa de internet). Só carrega quando você toca: não pesa no app.</p>
+          <div class="v3d-links">${r.d3.map((m) => `<a class="v3d-link" href="https://pubchem.ncbi.nlm.nih.gov/compound/${m.c}#section=3D-Conformer" target="_blank" rel="noopener noreferrer"><span class="v3d-k">${m.k}</span><b>${esc(m.t)}</b><svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a>`).join('')}</div></div>` : ''}
         ${r.nt ? `<div class="cartao sobe" style="--i:5"><p class="notas">${r.nt}</p></div>` : ''}
         ${estudoDetalheHtml(r)}
         ${mec}
@@ -774,14 +850,17 @@
     if (t.closest('[data-limpar-filtros]')) { filtrosSel = { a: '', c: '', nu: '', el: '' }; const h = rotaAtual.split('/')[1]; if (h === 'busca' && buscaAtual) { $('#filtros-av').innerHTML = filtrosHtml(); buscaAtual(); } else mostra(); return; }
     const tb = t.closest('.tema [data-tema]');
     if (tb) { guarda.gravar('atlas.tema', tb.dataset.tema); aplicaTema(tb.dataset.tema); marcaTema(); return; }
+    const rp = t.closest('[data-repetir]');
+    if (rp) { const tl = rp.closest('.passo').querySelector('.tile.com-setas'); if (tl) rodaSetas(tl); return; }
     if (t.closest('[data-verificar]')) { verifica(true); return; }
     if (t.closest('[data-creditos]')) { abreCreditos(e); return; }
     const tl = t.closest('.tile');
     if (tl && tl.querySelector('svg') && !zoom.contains(tl)) abreZoom(tl);
   });
-  function abreZoom(tl) { zoomConteudo.innerHTML = tl.innerHTML; zoomConteudo.classList.toggle('anima', tl.classList.contains('com-setas')); zoomConteudo.style.setProperty('--w', tl.style.getPropertyValue('--w') || 200); zoom.hidden = false;
-    if (usaMotion) { M.animate(zoom, { opacity: [0, 1] }, { duration: 0.2 }); M.animate(zoomConteudo, { opacity: [0, 1], scale: [0.8, 1] }, { type: 'spring', stiffness: 340, damping: 24 }); } }
-  function fechaZoom() { zoom.hidden = true; zoomConteudo.innerHTML = ''; }
+  function abreZoom(tl) { zoomConteudo.innerHTML = tl.innerHTML; zoomConteudo.classList.toggle('com-setas', tl.classList.contains('com-setas')); zoomConteudo.style.setProperty('--w', tl.style.getPropertyValue('--w') || 200); zoom.hidden = false;
+    if (usaMotion) { M.animate(zoom, { opacity: [0, 1] }, { duration: 0.2 }); M.animate(zoomConteudo, { opacity: [0, 1], scale: [0.8, 1] }, { type: 'spring', stiffness: 340, damping: 24 }); }
+    if (tl.classList.contains('com-setas')) setTimeout(() => rodaSetas(zoomConteudo), 350); }
+  function fechaZoom() { paraSetas(zoomConteudo); zoom.hidden = true; zoomConteudo.innerHTML = ''; }
   zoom.addEventListener('click', fechaZoom);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fechaZoom(); });
 

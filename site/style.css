@@ -286,19 +286,13 @@ a.etq{transition:transform .15s}a.etq:active{transform:scale(.92)}
   .mec .passo .vai{transform:rotate(90deg);margin:0 0 0 18px;animation:none}
 }
 .seta-c{stroke-dasharray:1;stroke-dashoffset:0}
-.seta-r,.seta-e{display:none}
-/* Cada seta é desenhada em ordem (--i): o elétron corre pela curva, o traço o acompanha, a ponta "estala" e uma onda sai dela. */
-@media (prefers-reduced-motion:no-preference){
-  .anima .seta-e{display:inline}
-  .anima .seta-r{display:inline;opacity:0;transform-box:fill-box;transform-origin:center}
-  .anima .seta-c,.anima .seta-h{filter:drop-shadow(0 0 1.6px rgba(31,99,214,.55))}
-  .anima .seta-c{stroke-dashoffset:1;animation:seta-traca 6.5s cubic-bezier(.65,0,.35,1) infinite;animation-delay:calc(var(--i,0) * 1s)}
-  .anima .seta-h{opacity:0;transform-box:fill-box;transform-origin:center;animation:seta-ponta 6.5s ease-out infinite;animation-delay:calc(var(--i,0) * 1s)}
-  .anima .seta-r{animation:seta-onda 6.5s ease-out infinite;animation-delay:calc(var(--i,0) * 1s)}
-}
-@keyframes seta-traca{0%,2%{stroke-dashoffset:1;opacity:1}17%,88%{stroke-dashoffset:0;opacity:1}97%,100%{stroke-dashoffset:0;opacity:0}}
-@keyframes seta-ponta{0%,16%{opacity:0;transform:scale(.2)}20%{opacity:1;transform:scale(1.45)}25%,88%{opacity:1;transform:scale(1)}97%,100%{opacity:0;transform:scale(1)}}
-@keyframes seta-onda{0%,16.5%{opacity:0;transform:scale(.3)}17.5%{opacity:.7;transform:scale(.3)}33%,100%{opacity:0;transform:scale(2.8)}}
+/* Animação das setas de elétrons: feita em JavaScript com a Motion (veja rodaSetas). Aqui só o brilho e o estilo dos pontos. */
+.rodando .seta-c,.rodando .seta-h{filter:drop-shadow(0 0 2px rgba(31,99,214,.55))}
+.seta-d,.seta-onda{pointer-events:none}
+.rep-btn{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;margin-left:auto;color:var(--mut);background:color-mix(in srgb,var(--ink) 6%,transparent);transition:transform .2s,background .2s}
+.rep-btn:active{transform:rotate(-200deg) scale(.9)}
+.rep-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.mec .passo h4{display:flex;align-items:center;gap:8px}
 
 /* busca */
 .campo{position:sticky;top:calc(var(--topo) + var(--top));z-index:5;padding:6px 0 10px;background:linear-gradient(var(--bg) 75%,transparent)}
@@ -508,6 +502,18 @@ html.mo .item,html.mo .aula,html.mo .ficha,html.mo .guia-link,html.mo .nav-det a
 .filtros-av .limpar{margin:0 0 12px}
 .didyou{margin:0 2px 10px;color:var(--mut);font-size:.88rem}
 .didyou b{color:var(--ink)}
+
+/* link para o modelo 3D (PubChem) */
+.v3d{padding:14px}
+.v3d-t{display:flex;align-items:center;gap:8px;font-size:1rem}
+.v3d-t svg{width:22px;height:22px;fill:none;stroke:var(--ac);stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
+.v3d-s{margin:4px 0 10px;color:var(--mut);font-size:.82rem;line-height:1.4}
+.v3d-links{display:grid;gap:8px}
+.v3d-link{display:flex;align-items:center;gap:10px;min-height:48px;padding:8px 12px;border-radius:12px;border:1px solid var(--bd);background:color-mix(in srgb,var(--ink) 3%,var(--card));transition:transform .15s,border-color .15s}
+.v3d-link:active{transform:scale(.98);border-color:var(--ac)}
+.v3d-k{flex:none;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;padding:2px 8px;border-radius:99px;background:var(--ac-soft);color:var(--ac)}
+.v3d-link b{flex:1;min-width:0;font-size:.88rem;font-weight:650;line-height:1.3;overflow-wrap:anywhere}
+.v3d-link svg{flex:none;width:18px;height:18px;fill:none;stroke:var(--mut);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 @media (prefers-color-scheme:dark){:root:not([data-tema="claro"]){/* Modo escuro. Este arquivo é escrito UMA vez e o build o aplica de duas formas:
    - automático, quando o sistema está no escuro (e o usuário não forçou "claro");
    - manual, quando o usuário escolheu "escuro" no rodapé. */
