@@ -169,11 +169,12 @@
     };
   }
   function atualizaProgresso() {
-    const certos = new Set(sessaoC.resp.filter((x) => x.nota > 0).map((x) => x.id)).size;
-    const pct = Math.min(100, (100 * certos) / sessaoC.total);
+    // a contagem é só de cartões: quantos já passaram por você (errar também avança; o cartão refeito não conta de novo)
+    const vistos = new Set(sessaoC.resp.map((x) => x.id)), atual = sessaoC.fila[0];
+    const pct = Math.min(100, (100 * vistos.size) / sessaoC.total);
     mo($('#sess-prog'), { width: pct + '%' }, { type: 'spring', stiffness: 140, damping: 20 });
     if (!usaMotion) $('#sess-prog').style.width = pct + '%';
-    $('#sess-cont').textContent = `${Math.min(sessaoC.total, certos + 1)}/${sessaoC.total}`;
+    $('#sess-cont').textContent = vistos.has(atual) ? `${vistos.size}/${sessaoC.total} · de novo` : `${Math.min(sessaoC.total, vistos.size + 1)}/${sessaoC.total}`;
   }
   let virado = false, cartaoAtual = null;
   function cartaoSeguinte(primeiro) {
@@ -329,10 +330,13 @@
     const erradas = sessaoS.resp.filter((x) => !x.ok);
     $('#sess-prog').style.width = '100%'; $('#sess-cont').textContent = 'Resultado';
     const nota = (pct / 10).toFixed(1).replace('.', ',');
+    const novo = sessaoS.acertos === n ? ganhaAcessorio('oculos') : null; // 100%: ganha um acessório para o Mutaninho
+    const premio = novo ? `<div class="premio"><svg viewBox="${novo.vb}" aria-hidden="true">${novo.arte}</svg><div><b>Você ganhou: ${esc(novo.nome)}!</b><small>Está na loja do Mutaninho.</small></div><button class="btn" data-loja-abrir>Ver</button></div>` : '';
     palco.innerHTML = `<div class="resumo"><div class="resumo-anel" id="anel-fim"></div><h3 class="resumo-t">Nota ${nota}</h3>
       <p class="resumo-s">${sessaoS.acertos} de ${n} certas · ${min} min</p>
       <div class="por-cat">${Object.entries(porCat).map(([c, [a, t]]) => `<div class="cat-linha c-${c}"><span class="cat-nome">${esc(nomeCat(c))}</span><span class="cat-barra"><i data-pct="${((100 * a) / t).toFixed(0)}"></i></span><span class="cat-num">${a}/${t}</span></div>`).join('')}</div>
       ${erradas.length ? `<div class="sec"><h3>Para rever</h3><span>${erradas.length}</span></div><div class="erradas">${erradas.map((x, k) => itemHtml(porId.get(x.id), k)).join('')}</div>` : '<p class="resumo-s">Sem erros: perfeito!</p>'}
+      ${premio}
       <div class="resumo-acoes"><button class="btn-grande pequeno" data-iniciar="simulado"><b>Novo simulado</b></button><a class="btn" href="#/estudar">Voltar</a></div></div>`;
     anel($('#anel-fim'), pct, pct >= 80 ? '#1e9a52' : pct >= 50 ? '#d49a1a' : '#c4452d');
     mo(palco.querySelectorAll('.resumo > *:not(.resumo-anel), .erradas .item'), { opacity: [0, 1], y: [16, 0] }, { type: 'spring', stiffness: 280, damping: 24, delay: M && M.stagger ? M.stagger(0.06, { startDelay: 0.25 }) : 0 });
@@ -354,6 +358,7 @@
     const es = t.closest('[data-escopo]');
     if (es) { escopo = { tipo: es.dataset.escopo, id: es.dataset.escopo === 'aula' ? (escopo.tipo === 'aula' ? escopo.id : D.aulas.find((a) => a.id !== '00').id) : es.dataset.escopo === 'mec' ? (escopo.tipo === 'mec' ? escopo.id : D.categorias[0].id) : '' }; guarda.gravar('atlas.escopo', escopo); mostra(); return; }
     const qn = t.closest('[data-qtd]'); if (qn) { qtd = +qn.dataset.qtd; guarda.gravar('atlas.qtd', qtd); mostra(); return; }
+    if (t.closest('[data-loja-abrir]')) { abreCreditos(null, true); return; }
     const ini = t.closest('[data-iniciar]');
     if (ini) {
       if (ini.dataset.iniciar === 'cartoes') iniciaCartoes(montaBaralho(escopo, qtd === 0 ? Infinity : qtd, false));

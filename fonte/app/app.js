@@ -625,10 +625,30 @@
     return gsapPronto;
   }
 
-  function dinoSvg(V) {
+  // Acessórios do Mutaninho (desenhados nas coordenadas do dinossauro). Ganham-se acertando 100% num simulado.
+  const ACESSORIOS = [{
+    id: 'oculos', slot: 'rosto', nome: 'Óculos de sol', como: 'Acerte 100% em um simulado', vb: '436 76 100 48',
+    arte: `<path d="M471 92 L441 85" stroke="#111" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+      <path d="M513 91 L529 94" stroke="#111" stroke-width="5" stroke-linecap="round" fill="none"/>
+      <path d="M469 91 Q490 84 514 89 Q518 104 506 112 Q488 117 474 109 Q466 100 469 91 Z" fill="#111" stroke="#111" stroke-width="2.4" stroke-linejoin="round"/>
+      <path d="M467 88 Q491 81 517 87" stroke="#111" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M477 95 L492 92 M497 94 L503 93" stroke="#f6f3ec" stroke-width="3.2" stroke-linecap="round" fill="none" opacity=".9"/>`,
+  }];
+  const lerAcess = () => { const a = guarda.ler('atlas.acessorios', null); return a && Array.isArray(a.tem) ? a : { tem: [], uso: [] }; };
+  function ganhaAcessorio(id) {
+    const a = lerAcess(); if (a.tem.includes(id)) return null;
+    a.tem.push(id);
+    const ac = ACESSORIOS.find((x) => x.id === id);
+    if (ac && !a.uso.some((u) => ACESSORIOS.find((x) => x.id === u).slot === ac.slot)) a.uso.push(id); // já sai vestido
+    guarda.gravar('atlas.acessorios', a);
+    return ac;
+  }
+  const arteAcess = (uso) => uso.map((id) => { const a = ACESSORIOS.find((x) => x.id === id); return a ? `<g class="acc" data-acc="${id}">${a.arte}</g>` : ''; }).join('');
+
+  function dinoSvg(V, op = {}) {
     const tr = (g) => V.tracos.filter((t) => t.g === g).map((t) => `<path class="v-traco" d="${t.d}" stroke-width="${t.w}"/>`).join('');
     const parte = (nome) => `<path class="v-red" d="${V.vermelho[nome]}" fill-rule="evenodd"/>`;
-    return `<svg class="dv" viewBox="0 0 ${V.w} ${V.h}" role="img" aria-label="Dinossauro vermelho" fill="none" stroke="#111" stroke-linecap="round" stroke-linejoin="round" style="--vermelho:${V.cor}">
+    return `<svg class="dv" viewBox="${op.vb || `0 0 ${V.w} ${V.h}`}" role="img" aria-label="Dinossauro vermelho" fill="none" stroke="#111" stroke-linecap="round" stroke-linejoin="round" style="--vermelho:${V.cor}">
       <g class="dv-par"><g class="dv-baixa"><g class="dv-raiz">
         ${parte('corpo')}
         <g class="p-cauda">${parte('cauda')}${tr('cauda')}</g>
@@ -636,7 +656,7 @@
         <g class="g-corpo">${tr('corpo')}${tr('bracoE')}</g>
         <g class="g-espinhos">${tr('espinhos')}</g>
         <g class="g-garras">${tr('garrasE')}${tr('garrasD')}</g>
-        <g class="p-cabeca">${parte('cabeca')}${tr('cabeca')}</g>
+        <g class="p-cabeca">${parte('cabeca')}${tr('cabeca')}${arteAcess(op.uso || [])}</g>
       </g></g></g></svg>`;
   }
 
@@ -649,17 +669,20 @@
     <svg class="cr-papel" preserveAspectRatio="none" aria-hidden="true"><rect width="100%" height="100%" filter="url(#cr-papel)" opacity=".55"/></svg>`;
   const MARCOS = { 10: '10 CARINHOS. AGORA SOMOS AMIGOS.', 25: 'PROVA DE ORGÂNICA II? PODE VIR.', 50: 'MUTANO APROVA.', 100: 'LENDA DO CARINHO.' };
 
-  function abreCreditos(ev) {
+  function abreCreditos(ev, loja) {
     if (creditosEl) return;
     const alvo = ev && ev.target && ev.target.closest && ev.target.closest('[data-creditos]');
     const r0 = alvo ? alvo.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight, width: 0, height: 0 };
     const origem = [r0.left + r0.width / 2, r0.top + r0.height / 2];
     if (reduzido) { abreCreditosEstatico(); return; }
     creditosEl = document.createElement('div'); // reserva enquanto carrega
-    carregaGsap().then((V) => { creditosEl = null; montaCreditos(V, origem); }).catch(() => { creditosEl = null; abreCreditosEstatico(); });
+    carregaGsap().then((V) => { creditosEl = null; montaCreditos(V, origem, loja); }).catch(() => { creditosEl = null; abreCreditosEstatico(); });
   }
 
-  function montaCreditos(V, origem) {
+  const BOLSA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>';
+  const CADEADO = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+
+  function montaCreditos(V, origem, abrirLoja) {
     const gsap = window.gsap, SplitText = window.SplitText;
     let n = guarda.ler('atlas.carinhos', 0);
     const el = document.createElement('div');
@@ -667,10 +690,11 @@
     el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Créditos');
     el.innerHTML = `${FILTROS}<button class="cr-fechar" aria-label="Fechar"><svg viewBox="0 0 40 40"><path d="M8 9 L32 31 M31 8 L9 33" /></svg></button>
       <div class="cr-conteudo">${CABECALHO}
-        <div class="dv-caixa">${dinoSvg(V)}</div>
+        <div class="dv-caixa">${dinoSvg(V, { uso: lerAcess().uso })}</div>
         <h2 class="cr-msg">Boa prova de<br>Química Orgânica II</h2>
         <div class="cr-contagem"><svg class="cr-tally" viewBox="0 0 240 60" aria-hidden="true"><g class="tally"></g></svg><span class="cr-n">×${n}</span></div>
         <p class="cr-marco" aria-live="polite"></p>
+        <button class="cr-lojabtn" data-loja>${BOLSA}<span>Loja</span></button>
       </div>`;
     document.body.appendChild(el);
     creditosEl = el;
@@ -709,6 +733,15 @@
     const numEl = q('.cr-n'), numEstado = { v: n };
     const mostraNum = () => { numEl.textContent = '×' + Math.round(numEstado.v); };
 
+    // ---- acessórios: ficam presos à cabeça e entram por último, caindo no rosto ----
+    const poeAcessorios = (animar) => {
+      cabeca.querySelectorAll('.acc').forEach((a) => a.remove());
+      cabeca.insertAdjacentHTML('beforeend', arteAcess(lerAcess().uso));
+      const novos = [...cabeca.querySelectorAll('.acc')];
+      if (animar && novos.length) gsap.fromTo(novos, { y: -46, opacity: 0, rotation: -10, svgOrigin: '490 100' }, { y: 0, opacity: 1, rotation: 0, duration: 0.8, ease: 'bounce.out' });
+      return novos;
+    };
+
     // ---- entrada ----
     gsap.set(vermelhos, { opacity: 0, scale: 0.86, svgOrigin: PIV.centro });
     gsap.set(tracos, { drawSVG: '0%' });
@@ -718,7 +751,8 @@
     gsap.set(splitMsg.chars, { yPercent: 115, opacity: 0 });
     gsap.set([contagem, ...iniciais], { opacity: 0 });
     gsap.set(iniciais, { drawSVG: '0%' });
-    const intro = gsap.timeline({ onComplete: idle });
+    const accs = [...cabeca.querySelectorAll('.acc')]; gsap.set(accs, { opacity: 0 });
+    const intro = gsap.timeline({ onComplete: () => { idle(); if (abrirLoja) abreLoja(); } });
     intro
       .fromTo(el, { clipPath: `circle(0px at ${origem[0]}px ${origem[1]}px)` }, { clipPath: `circle(${raio + 40}px at ${origem[0]}px ${origem[1]}px)`, duration: 0.85, ease: 'power3.inOut' })
       .to(peq, { opacity: 1, letterSpacing: '0.24em', duration: 0.9, ease: 'power3.out' }, 0.55)
@@ -727,6 +761,7 @@
       .to(vermelhos, { opacity: 1, scale: 1, duration: 0.85, ease: 'back.out(1.5)', stagger: 0.09 }, 0.8)
       .to(tracos, { drawSVG: '100%', duration: () => gsap.utils.random(0.28, 0.6), ease: 'power1.inOut', stagger: { each: 0.03, from: 'start' } }, 1.3)
       .to(splitMsg.chars, { yPercent: 0, opacity: 1, duration: 0.7, ease: 'back.out(1.8)', stagger: { each: 0.022, from: 'start' } }, 1.75)
+      .fromTo(accs, { y: -46, rotation: -10, svgOrigin: '490 100' }, { y: 0, opacity: 1, rotation: 0, duration: 0.8, ease: 'bounce.out' }, 2.4)
       .to(contagem, { opacity: 1, duration: 0.3 }, 2.1)
       .to(iniciais, { opacity: 1, drawSVG: '100%', duration: 0.3, stagger: 0.02, ease: 'power2.out' }, 2.15);
 
@@ -782,12 +817,48 @@
       }
     };
     el.addEventListener('pointerdown', (e) => {
-      if (!vivo || e.target.closest('.cr-fechar')) return;
+      if (!vivo || e.target.closest('.cr-fechar, .cr-lojabtn, .cr-loja')) return;
       const agora = performance.now();
       abaixa();
       if (agora - ultimoToque > 140) { ultimoToque = agora; conta(); }
       window.addEventListener('pointerup', levanta, { once: true });
       window.addEventListener('pointercancel', levanta, { once: true });
+    });
+
+    // ---- loja de acessórios ----
+    let loja = null;
+    const cartaoLoja = (a) => {
+      const u = lerAcess(), tem = u.tem.includes(a.id), usando = u.uso.includes(a.id);
+      return `<div class="cl-card${tem ? '' : ' trava'}"><div class="cl-prev">${dinoSvg(V, { vb: '408 50 192 112', uso: [a.id] })}${tem ? '' : `<span class="cl-lock">${CADEADO}</span>`}</div>
+        <b>${a.nome}</b><small>${tem ? (usando ? 'Vestido agora' : 'Na sua coleção') : a.como}</small>
+        ${tem ? `<button class="cl-btn${usando ? ' on' : ''}" data-vestir="${a.id}">${usando ? 'Tirar' : 'Vestir'}</button>` : ''}</div>`;
+    };
+    const fechaLoja = () => {
+      if (!loja) return; const l = loja; loja = null;
+      gsap.to(l, { yPercent: 105, duration: 0.4, ease: 'power3.in', onComplete: () => l.remove() });
+    };
+    function abreLoja() {
+      if (loja) return;
+      loja = document.createElement('div'); loja.className = 'cr-loja'; loja.setAttribute('role', 'dialog'); loja.setAttribute('aria-label', 'Loja do Mutaninho');
+      loja.innerHTML = `<div class="cl-topo"><h3>Loja</h3><button class="cl-x" aria-label="Fechar a loja"><svg viewBox="0 0 40 40"><path d="M8 9 L32 31 M31 8 L9 33"/></svg></button></div>
+        <p class="cl-sub">Acessórios do Mutaninho</p>
+        <div class="cl-grade">${ACESSORIOS.map(cartaoLoja).join('')}<div class="cl-card breve"><div class="cl-prev"><span class="cl-int">?</span></div><b>Mais em breve</b><small>Novos acessórios por vir</small></div></div>`;
+      el.appendChild(loja);
+      gsap.fromTo(loja, { yPercent: 105 }, { yPercent: 0, duration: 0.55, ease: 'power3.out' });
+      gsap.from(loja.querySelectorAll('.cl-card'), { y: 30, opacity: 0, rotation: () => gsap.utils.random(-4, 4), duration: 0.5, ease: 'back.out(1.6)', stagger: 0.08, delay: 0.25 });
+    }
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.cr-lojabtn')) { abreLoja(); return; }
+      if (e.target.closest('.cl-x')) { fechaLoja(); return; }
+      const v = e.target.closest('[data-vestir]');
+      if (v) {
+        const id = v.dataset.vestir, a = ACESSORIOS.find((x) => x.id === id), u = lerAcess();
+        u.uso = u.uso.filter((x) => x !== id && ACESSORIOS.find((y) => y.id === x).slot !== a.slot);
+        if (!v.classList.contains('on')) u.uso.push(id);
+        guarda.gravar('atlas.acessorios', u);
+        fechaLoja();
+        setTimeout(() => poeAcessorios(true), 250);
+      }
     });
 
     // ---- saída: desfaz o desenho e o círculo fecha de volta no ícone ----
@@ -800,12 +871,13 @@
         .to(tracos, { drawSVG: '0%', duration: 0.3, ease: 'power2.in', stagger: { each: 0.011, from: 'end' } }, 0)
         .to([...splitMsg.chars, ...splitNome.chars], { yPercent: -115, opacity: 0, duration: 0.35, ease: 'power2.in', stagger: { each: 0.012, from: 'end' } }, 0)
         .to(zz, { drawSVG: '0%', duration: 0.3, ease: 'power2.in' }, 0)
+        .to([...cabeca.querySelectorAll('.acc'), q('.cr-lojabtn'), q('.cr-loja')].filter(Boolean), { opacity: 0, duration: 0.25 }, 0)
         .to([peq, contagem, q('.cr-marco')], { opacity: 0, duration: 0.25 }, 0)
         .to(vermelhos, { scale: 0.88, opacity: 0, duration: 0.35, ease: 'power2.in', stagger: 0.04 }, 0.15)
         .to(el, { clipPath: `circle(0px at ${origem[0]}px ${origem[1]}px)`, duration: 0.6, ease: 'power3.inOut' }, 0.4);
     };
     el.querySelector('.cr-fechar').addEventListener('click', (e) => { e.stopPropagation(); fecha(); });
-    document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape' && creditosEl === el) { fecha(); document.removeEventListener('keydown', esc); } });
+    document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape' && creditosEl === el) { if (loja) { fechaLoja(); return; } fecha(); document.removeEventListener('keydown', esc); } });
   }
 
   // Sem GSAP (offline sem cache, ou "reduzir movimento"): a imagem original, sem animação.
