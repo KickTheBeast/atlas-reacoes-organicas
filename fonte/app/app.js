@@ -87,8 +87,8 @@
       titulo: 'Atlas Orgânico', aba: 'aulas', prof: 0,
       html: `<section class="hero sobe">${hex}<h2>Reações de Química Orgânica II</h2><p>Toda a matéria, organizada para estudar.</p>${stats}</section>
         <div id="instalar"></div>
-        <button class="busca-falsa sobe" style="--i:1" data-ir="#/busca"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>Buscar reação, reagente, mecanismo…</button>
-        <a class="guia-link sobe" style="--i:2" href="#/mec"><span class="gl-ic">vs</span><span class="gl-tx"><b>Guias rápidos de mecanismos</b><small>SN1, SN2, E1, E2, adição a alcenos e mais</small></span>${SETA_IR}</a>
+        <button class="busca-falsa sobe" style="--i:1" data-ir="#/busca"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>Buscar reação ou reagente…</button>
+        <a class="guia-link sobe" style="--i:2" href="#/mec"><span class="gl-ic">vs</span><span class="gl-tx"><b>Guias rápidos de mecanismos</b><small>SN1, SN2, E1, E2, alcenos e mais</small></span>${SETA_IR}</a>
         <div class="sec"><h3>Por aula</h3><span>${D.aulas.length} aulas</span></div>${itens}
         <a class="aula sobe" style="--i:${D.aulas.length + 3}" href="#/todas"><div class="num">∑</div><div class="tx"><b>Todas as reações</b><small>${plural(D.reacoes.length, 'reação', 'reações')}</small></div>${SETA_IR}</a>
         <div class="rodape">Versão ${BUILD}<br><button data-verificar>Verificar atualização</button></div>`,
