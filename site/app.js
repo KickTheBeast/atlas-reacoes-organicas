@@ -2,7 +2,7 @@
 // Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
 (() => {
   'use strict';
-  const BUILD = 'ea3899f737';
+  const BUILD = 'ddc8daf698';
   const $ = (s) => document.querySelector(s);
   const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
   const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
@@ -28,7 +28,7 @@
   };
 
   // ---------- dados ----------
-  let D = null, S = null, porId = new Map(), nomes = { aula: {}, mec: {}, nu: {}, el: {} }, texto = new Map();
+  let D = null, S = null, guiaPorId = new Map(), porId = new Map(), nomes = { aula: {}, mec: {}, nu: {}, el: {} }, texto = new Map();
   const get = (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
 
   function prepara(d) {
@@ -38,6 +38,7 @@
     d.categorias.forEach((x) => (nomes.mec[x.id] = x.nome));
     d.nucleofilos.forEach((x) => (nomes.nu[x.id] = x.nome));
     d.eletrofilos.forEach((x) => (nomes.el[x.id] = x.nome));
+    d.guias.forEach((g) => guiaPorId.set(g.id, g));
     d.reacoes.forEach((r) => texto.set(r.i, norm([
       r.n, r.rg, r.cd, r.nt.replace(/<[^>]+>/g, ' '), 'aula ' + r.a, nomes.aula[r.a],
       ...r.c.map((x) => nomes.mec[x]), ...r.nu.map((x) => nomes.nu[x]), ...r.el.map((x) => nomes.el[x]),
@@ -87,6 +88,7 @@
       html: `<section class="hero sobe">${hex}<h2>Reações de Química Orgânica II</h2><p>Toda a matéria, organizada para estudar.</p>${stats}</section>
         <div id="instalar"></div>
         <button class="busca-falsa sobe" style="--i:1" data-ir="#/busca"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>Buscar reação, reagente, mecanismo…</button>
+        <a class="guia-link sobe" style="--i:2" href="#/mec"><span class="gl-ic">vs</span><span class="gl-tx"><b>Guias rápidos de mecanismos</b><small>SN1, SN2, E1, E2, adição a alcenos e mais</small></span>${SETA_IR}</a>
         <div class="sec"><h3>Por aula</h3><span>${D.aulas.length} aulas</span></div>${itens}
         <a class="aula sobe" style="--i:${D.aulas.length + 3}" href="#/todas"><div class="num">∑</div><div class="tx"><b>Todas as reações</b><small>${plural(D.reacoes.length, 'reação', 'reações')}</small></div>${SETA_IR}</a>
         <div class="rodape">Versão ${BUILD}<br><button data-verificar>Verificar atualização</button></div>`,
@@ -102,10 +104,42 @@
       el: ['Eletrófilos', 'Escolha o eletrófilo (substrato ou reagente) e veja as reações.'],
     }[tipo];
     const nota = tipo === 'mec' ? '' : '<p class="sub-lista">Classificação automática a partir dos reagentes e das estruturas: confira no slide em caso de dúvida.</p>';
+    const guias = tipo === 'mec' ? `<div class="sec"><h3>Guias rápidos</h3><span>tabelas e esquemas</span></div>${D.guias.map((g, i) => `<a class="aula sobe" style="--i:${i + 2}" href="#/guia/${g.id}"><div class="num guia-num">${esc(g.curto)}</div><div class="tx"><b>${esc(g.t)}</b><small>${esc(g.sub)}</small></div>${SETA_IR}</a>`).join('')}<div class="sec"><h3>Reações por mecanismo</h3><span>${D.categorias.length} tipos</span></div>` : '';
     return {
       titulo: info[0], aba: tipo, prof: 0,
-      html: `<h2 class="titulo-lista sobe">${info[0]}</h2><p class="sub-lista sobe" style="--i:1">${info[1]}</p>${nota}
+      html: `<h2 class="titulo-lista sobe">${info[0]}</h2><p class="sub-lista sobe" style="--i:1">${info[1]}</p>${nota}${guias}
         <div class="grade">${lista.map((x, i) => `<a class="ficha k-${tipo} sobe" style="--i:${i + 2}" href="#/${tipo}/${x.id}"><b>${esc(x.nome)}</b><small>${x.n}</small></a>`).join('')}</div>`,
+    };
+  }
+
+  // ---------- guias rápidos ----------
+  const guiaDe = (catId) => guiaPorId.get(catId) || D.guias.find((g) => g.id !== 'decisao' && g.cats.includes(catId));
+  const guiaLink = (catId) => {
+    const g = guiaDe(catId);
+    return g ? `<a class="guia-link sobe" style="--i:2" href="#/guia/${g.id}"><span class="gl-ic">${esc(g.curto)}</span><span class="gl-tx"><b>Guia rápido: ${esc(g.t)}</b><small>Tabelas de fatores, esquema e dicas</small></span>${SETA_IR}</a>` : '';
+  };
+  const marca = (t) => String(t).replace(/^(✓)/, '<span class="ok">$1</span>').replace(/^(✗)/, '<span class="no">$1</span>');
+  const celulaHtml = (c) => Array.isArray(c) ? `<div class="multi">${c.map(celulaHtml).join('')}</div>`
+    : c && typeof c === 'object' ? `<div class="tile mini carrega" data-m="${c.s}" role="button" aria-label="Ampliar estrutura"></div>` : marca(c);
+  const tabelaHtml = (b) => `<div class="cartao tabela sobe"><h3 class="tb-titulo">${esc(b.t)}</h3><div class="tb-wrap"><table class="tb"><thead><tr>${b.cols.map((c) => `<th>${c}</th>`).join('')}</tr></thead><tbody>${b.rows.map((l) => `<tr>${l.map((c, i) => (i === 0 ? '<th scope="row">' : '<td>') + celulaHtml(c) + (i === 0 ? '</th>' : '</td>')).join('')}</tr>`).join('')}</tbody></table></div><div class="tb-dica" hidden>deslize para ver mais →</div>${b.nota ? `<p class="tb-nota">${esc(b.nota)}</p>` : ''}</div>`;
+
+  function telaGuia(id) {
+    const g = guiaPorId.get(id);
+    if (!g) return null;
+    const e = g.esq;
+    const blocos = g.bl.map((b) => b.k === 'l'
+      ? `<div class="cartao dicas sobe"><h3 class="tb-titulo">${esc(b.t)}</h3><ul>${b.itens.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>`
+      : tabelaHtml(b)).join('');
+    const ver = g.cats.filter((c) => nomes.mec[c]).map((c) => `<a class="btn" href="#/mec/${c}">Ver reações de ${esc(nomes.mec[c])}<span class="n">${D.categorias.find((x) => x.id === c).n}</span></a>`).join('');
+    return {
+      titulo: g.topo || g.t, aba: 'mec', prof: 1,
+      html: `<article class="det guia">
+        <h2 class="sobe">${esc(g.t)}</h2><p class="origem sobe" style="--i:1">${esc(g.sub)}</p>
+        <p class="intro sobe" style="--i:2">${g.intro}</p>
+        <div class="cartao sobe" style="--i:3"><div class="rotulo-c">Esquema</div><div class="esquema">${lado(e.r)}${seta(e.rg, e.cd)}${lado(e.p, e.r.length)}</div>${e.leg ? `<p class="tb-nota">${esc(e.leg)}</p>` : ''}</div>
+        ${blocos}
+        <div class="rotulo">Exemplos nas aulas</div><div class="acoes colunas">${ver}</div></article>`,
+      depois: () => document.querySelectorAll('.tb-wrap').forEach((w) => { if (w.scrollWidth > w.clientWidth + 4) w.nextElementSibling.hidden = false; w.addEventListener('scroll', () => { w.nextElementSibling.hidden = true; }, { passive: true, once: true }); }),
     };
   }
 
@@ -129,6 +163,7 @@
       titulo: nome, aba, prof,
       html: `<h2 class="titulo-lista sobe">${esc(nome)}</h2>
         <p class="sub-lista sobe" style="--i:1">${sub ? esc(sub) + ' · ' : ''}<span id="contagem"></span></p>
+        ${tipo === 'mec' ? guiaLink(id) : ''}
         ${chips.length > 1 ? `<div class="filtros sobe" style="--i:2" id="filtros"><button class="chip on" data-f="">Todas</button>${chips.map(([k, n]) => `<button class="chip" data-f="${esc(k)}">${esc(porAula ? 'Aula ' + rotuloAula(k) : nomes.mec[k] || k)}<i>${n}</i></button>`).join('')}</div>` : ''}
         <div id="itens"></div>`,
       depois: () => {
@@ -215,6 +250,7 @@
     const [, a, b] = hash.split('?')[0].split('/');
     if (!a || a === 'aulas') return telaAulas();
     if (a === 'mec' || a === 'nu' || a === 'el') return b ? telaLista(a, b) : telaIndice(a);
+    if (a === 'guia') return telaGuia(b);
     if (a === 'aula') return telaLista('aula', b);
     if (a === 'todas') return telaLista('todas');
     if (a === 'salvos') return telaLista('salvos');

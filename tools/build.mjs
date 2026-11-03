@@ -25,6 +25,10 @@ const arquivos = fs.readdirSync(path.join(FONTE, 'dados')).filter((f) => f.endsW
 arquivos.sort((a, b) => (a === 'reactions.js' ? -1 : b === 'reactions.js' ? 1 : a.localeCompare(b)));
 for (const f of arquivos) vm.runInContext(fs.readFileSync(path.join(FONTE, 'dados', f), 'utf8'), ctx, { filename: f });
 const { REACTIONS, CATEGORIES } = ctx.window;
+const ctxG = { window: {} };
+vm.createContext(ctxG);
+vm.runInContext(fs.readFileSync(path.join(FONTE, 'guias/guias.js'), 'utf8'), ctxG, { filename: 'guias.js' });
+const GUIAS = ctxG.window.GUIAS;
 
 const AULAS = {
   '00': 'Exemplos básicos (meus)',
@@ -235,6 +239,15 @@ const cNu = contar('nu'), cEl = contar('el'), cCat = contar('c'), cAula = {};
 reacoes.forEach((r) => (cAula[r.a] = (cAula[r.a] || 0) + 1));
 const lista = (mapa, cont) => [...mapa].filter(([id]) => cont[id]).map(([id, nome]) => ({ id, nome, n: cont[id] })).sort((a, b) => (a.id === 'outros') - (b.id === 'outros') || b.n - a.n);
 
+// ---------- guias ----------
+const celula = (c) => Array.isArray(c) ? c.map(celula) : (c && typeof c === 'object' && c.s ? { s: desenhar(c.s) } : c);
+const guias = GUIAS.map((g) => ({
+  id: g.id, curto: g.curto, topo: g.topo || '', t: g.titulo, sub: g.sub, cats: g.cats, intro: g.intro,
+  esq: { r: g.esquema.r.map(desenhar), rg: g.esquema.rg, cd: g.esquema.cd, p: g.esquema.p.map(desenhar), leg: g.esquema.leg },
+  bl: g.blocos.map((b) => b.k === 'l' ? { k: 'l', t: b.titulo, itens: b.itens } :
+    { k: 't', t: b.titulo, cols: b.cols, rows: b.rows.map((l) => l.map(celula)), nota: b.nota || '' }),
+}));
+
 // ---------- build ----------
 fs.mkdirSync(SITE, { recursive: true });
 const dados = {
@@ -242,6 +255,7 @@ const dados = {
   categorias: CATEGORIES.filter((c) => cCat[c.id]).map((c) => ({ id: c.id, nome: c.nome, n: cCat[c.id] })),
   nucleofilos: lista(LISTA_NU, cNu),
   eletrofilos: lista(LISTA_EL, cEl),
+  guias,
   reacoes,
 };
 const dadosTxt = JSON.stringify(dados);
