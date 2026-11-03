@@ -2,7 +2,7 @@
 // Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
 (() => {
   'use strict';
-  const BUILD = '50476d4030';
+  const BUILD = 'ea3899f737';
   const $ = (s) => document.querySelector(s);
   const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
   const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
@@ -81,7 +81,7 @@
   function telaAulas() {
     const stats = `<div class="stats"><div><b>${D.reacoes.length}</b><span>reações</span></div><div><b>${D.aulas.filter((a) => a.id !== '00').length}</b><span>aulas</span></div><div><b>${D.categorias.length}</b><span>mecanismos</span></div></div>`;
     const hex = '<svg class="hex" viewBox="0 0 100 100"><path d="M50 8 L86 29 L86 71 L50 92 L14 71 L14 29 Z"/></svg><svg class="hex" viewBox="0 0 100 100"><path d="M50 8 L86 29 L86 71 L50 92 L14 71 L14 29 Z"/></svg>';
-    const itens = D.aulas.map((a, i) => `<a class="aula sobe" style="--i:${i + 2}" href="#/aula/${a.id}"><div class="num">${rotuloAula(a.id)}</div><div class="tx"><b>${esc(a.nome)}</b><small>${plural(a.n, 'reação', 'reações')}</small></div>${SETA_IR}</a>`).join('');
+    const itens = D.aulas.map((a, i) => `<a class="aula sobe" style="--i:${i + 2}" href="#/aula/${a.id}"><div class="num">${a.id === '00' ? 'Ex.' : rotuloAula(a.id)}</div><div class="tx"><b>${esc(a.nome)}</b><small>${plural(a.n, 'reação', 'reações')}</small></div>${SETA_IR}</a>`).join('');
     return {
       titulo: 'Atlas Orgânico', aba: 'aulas', prof: 0,
       html: `<section class="hero sobe">${hex}<h2>Reações de Química Orgânica II</h2><p>Toda a matéria, organizada para estudar.</p>${stats}</section>
@@ -248,9 +248,10 @@
     abas.querySelectorAll('a').forEach((a) => a.classList.toggle('on', a.dataset.aba === abaAtual));
     const on = abas.querySelector('a.on');
     if (!on) { pilula.style.opacity = 0; return; }
-    const r = on.getBoundingClientRect(), b = abas.getBoundingClientRect();
+    // offsetLeft/offsetWidth não sofrem com a animação de entrada da dock (scale)
     pilula.style.opacity = 1;
-    pilula.style.transform = `translateX(${r.left - b.left + (r.width - 56) / 2}px)`;
+    pilula.style.width = `${on.offsetWidth}px`;
+    pilula.style.transform = `translateX(${on.offsetLeft}px)`;
   }
   window.addEventListener('resize', marcaAba);
   window.addEventListener('hashchange', mostra);
