@@ -2,7 +2,7 @@
 // Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
 (() => {
   'use strict';
-  const BUILD = 'e8529b78c8';
+  const BUILD = 'f7f92a6f85';
   const $ = (s) => document.querySelector(s);
   const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
   const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
@@ -425,32 +425,71 @@
     });
   }
 
-  // ---------- créditos e o dinossauro ----------
-  const DINO_AVATAR = '<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="#d9f5e4"/><path d="M14 17l3-6 3 5M22 14l3-6 3 6M30 17l3-5 2 6" fill="#4fb286"/><ellipse cx="22" cy="28" rx="15" ry="12.5" fill="#7ed3a8"/><ellipse cx="35" cy="31" rx="9" ry="7" fill="#7ed3a8"/><circle cx="25" cy="23" r="3.4" fill="#fff"/><circle cx="25.6" cy="23.4" r="2" fill="#1c2b26"/><circle cx="26.2" cy="22.6" r=".7" fill="#fff"/><ellipse cx="18" cy="32" rx="3.6" ry="2.4" fill="#ff9db0" opacity=".75"/><path d="M33 35c2 1.6 5 1.4 6.6-.4" fill="none" stroke="#1c2b26" stroke-width="1.6" stroke-linecap="round"/><circle cx="38" cy="29" r=".9" fill="#1c2b26"/></svg>';
-  const DINO = `<svg class="dino" viewBox="0 0 260 230" aria-label="Dinossauro fofo" role="img">
-    <ellipse cx="128" cy="212" rx="78" ry="9" fill="#000" opacity=".12"/>
-    <g class="d-tail"><path d="M76 150C34 156 12 128 20 98c10 14 26 22 58 22z" fill="#6cc79b"/><path d="M26 108c4 10 12 16 22 19" fill="none" stroke="#4fb286" stroke-width="3" stroke-linecap="round"/></g>
-    <g class="d-corpo">
-      <path d="M92 98l8-20 10 18zM116 90l10-22 10 20zM142 92l10-20 8 20z" fill="#4fb286"/>
-      <ellipse cx="124" cy="146" rx="64" ry="50" fill="#7ed3a8"/>
-      <ellipse cx="136" cy="158" rx="40" ry="32" fill="#d9f5e4"/>
-      <rect x="92" y="178" width="26" height="28" rx="12" fill="#6cc79b"/><ellipse cx="102" cy="206" rx="17" ry="7" fill="#5bb88b"/>
-      <rect x="134" y="178" width="26" height="28" rx="12" fill="#6cc79b"/><ellipse cx="146" cy="206" rx="17" ry="7" fill="#5bb88b"/>
-      <ellipse class="d-braco" cx="166" cy="152" rx="11" ry="7" fill="#6cc79b" transform="rotate(25 166 152)"/>
+  // ---------- créditos: o dinossauro (traço cru, tela cheia) ----------
+  const COROA = 'M8 56 L12 14 L30 38 L46 6 L62 38 L80 14 L84 56 Z';
+  const DINO_AVATAR = `<svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="24" fill="#111"/><path d="M11 33 L13 17 L21 26 L24 13 L27 26 L35 17 L37 33 Z" fill="#f4c20d" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="M11 37h26" stroke="#e63a2e" stroke-width="3" stroke-linecap="round"/></svg>`;
+  const BD = `<svg class="bd" viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Dinossauro desenhado em traço cru">
+    <defs>
+      <filter id="rug" x="-6%" y="-6%" width="112%" height="112%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G"/></filter>
+      <filter id="rug2" x="-6%" y="-6%" width="112%" height="112%"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="21" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="G" yChannelSelector="R"/></filter>
+      <filter id="grao"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 -.18"/></filter>
+    </defs>
+    <g class="bd-fundo" filter="url(#rug2)">
+      <rect x="-20" y="-20" width="430" height="884" fill="#1a3fa6"/>
+      <path d="M-20 560 L140 520 L410 560 L430 880 L-20 880 Z" fill="#e8452c"/>
+      <path d="M-20 700 L200 668 L430 720 L430 880 L-20 880 Z" fill="#f4c20d"/>
+      <path d="M270 -20 L430 -20 L430 150 L300 120 Z" fill="#f4c20d"/>
+      <path d="M-20 -20 L120 -20 L90 70 L-20 40 Z" fill="#e8452c"/>
+      <g stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".75" fill="none"><path d="M20 590 l30 -10 M30 610 l40 -12 M40 630 l30 -8 M300 600 l34 -8 M310 620 l40 -10 M295 640 l44 -9"/></g>
+      <g stroke="#111" stroke-width="3" stroke-linecap="round" opacity=".7" fill="none"><path d="M330 20 l40 14 M336 44 l36 12 M326 70 l44 10 M20 740 l60 -8 M26 760 l66 -10 M300 770 l60 10 M296 790 l66 8"/></g>
     </g>
-    <g class="d-cabeca">
-      <path d="M156 66l6-14 8 12M176 62l8-14 6 14" fill="#4fb286"/>
-      <ellipse cx="172" cy="98" rx="42" ry="36" fill="#7ed3a8"/>
-      <ellipse cx="204" cy="108" rx="24" ry="18" fill="#7ed3a8"/>
-      <circle cx="212" cy="100" r="2.4" fill="#1c2b26" opacity=".7"/>
-      <ellipse class="d-rosa" cx="160" cy="112" rx="10" ry="6.5" fill="#ff8fa6" opacity=".35"/>
-      <g class="d-olhos"><circle cx="170" cy="90" r="10" fill="#fff"/><circle cx="172" cy="91" r="6" fill="#1c2b26"/><circle cx="174" cy="88.5" r="2.2" fill="#fff"/></g>
-      <path class="d-feliz" d="M160 92q10-12 20 0" fill="none" stroke="#1c2b26" stroke-width="4" stroke-linecap="round" opacity="0"/>
-      <path class="d-boca" d="M190 118c6 5 16 4 22-2" fill="none" stroke="#1c2b26" stroke-width="3" stroke-linecap="round"/>
+    <g class="bd-doodles" filter="url(#rug2)" font-family="Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif" font-weight="900" fill="#fff" stroke="#111" stroke-width="1.2" paint-order="stroke">
+      <path d="M52 262 L72 250 L92 262 L92 286 L72 298 L52 286 Z" fill="none" stroke="#fff" stroke-width="3.5" stroke-linejoin="round"/>
+      <path d="M58 270 l26 -10 M58 284 l28 -12" stroke="#fff" stroke-width="2.5" fill="none"/>
+      <text x="22" y="330" font-size="26" transform="rotate(-9 22 330)">SN2</text>
+      <path d="M20 340 l48 -16 m-10 -4 l12 4 l-6 12" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="300" y="392" font-size="24" transform="rotate(8 300 392)" fill="#f4c20d">C=C</text>
+      <text x="318" y="432" font-size="19" transform="rotate(-6 318 432)">E2 ✕</text>
+    </g>
+    <g class="bd-titulo" filter="url(#rug)" font-family="Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif" font-weight="900" stroke="#111" paint-order="stroke" stroke-linejoin="round">
+      <text x="30" y="92" font-size="24" fill="#fff" stroke-width="5" transform="rotate(-4 30 92)" letter-spacing="3">FEITO POR</text>
+      <text x="26" y="150" font-size="56" fill="#fff" stroke-width="6" transform="rotate(-3 26 150)" letter-spacing="1" opacity=".95">MUTANO</text>
+      <path d="M18 132 L238 106 M22 112 L232 146 M20 148 L236 120" stroke="#111" stroke-width="7" stroke-linecap="round" fill="none"/>
+      <text x="24" y="222" font-size="86" fill="#f4c20d" stroke-width="9" transform="rotate(-3 24 222)" letter-spacing="-1">MUTANO</text>
+      <text x="322" y="96" font-size="46" fill="#fff" stroke-width="6" transform="rotate(8 322 96)">©</text>
+      
+    </g>
+    <g transform="translate(-14 8) scale(.955)"><g class="bd-dino" filter="url(#rug)" stroke="#111" stroke-linejoin="round" stroke-linecap="round">
+      <g class="d-cauda-corpo">
+        <path d="M24 548 C70 536 108 500 138 462 C168 424 206 392 244 354 L258 318 C262 286 286 262 320 262 C352 262 376 280 376 306 L366 322 L330 330 C304 338 292 352 292 376 C292 420 276 462 250 492 C232 514 212 528 192 536 L182 610 L160 668 L92 668 L106 628 L100 580 C78 590 54 580 24 548 Z" fill="#f4c20d" stroke-width="9"/>
+        <path d="M196 452 C236 458 266 430 280 392" fill="#e8452c" stroke="none"/>
+        <path d="M170 520 C200 540 236 520 262 480 C250 506 226 540 188 548 Z" fill="#e8452c" stroke="none"/>
+      </g>
+      <g class="d-ossos" fill="none" stroke="#111" stroke-width="5">
+        <path d="M150 478 q40 -26 76 -22"/><path d="M168 456 q34 -26 70 -26"/><path d="M188 432 q30 -26 60 -26"/><path d="M206 408 q26 -22 52 -24"/>
+        <path d="M120 520 q34 -6 62 -30"/>
+      </g>
+      <g class="d-espinha" fill="none" stroke="#111" stroke-width="4.5"><path d="M44 536 C90 518 128 484 156 450 C188 410 222 380 250 346"/><path d="M62 528 l-2 -16 M84 518 l-2 -18 M106 504 l-4 -18 M128 486 l-6 -18 M150 462 l-8 -16 M174 436 l-10 -14 M198 412 l-10 -12 M222 388 l-10 -12"/></g>
+      <g class="d-perna" fill="none" stroke="#111" stroke-width="6"><path d="M160 668 l-22 14 M130 668 l-16 16 M100 668 l-10 18"/><path d="M146 620 q10 -30 6 -64"/></g>
+      <g class="d-braco" transform-origin="262 446"><path d="M252 436 C276 440 298 454 308 476 L296 484 C288 470 270 462 248 458 Z" fill="#f4c20d" stroke-width="7"/><path d="M308 476 l16 8 M304 486 l16 14 M296 490 l8 18" fill="none" stroke-width="5"/></g>
+      <g class="d-mandibula" transform-origin="318 330"><path d="M312 336 C336 338 366 346 378 360 L374 384 C346 394 322 388 304 372 Z" fill="#f4c20d" stroke-width="8"/><path d="M322 346 l8 -16 l8 16 M342 352 l8 -16 l8 18 M362 360 l7 -14 l6 18" fill="#fff" stroke-width="3.5"/></g>
+      <g class="d-dentes-sup" fill="#fff" stroke-width="3.5"><path d="M326 330 l8 24 l8 -24 M346 328 l8 26 l8 -26 M366 322 l6 20 l6 -22"/></g>
+      <g class="d-olho">
+        <circle cx="318" cy="288" r="21" fill="#fff" stroke-width="7"/>
+        <g class="d-pupila"><path d="M318 288 m0 0 c3 -9 14 -6 12 4 c-2 12 -18 10 -18 -4 c0 -16 24 -14 24 4" fill="none" stroke-width="5"/><circle cx="320" cy="290" r="4" fill="#111" stroke="none"/></g>
+        <g class="d-xis" opacity="0"><path d="M304 274 L334 304 M334 274 L304 304" stroke="#e8452c" stroke-width="8" fill="none"/></g>
+        <path d="M296 262 q22 -18 46 -4" fill="none" stroke-width="6"/>
+      </g>
+      <g class="d-coroa"><path d="M276 252 L282 208 L300 232 L318 196 L336 232 L354 208 L360 252 Z" fill="#e8452c" stroke-width="7"/><circle cx="282" cy="204" r="6" fill="#fff" stroke-width="3.5"/><circle cx="318" cy="192" r="7" fill="#fff" stroke-width="3.5"/><circle cx="354" cy="204" r="6" fill="#fff" stroke-width="3.5"/><path d="M280 244 h76" fill="none" stroke="#fff" stroke-width="3"/></g>
+    </g></g>
+    <g class="bd-marcas" filter="url(#rug2)" font-family="Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif" font-weight="900">
+      <text class="bd-fala" x="20" y="748" font-size="30" fill="#fff" stroke="#111" stroke-width="7" paint-order="stroke" stroke-linejoin="round" transform="rotate(-3 20 748)">FAÇA CARINHO.</text>
+      <g class="bd-tally" stroke="#111" stroke-width="5" stroke-linecap="round" fill="none"></g>
+      <text class="bd-cont" x="278" y="810" font-size="26" fill="#f4c20d" stroke="#111" stroke-width="6" paint-order="stroke" stroke-linejoin="round" transform="rotate(4 278 810)">×0</text>
     </g>
   </svg>`;
-  const FRASES = ['Hmm, que gostoso…', 'rrrrrr…', 'Mais um pouquinho!', 'Atrás da orelha, por favor.', 'Você é gente boa!', 'Isso, assim mesmo.', 'Já posso até tirar uma soneca…'];
-  const MARCOS = { 10: '10 carinhos! Agora somos amigos.', 25: 'Vou te ajudar na prova de Orgânica II!', 50: 'Mutano aprova você. 💚', 100: 'Lenda do carinho!' };
+  const FRASES = ['OK.', 'MAIS.', 'NÃO PARE.', 'HA!', 'RRRRR.', 'ISSO.', 'AGORA SIM.'];
+  const MARCOS = { 10: '10! AGORA SOMOS AMIGOS.', 25: 'PROVA DE ORGÂNICA II? PODE VIR.', 50: 'MUTANO APROVA.', 100: 'REI DO CARINHO.' };
   let creditosEl = null;
 
   function abreCreditos() {
@@ -458,75 +497,76 @@
     let n = guarda.ler('atlas.carinhos', 0);
     const el = document.createElement('div');
     el.className = 'creditos';
-    el.innerHTML = `<div class="cr-folha" role="dialog" aria-modal="true" aria-label="Créditos">
-      <button class="icone-btn cr-fechar" aria-label="Fechar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-      <div class="cr-alca"></div>
-      <p class="cr-peq">Atlas de Reações Orgânicas</p>
-      <h2 class="cr-titulo">Feito por <span>Mutano</span></h2>
-      <div class="cr-palco" aria-label="Faça carinho no dinossauro">${DINO}</div>
-      <p class="cr-fala">Faça carinho no dinossauro: toque ou arraste o dedo sobre ele.</p>
-      <p class="cr-cont">Carinhos: <b>${n}</b></p>
-    </div>`;
+    el.innerHTML = `${BD}<button class="cr-fechar" aria-label="Fechar"><svg viewBox="0 0 40 40"><path d="M7 9 L33 31 M32 7 L9 33" /></svg></button><div class="cr-marcas" aria-hidden="true"></div>`;
     document.body.appendChild(el);
     creditosEl = el;
     document.body.style.overflow = 'hidden';
-    const folha = el.querySelector('.cr-folha'), palco = el.querySelector('.cr-palco'), fala = el.querySelector('.cr-fala'), cont = el.querySelector('.cr-cont b');
     const q = (s) => el.querySelector(s);
-    const [cabeca, cauda, corpo, olhos, feliz, rosa, boca] = ['.d-cabeca', '.d-tail', '.d-corpo', '.d-olhos', '.d-feliz', '.d-rosa', '.d-boca'].map(q);
-    if (usaMotion) {
-      M.animate(el, { opacity: [0, 1] }, { duration: 0.2 });
-      M.animate(folha, { y: [420, 0] }, { type: 'spring', stiffness: 260, damping: 26 });
-      M.animate(corpo, { scaleY: [1, 1.035, 1] }, { duration: 3.2, repeat: Infinity, ease: 'easeInOut' });
-      M.animate(cabeca, { rotate: [-1.5, 1.5] }, { duration: 2.6, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' });
-    }
-    // piscar de vez em quando
-    const pisca = setInterval(() => {
-      if (feliz.style.opacity === '1') return;
-      olhos.style.transform = 'scaleY(.1)'; setTimeout(() => { olhos.style.transform = ''; }, 130);
-    }, 3200);
-    const fecha = () => {
-      clearInterval(pisca); clearTimeout(volta);
-      const sai = () => { el.remove(); creditosEl = null; document.body.style.overflow = ''; };
-      if (usaMotion) { M.animate(el, { opacity: [1, 0] }, { duration: 0.2 }); M.animate(folha, { y: [0, 420] }, { duration: 0.25, ease: 'easeIn' }).then(sai, sai); } else sai();
+    const [cabeca, coroa, mand, pupila, xis, braco, corpo, tally, cont, fala, marcas] =
+      ['.d-coroa', '.d-coroa', '.d-mandibula', '.d-pupila', '.d-xis', '.d-braco', '.bd-dino', '.bd-tally', '.bd-cont', '.bd-fala', '.cr-marcas'].map(q);
+    // Contagem em risquinhos de cinco (como quem conta dias na parede)
+    const risca = () => {
+      const g = 5, max = 30, v = Math.min(n, max);
+      let d = '';
+      for (let k = 0; k < v; k++) {
+        const grupo = Math.floor(k / g), pos = k % g, x0 = 22 + (grupo % 6) * 34, y0 = 772 + Math.floor(grupo / 6) * 28;
+        d += pos < 4 ? `M${x0 + pos * 6} ${y0} l${(k % 3) - 1} 22 ` : `M${x0 - 4} ${y0 + 18} l28 -14 `;
+      }
+      tally.setAttribute('d', d); tally.innerHTML = `<path d="${d}"/>`;
+      cont.textContent = '×' + n;
     };
-    el.addEventListener('click', (e) => { if (e.target === el || e.target.closest('.cr-fechar')) fecha(); });
+    risca();
+    if (n) fala.textContent = 'DE NOVO?';
+    if (usaMotion) {
+      M.animate(el, { clipPath: ['inset(100% 0 0 0)', 'inset(0% 0 0 0)'] }, { duration: 0.55, ease: [0.7, 0, 0.2, 1] });
+      M.animate('.bd-titulo text', { opacity: [0, 1], x: [-40, 0] }, { delay: M.stagger(0.12, { startDelay: 0.45 }), duration: 0.35 });
+      M.animate(corpo, { y: [60, 0], opacity: [0, 1] }, { type: 'spring', stiffness: 160, damping: 16, delay: 0.5 });
+      M.animate(coroa, { rotate: [-3, 3] }, { duration: 1.6, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' });
+      M.animate(mand, { rotate: [0, 4] }, { duration: 1.1, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' });
+    }
+    const fecha = () => {
+      clearTimeout(volta);
+      const sai = () => { el.remove(); creditosEl = null; document.body.style.overflow = ''; };
+      if (usaMotion) M.animate(el, { clipPath: ['inset(0% 0 0 0)', 'inset(0 0 100% 0)'] }, { duration: 0.4, ease: [0.7, 0, 0.2, 1] }).then(sai, sai); else sai();
+    };
+    el.addEventListener('click', (e) => { if (e.target.closest('.cr-fechar')) fecha(); });
     document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape' && creditosEl) { fecha(); document.removeEventListener('keydown', esc); } });
 
-    // carinho
+    // carinho: o bicho reage com riscos, olho riscado e mandíbula tremendo
     let volta, ultimo = 0, ultimoXY = null;
-    const coracao = (x, y) => {
-      const h = document.createElement('span');
-      h.className = 'coracao'; h.textContent = '♥';
-      h.style.left = x + 'px'; h.style.top = y + 'px';
-      h.style.color = ['#ff6f91', '#ff8fa6', '#ff5c7c', '#ffb3c1'][(Math.random() * 4) | 0];
-      h.style.fontSize = 16 + Math.random() * 14 + 'px';
-      palco.appendChild(h);
-      const fim = () => h.remove();
-      if (usaMotion) M.animate(h, { y: [0, -70 - Math.random() * 50], x: [0, (Math.random() - 0.5) * 60], opacity: [1, 0], scale: [0.6, 1.25] }, { duration: 1, ease: 'easeOut' }).then(fim, fim);
-      else { h.classList.add('sobe-c'); h.addEventListener('animationend', fim); }
+    const SINAIS = ['©', 'HA!', 'OK', '✕', '♛', '!!', 'SN2', 'MUTANO'];
+    const CORES = ['#f4c20d', '#fff', '#e8452c', '#111'];
+    const marca = (x, y) => {
+      const s = document.createElement('span');
+      s.className = 'marca'; s.textContent = SINAIS[(Math.random() * SINAIS.length) | 0];
+      s.style.left = x + 'px'; s.style.top = y + 'px';
+      s.style.color = CORES[(Math.random() * CORES.length) | 0];
+      s.style.fontSize = 22 + Math.random() * 30 + 'px';
+      s.style.rotate = (Math.random() - 0.5) * 50 + 'deg';
+      marcas.appendChild(s);
+      const fim = () => s.remove();
+      if (usaMotion) M.animate(s, { y: [0, -90 - Math.random() * 90], x: [0, (Math.random() - 0.5) * 80], opacity: [1, 1, 0], scale: [0.5, 1.15] }, { duration: 1.1, ease: 'easeOut' }).then(fim, fim);
+      else setTimeout(fim, 900);
     };
-    const carinho = (clientX, clientY) => {
-      const r = palco.getBoundingClientRect();
-      const x = clientX - r.left, y = clientY - r.top;
-      for (let i = 0; i < 2; i++) coracao(x + (Math.random() - 0.5) * 26, y - 10);
-      n++; cont.textContent = n; guarda.gravar('atlas.carinhos', n);
-      fala.textContent = MARCOS[n] || (n % 6 === 0 ? FRASES[(n / 6) % FRASES.length | 0] : fala.textContent);
-      if (!MARCOS[n] && n === 1) fala.textContent = 'Hmm, que gostoso…';
-      olhos.style.opacity = 0; feliz.style.opacity = 1; rosa.style.opacity = 0.85;
-      boca.setAttribute('d', 'M188 116c6 10 18 10 24-2');
+    const carinho = (x, y) => {
+      for (let i = 0; i < 2; i++) marca(x + (Math.random() - 0.5) * 30, y);
+      n++; guarda.gravar('atlas.carinhos', n); risca();
+      fala.textContent = MARCOS[n] || FRASES[(Math.random() * FRASES.length) | 0];
+      pupila.style.opacity = 0; xis.style.opacity = 1;
       if (usaMotion) {
-        M.animate(cauda, { rotate: [-9, 11] }, { duration: 0.16, repeat: 5, repeatType: 'reverse' });
-        M.animate(cabeca, { rotate: [0, x > r.width / 2 ? 5 : -4] }, { type: 'spring', stiffness: 300, damping: 14 });
-        M.animate(el.querySelector('.dino'), { y: [0, -7, 0], scaleX: [1, 1.02, 1] }, { duration: 0.34, ease: 'easeOut' });
+        M.animate(mand, { rotate: [0, 9] }, { duration: 0.07, repeat: 7, repeatType: 'reverse' });
+        M.animate(coroa, { rotate: [-8, 8], y: [-6, 0] }, { duration: 0.12, repeat: 3, repeatType: 'reverse' });
+        M.animate(braco, { rotate: [-18, 12] }, { duration: 0.1, repeat: 5, repeatType: 'reverse' });
+        M.animate(corpo, { x: [-5, 5, 0], scale: [1, 1.015, 1] }, { duration: 0.28 });
       }
       clearTimeout(volta);
-      volta = setTimeout(() => {
-        feliz.style.opacity = 0; olhos.style.opacity = 1; rosa.style.opacity = 0.35;
-        boca.setAttribute('d', 'M190 118c6 5 16 4 22-2');
-      }, 1300);
+      volta = setTimeout(() => { pupila.style.opacity = 1; xis.style.opacity = 0; }, 1200);
     };
-    palco.addEventListener('pointerdown', (e) => { palco.setPointerCapture?.(e.pointerId); ultimo = performance.now(); ultimoXY = [e.clientX, e.clientY]; carinho(e.clientX, e.clientY); });
-    palco.addEventListener('pointermove', (e) => {
+    el.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('.cr-fechar')) return;
+      el.setPointerCapture?.(e.pointerId); ultimo = performance.now(); ultimoXY = [e.clientX, e.clientY]; carinho(e.clientX, e.clientY);
+    });
+    el.addEventListener('pointermove', (e) => {
       const apertado = e.buttons || e.pointerType === 'touch';
       if (!apertado && e.pointerType !== 'mouse') return;
       const agora = performance.now();
