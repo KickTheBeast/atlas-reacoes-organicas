@@ -2,7 +2,7 @@
 // Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
 (() => {
   'use strict';
-  const BUILD = '659a18a7c0';
+  const BUILD = '9a15bba75a';
   const $ = (s) => document.querySelector(s);
   const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
   const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
@@ -60,8 +60,8 @@
   }
   const tile = (id, i) => `<div class="tile carrega" data-m="${id}" style="--i:${i}" role="button" aria-label="Ampliar estrutura"></div>`;
   const lado = (ids, ini = 0) => `<div class="lado">${ids.map((id, k) => (k ? '<span class="mais">+</span>' : '') + tile(id, ini + k)).join('')}</div>`;
-  const SETA_V = '<svg class="ar-v" viewBox="0 0 14 54"><path d="M7 2v48M2 43l5 7 5-7"/></svg>';
-  const SETA_H = '<svg class="ar-h" viewBox="0 0 72 14"><path d="M2 7h66M61 2l7 5-7 5"/></svg>';
+  const SETA_V = '<svg class="ar-v" viewBox="0 0 14 54"><path d="M7 2v48M2 43l5 7 5-7"/><circle class="e" r="2.3" cx="7" cy="2"><animateMotion dur="1.7s" begin="1.1s" repeatCount="indefinite" path="M0 0V42"/></circle></svg>';
+  const SETA_H = '<svg class="ar-h" viewBox="0 0 72 14"><path d="M2 7h66M61 2l7 5-7 5"/><circle class="e" r="2.3" cx="2" cy="7"><animateMotion dur="1.7s" begin="1.1s" repeatCount="indefinite" path="M0 0H58"/></circle></svg>';
   const seta = (rg, cd) => `<div class="seta">${SETA_V}${SETA_H}<div class="tx">${rg ? `<span class="rg">${esc(rg)}</span>` : ''}${cd ? `<span class="cd">${esc(cd)}</span>` : ''}</div></div>`;
 
   // ---------- peças de tela ----------
@@ -121,7 +121,7 @@
   const marca = (t) => String(t).replace(/^(✓)/, '<span class="ok">$1</span>').replace(/^(✗)/, '<span class="no">$1</span>');
   const celulaHtml = (c) => Array.isArray(c) ? `<div class="multi">${c.map(celulaHtml).join('')}</div>`
     : c && typeof c === 'object' ? `<div class="tile mini carrega" data-m="${c.s}" role="button" aria-label="Ampliar estrutura"></div>` : marca(c);
-  const tabelaHtml = (b) => `<div class="cartao tabela sobe"><h3 class="tb-titulo">${esc(b.t)}</h3><div class="tb-wrap"><table class="tb"><thead><tr>${b.cols.map((c) => `<th>${c}</th>`).join('')}</tr></thead><tbody>${b.rows.map((l) => `<tr>${l.map((c, i) => (i === 0 ? '<th scope="row">' : '<td>') + celulaHtml(c) + (i === 0 ? '</th>' : '</td>')).join('')}</tr>`).join('')}</tbody></table></div><div class="tb-dica" hidden>deslize para ver mais →</div>${b.nota ? `<p class="tb-nota">${esc(b.nota)}</p>` : ''}</div>`;
+  const tabelaHtml = (b) => `<div class="cartao tabela sobe"><h3 class="tb-titulo">${esc(b.t)}</h3><div class="tb-wrap"><table class="tb"><thead><tr>${b.cols.map((c) => `<th>${c}</th>`).join('')}</tr></thead><tbody>${b.rows.map((l) => `<tr>${l.map((c, i) => (i === 0 ? '<th scope="row">' : '<td>') + celulaHtml(c) + (i === 0 ? '</th>' : '</td>')).join('')}</tr>`).join('')}</tbody></table></div><div class="tb-dica" hidden>deslize para ver mais <span class="nudge">→</span></div>${b.nota ? `<p class="tb-nota">${esc(b.nota)}</p>` : ''}</div>`;
 
   function telaGuia(id) {
     const g = guiaPorId.get(id);
@@ -204,7 +204,7 @@
         <div class="cartao sobe" style="--i:4"><div class="esquema">${lado(r.r)}${seta(r.rg, r.cd)}${lado(r.p, n0)}</div></div>
         ${r.nt ? `<div class="cartao sobe" style="--i:5"><p class="notas">${r.nt}</p></div>` : ''}
         ${mec}
-        <div class="nav-det">${nav(ant, '← Anterior')}${nav(prox, 'Próxima →')}</div></article>`,
+        <div class="nav-det">${nav(ant, '<span class="nudge-e">←</span> Anterior')}${nav(prox, 'Próxima <span class="nudge">→</span>')}</div></article>`,
     };
   }
 
@@ -246,6 +246,7 @@
 
   // ---------- roteador ----------
   let profAnterior = -1, abaAtual = 'aulas', rotaAtual = '';
+  const reduzido = matchMedia('(prefers-reduced-motion: reduce)').matches;
   function resolve(hash) {
     const [, a, b] = hash.split('?')[0].split('/');
     if (!a || a === 'aulas') return telaAulas();
@@ -300,6 +301,66 @@
   window.addEventListener('hashchange', () => { window.__navegou = true; });
   $('#buscar').addEventListener('click', () => { location.hash = '#/busca'; });
 
+  // ---------- pó (desintegração em partículas) ----------
+  // O elemento some varrido da esquerda para a direita enquanto vira partículas que sobem e se dispersam.
+  function poeira(el, { tempo = 1000, aoFim } = {}) {
+    if (reduzido || !el) { aoFim && aoFim(); return; }
+    const r = el.getBoundingClientRect();
+    const pad = 70, dpr = Math.min(devicePixelRatio || 1, 2);
+    const W = r.width + pad * 2, H = r.height + pad * 2;
+    const cv = document.createElement('canvas');
+    cv.width = W * dpr; cv.height = H * dpr;
+    cv.style.cssText = `position:fixed;left:${r.left - pad}px;top:${r.top - pad}px;width:${W}px;height:${H}px;pointer-events:none;z-index:60`;
+    document.body.appendChild(cv);
+    const ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
+    const css = getComputedStyle(document.documentElement);
+    const cor = (v, f) => (css.getPropertyValue(v) || f).trim();
+    const paleta = [cor('--card', '#fff'), cor('--card', '#fff'), cor('--ink', '#10201b'), cor('--ac', '#14806a'), cor('--ac', '#14806a'), cor('--mut', '#5b6e67')];
+    const ps = [];
+    let frente = -0.15, t0 = performance.now(), ultimo = frente;
+    const varrer = 0.72; // parte do tempo em que a frente atravessa o elemento
+    const mascara = (f) => {
+      const m = `linear-gradient(90deg, transparent ${(f * 100).toFixed(1)}%, #000 ${(f * 100 + 16).toFixed(1)}%)`;
+      el.style.webkitMaskImage = el.style.maskImage = m;
+    };
+    mascara(frente);
+    const quadro = (agora) => {
+      const dt = Math.min(48, agora - (quadro.t || agora)); quadro.t = agora;
+      const p = Math.min(1, (agora - t0) / (tempo * varrer));
+      frente = -0.15 + p * 1.3;
+      mascara(frente);
+      // novas partículas na faixa varrida
+      const x0 = Math.max(0, ultimo) * r.width, x1 = Math.min(1, Math.max(0, frente + 0.08)) * r.width;
+      if (x1 > x0 && ps.length < 1100) {
+        const n = Math.ceil(((x1 - x0) * r.height) / 38);
+        for (let i = 0; i < n; i++) {
+          ps.push({
+            x: pad + x0 + Math.random() * (x1 - x0), y: pad + Math.random() * r.height,
+            vx: 0.25 + Math.random() * 1.7, vy: -(0.1 + Math.random() * 1.3),
+            s: 1.1 + Math.random() * 2.6, vida: 650 + Math.random() * 650, nasc: agora,
+            c: paleta[(Math.random() * paleta.length) | 0], fase: Math.random() * 6.28,
+          });
+        }
+      }
+      ultimo = frente;
+      ctx.clearRect(0, 0, W, H);
+      let vivos = 0;
+      for (const q of ps) {
+        const k = (agora - q.nasc) / q.vida;
+        if (k >= 1) continue;
+        vivos++;
+        q.x += q.vx * dt / 16 + Math.sin(agora / 180 + q.fase) * 0.25;
+        q.y += q.vy * dt / 16 - k * 0.5;
+        ctx.globalAlpha = (1 - k) * (1 - k) * 0.95;
+        ctx.fillStyle = q.c;
+        ctx.fillRect(q.x, q.y, q.s, q.s);
+      }
+      if (p < 1 || vivos) requestAnimationFrame(quadro);
+      else { cv.remove(); aoFim && aoFim(); }
+    };
+    requestAnimationFrame(quadro);
+  }
+
   // ---------- cliques ----------
   document.addEventListener('click', (e) => {
     const t = e.target;
@@ -309,13 +370,32 @@
       const on = alternarSalvo(+sv.dataset.salvar);
       sv.classList.toggle('on', on); sv.setAttribute('aria-pressed', on);
       sv.classList.remove('pop'); void sv.offsetWidth; sv.classList.add('pop');
-      if (rotaAtual === '#/salvos' && !on) setTimeout(mostra, 260);
+      if (rotaAtual === '#/salvos' && !on) {
+        const item = sv.closest('.item');
+        poeira(item, { aoFim: () => {
+          item.remove();
+          const n = document.querySelectorAll('#itens .item').length;
+          const c = $('#contagem'); if (c) c.textContent = plural(n, 'reação', 'reações');
+          if (!n) $('#itens').innerHTML = vazio('Toque na estrela de uma reação para guardá-la aqui.');
+        } });
+      }
       return;
     }
     const sd = t.closest('[data-salvar-d]');
     if (sd) { const on = alternarSalvo(+sd.dataset.salvarD); sd.classList.toggle('on', on); sd.querySelector('span').textContent = on ? 'Salvo' : 'Salvar'; return; }
     if (t.closest('[data-compartilhar]')) { navigator.share({ title: document.title, url: location.href }).catch(() => {}); return; }
     const ir = t.closest('[data-ir]'); if (ir) { location.hash = ir.dataset.ir; return; }
+    const heroEl = t.closest('.hero');
+    if (heroEl && !heroEl.dataset.poeira) {
+      heroEl.dataset.poeira = '1';
+      heroEl.style.opacity = '1'; heroEl.style.animation = 'none';
+      poeira(heroEl, { tempo: 1500, aoFim: () => {
+        heroEl.style.webkitMaskImage = heroEl.style.maskImage = '';
+        heroEl.style.animation = 'renasce .8s cubic-bezier(.2,.8,.2,1) both';
+        setTimeout(() => { delete heroEl.dataset.poeira; }, 900);
+      } });
+      return;
+    }
     if (t.closest('[data-instalar]') && promptInstalar) { promptInstalar.prompt(); promptInstalar.userChoice.finally(() => { promptInstalar = null; $('#instalar').innerHTML = ''; }); return; }
     if (t.closest('[data-fechar-instalar]')) { guarda.gravar('atlas.instalar', true); $('#instalar').innerHTML = ''; return; }
     if (t.closest('[data-verificar]')) { verifica(true); return; }
@@ -363,7 +443,7 @@
   if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 
   // ---------- início ----------
-  tela.innerHTML = '<div class="tela"><div class="vazio">Carregando…</div></div>';
+  tela.innerHTML = '<div class="tela"><div class="carregando"><div class="atomo"><i style="--r:0deg"><s></s></i><i style="--r:60deg"><s></s></i><i style="--r:120deg"><s></s></i><b></b></div><p>Carregando…</p></div></div>';
   get('dados.json?v=' + BUILD).then((d) => {
     prepara(d);
     if (!location.hash) history.replaceState(null, '', '#/aulas');
