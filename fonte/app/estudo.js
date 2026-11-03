@@ -315,7 +315,11 @@
   function proximaQuestao() {
     const palco = $('#palco');
     sessaoS.i++;
-    mo(palco, { opacity: [1, 0], x: [0, -60] }, { duration: 0.22 }).then(() => { if (usaMotion) { palco.style.opacity = ''; palco.style.transform = ''; } questaoSeguinte(false); window.scrollTo(0, 0); });
+    // sai para a esquerda e a próxima questão entra animando de volta a opacity 1 (a Motion grava o estado final, então não basta limpar o estilo)
+    mo(palco, { opacity: [1, 0], x: [0, -60] }, { duration: 0.22 }).then(() => {
+      questaoSeguinte(false); window.scrollTo(0, 0);
+      mo(palco, { opacity: [0, 1], x: [40, 0] }, { duration: 0.26, ease: [0.2, 0.9, 0.3, 1] }).then(() => { palco.style.opacity = ''; palco.style.transform = ''; });
+    });
   }
   function fimSimulado() {
     const palco = $('#palco'), n = sessaoS.qs.length, pct = (100 * sessaoS.acertos) / n;
