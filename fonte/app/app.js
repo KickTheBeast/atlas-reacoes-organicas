@@ -642,11 +642,17 @@
       <circle cx="444" cy="52" r="8.5" fill="#f6f3ec" stroke="#111" stroke-width="3"/>`,
   }, {
     id: 'bone', slot: 'cabeca', nome: 'Boné', como: 'Ganhe em um simulado 100%', vb: '432 50 120 50',
-    arte: `<path d="M456 85 Q456 60 485 59 Q514 60 515 82 Z" fill="#f2c230" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+    arte: `<path d="M456 85 Q456 60 485 59 Q514 60 515 82 Z" fill="#1f63d6" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
       <path d="M485 59 Q480 70 482 84" stroke="#111" stroke-width="2" fill="none" stroke-linecap="round" opacity=".6"/>
       <circle cx="485" cy="58.5" r="3" fill="#111"/>
       <path d="M508 80 Q532 78 545 87 Q526 90 507 88 Z" fill="#111" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
       <path d="M458 83 Q486 90 514 81" stroke="#111" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+  }, {
+    id: 'gravata', slot: 'pescoco', nome: 'Gravata', como: 'Ganhe em um simulado 100%', vb: '430 128 80 76',
+    arte: `<g transform="translate(-10 0)"><path d="M458 139 L470 146 L466 152 Z M486 139 L474 146 L478 152 Z" fill="#f6f3ec" stroke="#111" stroke-width="2.6" stroke-linejoin="round"/>
+      <path d="M472 150 L463 176 L474 196 L486 176 L477 150 Z" fill="#d93a2f" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M465 146 L482 146 L479 154 L468 154 Z" fill="#d93a2f" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M470 166 L479 163 M468 176 L482 172" stroke="#111" stroke-width="2.2" stroke-linecap="round" opacity=".5"/></g>`,
   }];
   const lerAcess = () => { const a = guarda.ler('atlas.acessorios', null); return a && Array.isArray(a.tem) ? a : { tem: [], uso: [] }; };
   function ganhaAcessorio(id) {
@@ -847,7 +853,7 @@
     let loja = null;
     const cartaoLoja = (a) => {
       const u = lerAcess(), tem = u.tem.includes(a.id), usando = u.uso.includes(a.id);
-      return `<div class="cl-card${tem ? '' : ' trava'}"><div class="cl-prev">${dinoSvg(V, { vb: '408 34 192 128', uso: [a.id] })}${tem ? '' : `<span class="cl-lock">${CADEADO}</span>`}</div>
+      return `<div class="cl-card${tem ? '' : ' trava'}"><div class="cl-prev">${dinoSvg(V, { vb: a.slot === 'pescoco' ? '420 112 130 96' : '408 34 192 128', uso: [a.id] })}${tem ? '' : `<span class="cl-lock">${CADEADO}</span>`}</div>
         <b>${a.nome}</b><small>${tem ? (usando ? 'Vestido agora' : 'Na sua coleção') : a.como}</small>
         ${tem ? `<button class="cl-btn${usando ? ' on' : ''}" data-vestir="${a.id}">${usando ? 'Tirar' : 'Vestir'}</button>` : ''}</div>`;
     };
