@@ -7,6 +7,11 @@ window.CATEGORIES = [
   { id: 'e2', nome: 'E2' },
   { id: 'adicao-alcenos', nome: 'Adição a alcenos' },
   { id: 'adicao-eletrofilica', nome: 'Adição eletrofílica' },
+  { id: 'rearranjos', nome: 'Rearranjos de carbocátion' },
+  { id: 'eliminacao-alfa-carbenos', nome: 'α-Eliminação / Carbenos' },
+  { id: 'radicais', nome: 'Radicais' },
+  { id: 'reducao-alcinos', nome: 'Redução de alcinos' },
+  { id: 'mecanismos-gerais', nome: 'Mecanismos gerais' },
 ];
 
 window.REACTIONS = [
