@@ -273,6 +273,32 @@ a.etq{transition:transform .15s}a.etq:active{transform:scale(.92)}
 .ficha.k-mec[class*=" c-"]{border-left-color:var(--c)}
 .ficha.k-mec[class*=" c-"] small{background:color-mix(in srgb,var(--c) 16%,var(--card));color:var(--c)}
 .item[data-c]::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3.5px;border-radius:0 4px 4px 0;background:var(--c,transparent)}
+/* mecanismos com setas de elétrons */
+.mec-nota{margin:0;padding:0 16px 8px;color:var(--mut);font-size:.84rem}
+.cartao.mec{padding-bottom:6px}
+.mec-passos{padding:6px 14px 0}
+.mec .passo{margin-bottom:16px}
+.mec .passo .tile svg{width:calc(var(--w,160) * 1.45px);max-width:100%}
+.mec .passo .lado{align-items:center}
+.mec .passo .vai{font-size:1.5rem}
+@media (max-width:560px){
+  .mec .passo .lado{flex-direction:column;align-items:flex-start;gap:6px}
+  .mec .passo .vai{transform:rotate(90deg);margin:0 0 0 18px;animation:none}
+}
+.seta-c{stroke-dasharray:1;stroke-dashoffset:0}
+.seta-r,.seta-e{display:none}
+/* Cada seta é desenhada em ordem (--i): o elétron corre pela curva, o traço o acompanha, a ponta "estala" e uma onda sai dela. */
+@media (prefers-reduced-motion:no-preference){
+  .anima .seta-e{display:inline}
+  .anima .seta-r{display:inline;opacity:0;transform-box:fill-box;transform-origin:center}
+  .anima .seta-c,.anima .seta-h{filter:drop-shadow(0 0 1.6px rgba(31,99,214,.55))}
+  .anima .seta-c{stroke-dashoffset:1;animation:seta-traca 6.5s cubic-bezier(.65,0,.35,1) infinite;animation-delay:calc(var(--i,0) * 1s)}
+  .anima .seta-h{opacity:0;transform-box:fill-box;transform-origin:center;animation:seta-ponta 6.5s ease-out infinite;animation-delay:calc(var(--i,0) * 1s)}
+  .anima .seta-r{animation:seta-onda 6.5s ease-out infinite;animation-delay:calc(var(--i,0) * 1s)}
+}
+@keyframes seta-traca{0%,2%{stroke-dashoffset:1;opacity:1}17%,88%{stroke-dashoffset:0;opacity:1}97%,100%{stroke-dashoffset:0;opacity:0}}
+@keyframes seta-ponta{0%,16%{opacity:0;transform:scale(.2)}20%{opacity:1;transform:scale(1.45)}25%,88%{opacity:1;transform:scale(1)}97%,100%{opacity:0;transform:scale(1)}}
+@keyframes seta-onda{0%,16.5%{opacity:0;transform:scale(.3)}17.5%{opacity:.7;transform:scale(.3)}33%,100%{opacity:0;transform:scale(2.8)}}
 
 /* busca */
 .campo{position:sticky;top:calc(var(--topo) + var(--top));z-index:5;padding:6px 0 10px;background:linear-gradient(var(--bg) 75%,transparent)}
