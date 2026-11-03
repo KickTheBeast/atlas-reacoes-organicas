@@ -235,9 +235,14 @@ a.etq{transition:transform .15s}a.etq:active{transform:scale(.92)}
 .rodape .avatar{display:block;width:54px;height:54px;padding:0;border:1px solid var(--bd);background:#fff;margin:0 auto 10px;border-radius:50%;overflow:hidden;transition:transform .2s}
 .rodape .avatar:active{transform:scale(.9)}
 .avatar img{display:block;width:100%;height:100%;object-fit:contain;padding:5px}
-.creditos{position:fixed;inset:0;z-index:70;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;text-align:center;padding:max(24px,env(safe-area-inset-top)) 24px max(24px,env(safe-area-inset-bottom));cursor:pointer}
+.creditos{position:fixed;inset:0;z-index:70;background:#fff;color:#111;touch-action:none;display:flex;align-items:center;justify-content:center;text-align:center;padding:max(24px,env(safe-area-inset-top)) 24px max(24px,env(safe-area-inset-bottom));cursor:pointer}
 .cr-conteudo{display:flex;flex-direction:column;align-items:center;gap:clamp(10px,3vh,26px);width:100%;max-width:480px}
 .cr-peq{margin:0;font:900 clamp(15px,4.4vw,20px)/1 Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif;letter-spacing:.22em;text-transform:uppercase}
+.dv-caixa{width:min(88vw,450px);touch-action:none}
+.dv{display:block;width:100%;height:auto;overflow:visible}
+.dv .v-red{fill:var(--vermelho,#f60507);stroke:none}
+.dv .v-traco{fill:none;stroke:#111}
+.rawr{position:absolute;z-index:5;pointer-events:none;white-space:nowrap;font:900 clamp(34px,11vw,64px)/1 Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif;text-transform:uppercase;letter-spacing:.02em}
 .cr-img{display:block;width:min(86vw,440px);max-height:52vh;object-fit:contain;mix-blend-mode:multiply;-webkit-user-drag:none;user-select:none}
 .cr-msg{margin:0;font:900 clamp(30px,9.4vw,52px)/1.04 Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif;text-transform:uppercase;letter-spacing:.01em}
 .cr-fechar{position:absolute;right:max(10px,env(safe-area-inset-right));top:calc(10px + var(--top));width:56px;height:56px;display:grid;place-items:center}

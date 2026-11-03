@@ -426,35 +426,174 @@
   }
 
   // ---------- easter egg: créditos ----------
+  // O dinossauro é a imagem original vetorizada (tools/vetorizar.py): silhueta em partes + traços pretos.
+  // Animação com GSAP (DrawSVG desenha os traços, SplitText revela as letras), carregado só ao abrir.
   const DINO_AVATAR = `<img src="dino.png?v=${BUILD}" alt="" width="54" height="54">`;
-  let creditosEl = null;
+  let creditosEl = null, gsapPronto = null;
 
-  function abreCreditos() {
+  function carregaGsap() {
+    if (gsapPronto) return gsapPronto;
+    const v = '?v=' + BUILD;
+    const script = (src) => new Promise((ok, erro) => { const s = document.createElement('script'); s.src = src + v; s.onload = ok; s.onerror = erro; document.head.appendChild(s); });
+    gsapPronto = Promise.all([
+      script('gsap.min.js').then(() => Promise.all([script('DrawSVGPlugin.min.js'), script('SplitText.min.js')])).then(() => window.gsap.registerPlugin(window.DrawSVGPlugin, window.SplitText)),
+      fetch('dino-vetor.json' + v).then((r) => r.json()),
+    ]).then(([, vetor]) => vetor).catch((e) => { gsapPronto = null; throw e; });
+    return gsapPronto;
+  }
+
+  function dinoSvg(V) {
+    const tr = (g) => V.tracos.filter((t) => t.g === g).map((t) => `<path class="v-traco" d="${t.d}" stroke-width="${t.w}"/>`).join('');
+    const parte = (nome) => `<path class="v-red" d="${V.vermelho[nome]}" fill-rule="evenodd"/>`;
+    return `<svg class="dv" viewBox="0 0 ${V.w} ${V.h}" role="img" aria-label="Dinossauro vermelho" fill="none" stroke="#111" stroke-linecap="round" stroke-linejoin="round" style="--vermelho:${V.cor}">
+      <g class="dv-par"><g class="dv-raiz">
+        ${parte('corpo')}
+        <g class="p-cauda">${parte('cauda')}${tr('cauda')}</g>
+        <g class="p-braco">${parte('braco')}${tr('braco')}</g>
+        <g class="g-corpo">${tr('corpo')}${tr('bracoE')}</g>
+        <g class="g-espinhos">${tr('espinhos')}</g>
+        <g class="g-garras">${tr('garrasE')}${tr('garrasD')}</g>
+        <g class="p-cabeca">${parte('cabeca')}${tr('cabeca')}
+          <g class="dv-olho"><ellipse cx="500" cy="104" rx="10" ry="4.6" fill="#ffd9e0" stroke="none"/><circle class="dv-pupila" cx="502" cy="104" r="2.6" fill="#111" stroke="none"/></g>
+        </g>
+      </g></g></svg>`;
+  }
+
+  function abreCreditos(ev) {
     if (creditosEl) return;
+    const alvo = ev && ev.target && ev.target.closest && ev.target.closest('[data-creditos]');
+    const r0 = alvo ? alvo.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight, width: 0, height: 0 };
+    const origem = [r0.left + r0.width / 2, r0.top + r0.height / 2];
+    if (reduzido) { abreCreditosEstatico(); return; }
+    creditosEl = document.createElement('div'); // reserva enquanto carrega
+    carregaGsap().then((V) => { creditosEl = null; montaCreditos(V, origem); }).catch(() => { creditosEl = null; abreCreditosEstatico(); });
+  }
+
+  function montaCreditos(V, origem) {
+    const gsap = window.gsap, SplitText = window.SplitText;
     const el = document.createElement('div');
     el.className = 'creditos';
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-label', 'Créditos');
+    el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Créditos');
     el.innerHTML = `<button class="cr-fechar" aria-label="Fechar"><svg viewBox="0 0 40 40"><path d="M8 9 L32 31 M31 8 L9 33" /></svg></button>
-      <div class="cr-conteudo">
-        <p class="cr-peq">Feito por Mutano</p>
-        <img class="cr-img" src="dino.png?v=${BUILD}" alt="Dinossauro vermelho">
-        <h2 class="cr-msg">Boa prova de<br>Química Orgânica II</h2>
-      </div>`;
+      <div class="cr-conteudo"><p class="cr-peq">Feito por Mutano</p><div class="dv-caixa">${dinoSvg(V)}</div><h2 class="cr-msg">Boa prova de<br>Química Orgânica II</h2></div>`;
     document.body.appendChild(el);
     creditosEl = el;
     document.body.style.overflow = 'hidden';
-    if (usaMotion) {
-      M.animate(el, { opacity: [0, 1] }, { duration: 0.25 });
-      M.animate('.cr-img', { opacity: [0, 1], scale: [0.96, 1] }, { duration: 0.5, delay: 0.1, ease: [0.2, 0.8, 0.2, 1] });
-      M.animate('.cr-peq, .cr-msg', { opacity: [0, 1], y: [10, 0] }, { duration: 0.4, delay: M.stagger(0.12, { startDelay: 0.2 }) });
+    const q = (s) => el.querySelector(s), qa = (s) => [...el.querySelectorAll(s)];
+    const caixa = q('.cr-conteudo'), raiz = q('.dv-raiz'), par = q('.dv-par');
+    const vermelhos = qa('.v-red'), tracos = qa('.v-traco'), espinhos = qa('.g-espinhos .v-traco'), garras = qa('.g-garras .v-traco');
+    const pupila = q('.dv-pupila'), olho = q('.dv-olho');
+    const PIV = { cauda: '190 340', cabeca: '410 130', braco: '462 230', base: '300 630', centro: '300 420' };
+    const raio = Math.hypot(Math.max(origem[0], innerWidth - origem[0]), Math.max(origem[1], innerHeight - origem[1]));
+    const split = SplitText.create(q('.cr-msg'), { type: 'chars', mask: 'chars', aria: 'auto' });
+
+    // ---- entrada ----
+    gsap.set(vermelhos, { opacity: 0, scale: 0.84, svgOrigin: PIV.centro });
+    gsap.set(tracos, { drawSVG: '0%' });
+    gsap.set(olho, { opacity: 0 });
+    gsap.set(q('.cr-peq'), { opacity: 0, letterSpacing: '0.7em' });
+    gsap.set(split.chars, { yPercent: 115, opacity: 0 });
+    const intro = gsap.timeline({ onComplete: idle });
+    intro
+      .fromTo(el, { clipPath: `circle(0px at ${origem[0]}px ${origem[1]}px)` }, { clipPath: `circle(${raio + 40}px at ${origem[0]}px ${origem[1]}px)`, duration: 0.85, ease: 'power3.inOut' })
+      .to(vermelhos, { opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.6)', stagger: 0.09 }, 0.4)
+      .to(tracos, { drawSVG: '100%', duration: () => gsap.utils.random(0.28, 0.6), ease: 'power1.inOut', stagger: { each: 0.032, from: 'start' } }, 0.95)
+      .to(olho, { opacity: 1, duration: 0.25 }, 1.9)
+      .to(q('.cr-peq'), { opacity: 1, letterSpacing: '0.22em', duration: 0.9, ease: 'power3.out' }, 0.7)
+      .to(split.chars, { yPercent: 0, opacity: 1, duration: 0.7, ease: 'back.out(1.8)', stagger: { each: 0.024, from: 'start' } }, 1.35);
+
+    // ---- vida: respira, balança o rabo, pisca, os traços "fervem" como em desenho animado ----
+    let vivo = false, fervura, piscaCall;
+    const idleTL = gsap.timeline({ paused: true });
+    function idle() {
+      vivo = true;
+      idleTL.clear();
+      idleTL.to(raiz, { scaleY: 1.013, svgOrigin: PIV.base, duration: 2.4, ease: 'sine.inOut', repeat: -1, yoyo: true }, 0)
+        .to(q('.p-cauda'), { rotation: 3, svgOrigin: PIV.cauda, duration: 2.1, ease: 'sine.inOut', repeat: -1, yoyo: true }, 0)
+        .fromTo(q('.p-cabeca'), { rotation: -1.4 }, { rotation: 1.4, svgOrigin: PIV.cabeca, duration: 3, ease: 'sine.inOut', repeat: -1, yoyo: true }, 0)
+        .fromTo(q('.p-braco'), { rotation: -3 }, { rotation: 4, svgOrigin: PIV.braco, duration: 1.9, ease: 'sine.inOut', repeat: -1, yoyo: true }, 0)
+        .play();
+      const ferve = () => { gsap.set(tracos, { x: () => gsap.utils.random(-0.8, 0.8), y: () => gsap.utils.random(-0.8, 0.8) }); fervura = gsap.delayedCall(0.17, ferve); };
+      ferve();
+      const pisca = () => { gsap.fromTo(olho, { scaleY: 1 }, { scaleY: 0.08, svgOrigin: '500 104', duration: 0.07, yoyo: true, repeat: 1 }); piscaCall = gsap.delayedCall(gsap.utils.random(2.2, 5), pisca); };
+      piscaCall = gsap.delayedCall(2, pisca);
     }
-    const fecha = () => {
-      const sai = () => { el.remove(); creditosEl = null; document.body.style.overflow = ''; };
-      if (usaMotion) M.animate(el, { opacity: [1, 0] }, { duration: 0.2 }).then(sai, sai); else sai();
+
+    // ---- segue o dedo: o bicho inclina para o lado e a pupila acompanha ----
+    const px = gsap.quickTo(par, 'x', { duration: 0.8, ease: 'power3' }), py = gsap.quickTo(par, 'y', { duration: 0.8, ease: 'power3' });
+    const pr = gsap.quickTo(par, 'rotation', { duration: 1, ease: 'power3', svgOrigin: PIV.base });
+    const ppx = gsap.quickTo(pupila, 'x', { duration: 0.35, ease: 'power2' }), ppy = gsap.quickTo(pupila, 'y', { duration: 0.35, ease: 'power2' });
+    const segue = (e) => {
+      const nx = (e.clientX / innerWidth - 0.5) * 2, ny = (e.clientY / innerHeight - 0.5) * 2;
+      px(nx * 9); py(ny * 5); pr(nx * 1.4); ppx(nx * 3); ppy(ny * 1.6);
     };
+
+    // ---- rugido ----
+    const GRITOS = ['RAWR!', 'GRRR', 'BOA PROVA!', 'NÃO CHORE.', 'SN2!', 'ISSO AÍ.', 'E2!', 'VAI DAR.'];
+    let ultimoRugido = 0, tlRugido = null;
+    const rugido = (x, y) => {
+      const agora = performance.now();
+      if (!vivo || agora - ultimoRugido < 450) return;
+      ultimoRugido = agora;
+      navigator.vibrate && navigator.vibrate([18, 24, 18]);
+      tlRugido && tlRugido.progress(1).kill();
+      const tl = (tlRugido = gsap.timeline());
+      tl.to(raiz, { scaleY: 0.94, scaleX: 1.035, svgOrigin: PIV.base, duration: 0.09, ease: 'power2.in' })
+        .to(raiz, { scaleY: 1.05, scaleX: 0.975, duration: 0.14, ease: 'power2.out' })
+        .to(raiz, { scaleY: 1, scaleX: 1, duration: 0.9, ease: 'elastic.out(1,0.3)' })
+        .to(q('.p-cabeca'), { rotation: -7, svgOrigin: PIV.cabeca, duration: 0.12, ease: 'power2.out' }, 0.05)
+        .to(q('.p-cabeca'), { rotation: 0, duration: 0.8, ease: 'elastic.out(1,0.25)' }, 0.2)
+        .to(q('.p-braco'), { rotation: 16, svgOrigin: PIV.braco, duration: 0.1, ease: 'power2.out' }, 0.05)
+        .to(q('.p-braco'), { rotation: 0, duration: 0.9, ease: 'elastic.out(1,0.2)' }, 0.18)
+        .to(q('.p-cauda'), { rotation: 11, svgOrigin: PIV.cauda, duration: 0.1 }, 0.05)
+        .to(q('.p-cauda'), { rotation: -8, duration: 0.16 }, 0.15)
+        .to(q('.p-cauda'), { rotation: 0, duration: 0.9, ease: 'elastic.out(1,0.2)' }, 0.31)
+        .fromTo(garras, { x: -3 }, { x: 3, duration: 0.04, repeat: 9, yoyo: true, ease: 'none' }, 0.05)
+        .fromTo(espinhos, { y: 0 }, { y: -7, duration: 0.09, repeat: 1, yoyo: true, stagger: 0.035, ease: 'power2.out' }, 0.05)
+        .fromTo(olho, { scale: 1 }, { scale: 1.7, svgOrigin: '500 104', duration: 0.12, repeat: 1, yoyo: true }, 0.05)
+        .fromTo(caixa, { x: 0, y: 0 }, { x: () => gsap.utils.random(-5, 5), y: () => gsap.utils.random(-3, 3), duration: 0.035, repeat: 9, yoyo: true, onComplete: () => gsap.set(caixa, { x: 0, y: 0 }) }, 0.05);
+      const g = document.createElement('span');
+      g.className = 'rawr'; g.textContent = GRITOS[(Math.random() * GRITOS.length) | 0];
+      g.style.left = x + 'px'; g.style.top = y + 'px';
+      g.style.color = Math.random() < 0.5 ? '#111' : '#f60507';
+      el.appendChild(g);
+      gsap.timeline({ onComplete: () => g.remove() })
+        .fromTo(g, { scale: 0, rotation: gsap.utils.random(-25, 25), xPercent: -50, yPercent: -50 }, { scale: 1, duration: 0.35, ease: 'back.out(3)' })
+        .to(g, { y: -40, opacity: 0, duration: 0.5, ease: 'power1.in' }, '+=0.35');
+    };
+    el.addEventListener('pointerdown', (e) => { if (!e.target.closest('.cr-fechar')) rugido(e.clientX, e.clientY); });
+    el.addEventListener('pointermove', segue);
+
+    // ---- saída: desfaz o desenho e o círculo fecha de volta no ícone ----
+    let fechando = false;
+    const fecha = () => {
+      if (fechando) return; fechando = true;
+      vivo = false; fervura && fervura.kill(); piscaCall && piscaCall.kill(); idleTL.kill(); tlRugido && tlRugido.kill();
+      gsap.set(tracos, { x: 0, y: 0 });
+      gsap.timeline({ onComplete: () => { split.revert(); el.remove(); creditosEl = null; document.body.style.overflow = ''; } })
+        .to(tracos, { drawSVG: '0%', duration: 0.3, ease: 'power2.in', stagger: { each: 0.012, from: 'end' } }, 0)
+        .to(split.chars, { yPercent: -115, opacity: 0, duration: 0.35, ease: 'power2.in', stagger: { each: 0.012, from: 'end' } }, 0)
+        .to(q('.cr-peq'), { opacity: 0, letterSpacing: '0.7em', duration: 0.3 }, 0)
+        .to(vermelhos, { scale: 0.86, opacity: 0, duration: 0.35, ease: 'power2.in', stagger: 0.04 }, 0.15)
+        .to(el, { clipPath: `circle(0px at ${origem[0]}px ${origem[1]}px)`, duration: 0.6, ease: 'power3.inOut' }, 0.4);
+    };
+    el.querySelector('.cr-fechar').addEventListener('click', (e) => { e.stopPropagation(); fecha(); });
+    document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape' && creditosEl === el) { fecha(); document.removeEventListener('keydown', esc); } });
+  }
+
+  // Sem GSAP (offline sem cache, ou "reduzir movimento"): a imagem original, sem animação.
+  function abreCreditosEstatico() {
+    if (creditosEl && creditosEl.className === 'creditos') return;
+    const el = document.createElement('div');
+    el.className = 'creditos';
+    el.innerHTML = `<button class="cr-fechar" aria-label="Fechar"><svg viewBox="0 0 40 40"><path d="M8 9 L32 31 M31 8 L9 33" /></svg></button>
+      <div class="cr-conteudo"><p class="cr-peq">Feito por Mutano</p><img class="cr-img" src="dino.png?v=${BUILD}" alt="Dinossauro vermelho"><h2 class="cr-msg">Boa prova de<br>Química Orgânica II</h2></div>`;
+    document.body.appendChild(el);
+    creditosEl = el;
+    document.body.style.overflow = 'hidden';
+    const fecha = () => { el.remove(); creditosEl = null; document.body.style.overflow = ''; };
     el.addEventListener('click', fecha);
-    document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape' && creditosEl) { fecha(); document.removeEventListener('keydown', esc); } });
+    document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape' && creditosEl === el) { fecha(); document.removeEventListener('keydown', esc); } });
   }
 
   // ---------- cliques ----------
@@ -477,7 +616,7 @@
     if (t.closest('[data-instalar]') && promptInstalar) { promptInstalar.prompt(); promptInstalar.userChoice.finally(() => { promptInstalar = null; $('#instalar').innerHTML = ''; }); return; }
     if (t.closest('[data-fechar-instalar]')) { guarda.gravar('atlas.instalar', true); $('#instalar').innerHTML = ''; return; }
     if (t.closest('[data-verificar]')) { verifica(true); return; }
-    if (t.closest('[data-creditos]')) { abreCreditos(); return; }
+    if (t.closest('[data-creditos]')) { abreCreditos(e); return; }
     const tl = t.closest('.tile');
     if (tl && tl.querySelector('svg') && !zoom.contains(tl)) abreZoom(tl);
   });
