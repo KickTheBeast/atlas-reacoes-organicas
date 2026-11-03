@@ -1,0 +1,11 @@
+{
+  "framework": null,
+  "installCommand": "",
+  "buildCommand": "",
+  "outputDirectory": "site",
+  "headers": [
+    { "source": "/versao.json", "headers": [{ "key": "Cache-Control", "value": "no-store" }] },
+    { "source": "/sw.js", "headers": [{ "key": "Cache-Control", "value": "no-cache" }, { "key": "Service-Worker-Allowed", "value": "/" }] },
+    { "source": "/(|index.html)", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] }
+  ]
+}

@@ -1,0 +1,339 @@
+// Atlas de Reações Orgânicas — app (sem framework).
+// Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
+(() => {
+  'use strict';
+  const BUILD = '__BUILD__';
+  const $ = (s) => document.querySelector(s);
+  const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
+  const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
+  const zoom = $('#zoom'), zoomConteudo = $('#zoom-conteudo'), topo = document.querySelector('.topo');
+
+  const STAR = '<svg viewBox="0 0 24 24"><path d="M12 3.8l2.5 5.3 5.8.8-4.2 4 1 5.8-5.1-2.8-5.1 2.8 1-5.8-4.2-4 5.8-.8z"/></svg>';
+  const SETA_IR = '<svg class="seta-ir" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>';
+  const esc = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const norm = (t) => String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  const plural = (n, a, b) => `${n} ${n === 1 ? a : b}`;
+  const rotuloAula = (id) => id === '00' ? 'Exemplos' : id.replace(/^0/, '');
+
+  // ---------- armazenamento (nunca quebra se o navegador bloquear) ----------
+  const guarda = {
+    ler(k, pad) { try { const v = localStorage.getItem(k); return v == null ? pad : JSON.parse(v); } catch { return pad; } },
+    gravar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* sem armazenamento */ } },
+  };
+  let salvos = new Set(guarda.ler('atlas.salvos', []));
+  const alternarSalvo = (id) => {
+    salvos.has(id) ? salvos.delete(id) : salvos.add(id);
+    guarda.gravar('atlas.salvos', [...salvos]);
+    return salvos.has(id);
+  };
+
+  // ---------- dados ----------
+  let D = null, S = null, porId = new Map(), nomes = { aula: {}, mec: {}, nu: {}, el: {} }, texto = new Map();
+  const get = (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
+
+  function prepara(d) {
+    D = d;
+    d.reacoes.forEach((r) => porId.set(r.i, r));
+    d.aulas.forEach((x) => (nomes.aula[x.id] = x.nome));
+    d.categorias.forEach((x) => (nomes.mec[x.id] = x.nome));
+    d.nucleofilos.forEach((x) => (nomes.nu[x.id] = x.nome));
+    d.eletrofilos.forEach((x) => (nomes.el[x.id] = x.nome));
+    d.reacoes.forEach((r) => texto.set(r.i, norm([
+      r.n, r.rg, r.cd, r.nt.replace(/<[^>]+>/g, ' '), 'aula ' + r.a, nomes.aula[r.a],
+      ...r.c.map((x) => nomes.mec[x]), ...r.nu.map((x) => nomes.nu[x]), ...r.el.map((x) => nomes.el[x]),
+    ].join(' '))));
+  }
+
+  // ---------- estruturas ----------
+  function hidrata(raiz) {
+    raiz.querySelectorAll('.tile[data-m]').forEach((el) => {
+      if (!S) return;
+      const svg = S[el.dataset.m];
+      el.removeAttribute('data-m');
+      if (!svg) { el.classList.replace('carrega', 'erro'); el.textContent = 'estrutura indisponível'; return; }
+      el.classList.remove('carrega');
+      el.innerHTML = svg;
+      const w = parseFloat((/viewBox='[\d.\-]+ [\d.\-]+ ([\d.]+)/.exec(svg) || [])[1]) || 160;
+      el.style.setProperty('--w', Math.round(w));
+    });
+  }
+  const tile = (id, i) => `<div class="tile carrega" data-m="${id}" style="--i:${i}" role="button" aria-label="Ampliar estrutura"></div>`;
+  const lado = (ids, ini = 0) => `<div class="lado">${ids.map((id, k) => (k ? '<span class="mais">+</span>' : '') + tile(id, ini + k)).join('')}</div>`;
+  const SETA_V = '<svg class="ar-v" viewBox="0 0 14 54"><path d="M7 2v48M2 43l5 7 5-7"/></svg>';
+  const SETA_H = '<svg class="ar-h" viewBox="0 0 72 14"><path d="M2 7h66M61 2l7 5-7 5"/></svg>';
+  const seta = (rg, cd) => `<div class="seta">${SETA_V}${SETA_H}<div class="tx">${rg ? `<span class="rg">${esc(rg)}</span>` : ''}${cd ? `<span class="cd">${esc(cd)}</span>` : ''}</div></div>`;
+
+  // ---------- peças de tela ----------
+  const etq = (tipo, id, link) => {
+    const nome = nomes[tipo][id]; if (!nome) return '';
+    return link ? `<a class="etq ${tipo}" href="#/${tipo}/${id}">${esc(nome)}</a>` : `<span class="etq ${tipo}">${esc(nome)}</span>`;
+  };
+  function itemHtml(r, i) {
+    const on = salvos.has(r.i);
+    return `<div class="item sobe" style="--i:${i}"><a href="#/r/${r.i}">
+      <div class="linha">Aula ${rotuloAula(r.a)}${r.s ? `<em>slides ${esc(r.s)}</em>` : ''}</div>
+      <b>${esc(r.n)}</b><div class="etqs">${r.c.slice(0, 3).map((c) => etq('mec', c)).join('')}</div></a>
+      <button class="estrela${on ? ' on' : ''}" data-salvar="${r.i}" aria-label="${on ? 'Remover dos salvos' : 'Salvar'}" aria-pressed="${on}">${STAR}</button></div>`;
+  }
+  const vazio = (msg) => `<div class="vazio"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>${msg}</div>`;
+
+  // ---------- telas ----------
+  function telaAulas() {
+    const stats = `<div class="stats"><div><b>${D.reacoes.length}</b><span>reações</span></div><div><b>${D.aulas.filter((a) => a.id !== '00').length}</b><span>aulas</span></div><div><b>${D.categorias.length}</b><span>mecanismos</span></div></div>`;
+    const hex = '<svg class="hex" viewBox="0 0 100 100"><path d="M50 8 L86 29 L86 71 L50 92 L14 71 L14 29 Z"/></svg><svg class="hex" viewBox="0 0 100 100"><path d="M50 8 L86 29 L86 71 L50 92 L14 71 L14 29 Z"/></svg>';
+    const itens = D.aulas.map((a, i) => `<a class="aula sobe" style="--i:${i + 2}" href="#/aula/${a.id}"><div class="num">${rotuloAula(a.id)}</div><div class="tx"><b>${esc(a.nome)}</b><small>${plural(a.n, 'reação', 'reações')}</small></div>${SETA_IR}</a>`).join('');
+    return {
+      titulo: 'Atlas Orgânico', aba: 'aulas', prof: 0,
+      html: `<section class="hero sobe">${hex}<h2>Reações de Química Orgânica II</h2><p>Toda a matéria, organizada para estudar.</p>${stats}</section>
+        <div id="instalar"></div>
+        <button class="busca-falsa sobe" style="--i:1" data-ir="#/busca"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>Buscar reação, reagente, mecanismo…</button>
+        <div class="sec"><h3>Por aula</h3><span>${D.aulas.length} aulas</span></div>${itens}
+        <a class="aula sobe" style="--i:${D.aulas.length + 3}" href="#/todas"><div class="num">∑</div><div class="tx"><b>Todas as reações</b><small>${plural(D.reacoes.length, 'reação', 'reações')}</small></div>${SETA_IR}</a>
+        <div class="rodape">Versão ${BUILD}<br><button data-verificar>Verificar atualização</button></div>`,
+      depois: montaInstalar,
+    };
+  }
+
+  function telaIndice(tipo) {
+    const lista = { mec: D.categorias, nu: D.nucleofilos, el: D.eletrofilos }[tipo];
+    const info = {
+      mec: ['Mecanismos', 'Escolha o tipo de reação.'],
+      nu: ['Nucleófilos', 'Escolha o nucleófilo (ou a espécie rica em elétrons) e veja onde ele aparece.'],
+      el: ['Eletrófilos', 'Escolha o eletrófilo (substrato ou reagente) e veja as reações.'],
+    }[tipo];
+    const nota = tipo === 'mec' ? '' : '<p class="sub-lista">Classificação automática a partir dos reagentes e das estruturas: confira no slide em caso de dúvida.</p>';
+    return {
+      titulo: info[0], aba: tipo, prof: 0,
+      html: `<h2 class="titulo-lista sobe">${info[0]}</h2><p class="sub-lista sobe" style="--i:1">${info[1]}</p>${nota}
+        <div class="grade">${lista.map((x, i) => `<a class="ficha k-${tipo} sobe" style="--i:${i + 2}" href="#/${tipo}/${x.id}"><b>${esc(x.nome)}</b><small>${x.n}</small></a>`).join('')}</div>`,
+    };
+  }
+
+  // lista de reações (aula, mecanismo, nu, el, todas, salvos)
+  let filtroAtual = null;
+  function telaLista(tipo, id) {
+    let base, nome, aba, prof = 1, sub = '';
+    if (tipo === 'aula') { base = D.reacoes.filter((r) => r.a === id); nome = 'Aula ' + rotuloAula(id); sub = nomes.aula[id] || ''; aba = 'aulas'; }
+    else if (tipo === 'todas') { base = D.reacoes; nome = 'Todas as reações'; aba = 'aulas'; }
+    else if (tipo === 'salvos') { base = D.reacoes.filter((r) => salvos.has(r.i)); nome = 'Salvos'; aba = 'salvos'; prof = 0; sub = 'Suas reações favoritas, mesmo offline.'; }
+    else { base = D.reacoes.filter((r) => r[{ mec: 'c', nu: 'nu', el: 'el' }[tipo]].includes(id)); nome = nomes[tipo][id] || 'Reações'; aba = tipo; }
+    if (!nome) return null;
+    // filtros: por mecanismo dentro de uma aula; por aula nos demais
+    const porAula = tipo !== 'aula';
+    const cont = new Map();
+    base.forEach((r) => (porAula ? [r.a] : r.c).forEach((k) => cont.set(k, (cont.get(k) || 0) + 1)));
+    const chaveFiltro = tipo + ':' + id;
+    if (!filtroAtual || filtroAtual.chave !== chaveFiltro) filtroAtual = { chave: chaveFiltro, v: null };
+    const chips = [...cont].sort((a, b) => (porAula ? a[0].localeCompare(b[0]) : b[1] - a[1]));
+    return {
+      titulo: nome, aba, prof,
+      html: `<h2 class="titulo-lista sobe">${esc(nome)}</h2>
+        <p class="sub-lista sobe" style="--i:1">${sub ? esc(sub) + ' · ' : ''}<span id="contagem"></span></p>
+        ${chips.length > 1 ? `<div class="filtros sobe" style="--i:2" id="filtros"><button class="chip on" data-f="">Todas</button>${chips.map(([k, n]) => `<button class="chip" data-f="${esc(k)}">${esc(porAula ? 'Aula ' + rotuloAula(k) : nomes.mec[k] || k)}<i>${n}</i></button>`).join('')}</div>` : ''}
+        <div id="itens"></div>`,
+      depois: () => {
+        const pinta = () => {
+          const f = filtroAtual.v;
+          const l = f ? base.filter((r) => (porAula ? r.a === f : r.c.includes(f))) : base;
+          $('#contagem').textContent = plural(l.length, 'reação', 'reações');
+          $('#itens').innerHTML = l.length ? l.map(itemHtml).join('') : vazio(tipo === 'salvos' ? 'Toque na estrela de uma reação para guardá-la aqui.' : 'Nada por aqui.');
+          ultimaLista = l.map((r) => r.i);
+          document.querySelectorAll('#filtros .chip').forEach((c) => c.classList.toggle('on', c.dataset.f === (f || '')));
+        };
+        const fb = $('#filtros');
+        fb?.addEventListener('click', (e) => { const c = e.target.closest('.chip'); if (!c) return; filtroAtual.v = c.dataset.f || null; pinta(); });
+        pinta();
+      },
+    };
+  }
+  let ultimaLista = [];
+
+  function telaDetalhe(id) {
+    const r = porId.get(+id);
+    if (!r) return null;
+    const on = salvos.has(r.i);
+    const lista = ultimaLista.includes(r.i) ? ultimaLista : D.reacoes.filter((x) => x.a === r.a).map((x) => x.i);
+    const pos = lista.indexOf(r.i);
+    const ant = porId.get(lista[pos - 1]), prox = porId.get(lista[pos + 1]);
+    const nav = (x, rot, cls) => x ? `<a href="#/r/${x.i}"><small>${rot}</small><span>${esc(x.n)}</span></a>` : `<a aria-disabled="true"><small>${rot}</small><span>—</span></a>`;
+    const n0 = r.r.length;
+    const mec = r.m.length ? `<div class="rotulo">Mecanismo passo a passo</div>${r.m.map((m, k) => `<div class="passo sobe" style="--i:${k + 3}"><div class="n">${k + 1}</div><h4>${esc(m.t)}</h4><p>${esc(m.x)}</p><div class="lado">${m.s.map((s, j) => (j ? '<span class="vai">→</span>' : '') + tile(s, j)).join('')}</div></div>`).join('')}` : '';
+    return {
+      titulo: `Aula ${rotuloAula(r.a)}${r.s ? ' · slide ' + r.s : ''}`, aba: null, prof: 2,
+      html: `<article class="det">
+        <h2 class="sobe">${esc(r.n)}</h2>
+        <p class="origem sobe" style="--i:1">${esc(nomes.aula[r.a] || '')}${r.s ? ' · slides ' + esc(r.s) : ''}</p>
+        <div class="etqs sobe" style="--i:2">${r.c.map((c) => etq('mec', c, 1)).join('')}${r.nu.map((c) => etq('nu', c, 1)).join('')}${r.el.map((c) => etq('el', c, 1)).join('')}</div>
+        <div class="acoes sobe" style="--i:3"><button class="btn${on ? ' on' : ''}" data-salvar-d="${r.i}">${STAR}<span>${on ? 'Salvo' : 'Salvar'}</span></button>
+        ${navigator.share ? '<button class="btn" data-compartilhar>Compartilhar</button>' : ''}</div>
+        <div class="cartao sobe" style="--i:4"><div class="esquema">${lado(r.r)}${seta(r.rg, r.cd)}${lado(r.p, n0)}</div></div>
+        ${r.nt ? `<div class="cartao sobe" style="--i:5"><p class="notas">${r.nt}</p></div>` : ''}
+        ${mec}
+        <div class="nav-det">${nav(ant, '← Anterior')}${nav(prox, 'Próxima →')}</div></article>`,
+    };
+  }
+
+  function telaBusca() {
+    return {
+      titulo: 'Buscar', aba: undefined, prof: 1,
+      html: `<div class="campo"><input id="q" type="search" placeholder="Ex.: SN2, bromônio, Zaitsev, epóxido…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"></div><div id="resultados"></div>`,
+      depois: () => {
+        const q = $('#q'), out = $('#resultados');
+        const sugest = ['SN2', 'SN1', 'E2', 'Zaitsev', 'Markovnikov', 'carbeno', 'bromônio', 'epóxido', 'rearranjo', 'Hammond'];
+        const vazioInicial = () => { out.innerHTML = `<div class="sec"><h3>Sugestões</h3></div><div class="filtros" style="flex-wrap:wrap;overflow:visible">${sugest.map((s) => `<button class="chip" data-sug="${s}">${s}</button>`).join('')}</div>`; };
+        let t;
+        const buscar = () => {
+          const tok = norm(q.value).split(/\s+/).filter(Boolean);
+          if (!tok.length) return vazioInicial();
+          const res = D.reacoes.filter((r) => tok.every((k) => texto.get(r.i).includes(k)));
+          ultimaLista = res.map((r) => r.i);
+          out.innerHTML = `<div class="sec"><h3>Resultados</h3><span>${plural(res.length, 'reação', 'reações')}</span></div>` + (res.length ? res.slice(0, 80).map(itemHtml).join('') + (res.length > 80 ? `<p class="vazio">Mostrando 80 de ${res.length}. Refine a busca.</p>` : '') : vazio('Nada encontrado. Tente outra palavra.'));
+        };
+        q.addEventListener('input', () => { clearTimeout(t); t = setTimeout(buscar, 90); });
+        out.addEventListener('click', (e) => { const s = e.target.closest('[data-sug]'); if (s) { q.value = s.dataset.sug; buscar(); } });
+        vazioInicial();
+        q.focus({ preventScroll: true });
+      },
+    };
+  }
+
+  // ---------- instalar (atalho na tela inicial) ----------
+  let promptInstalar = null;
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); promptInstalar = e; montaInstalar(); });
+  const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  function montaInstalar() {
+    const el = $('#instalar');
+    if (!el || standalone() || guarda.ler('atlas.instalar', false)) return;
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    if (promptInstalar) el.innerHTML = '<div class="instalar sobe"><p><b>Instale o atlas</b><br>Abre como app e funciona offline.</p><button class="btn" data-instalar>Instalar</button></div>';
+    else if (ios) el.innerHTML = '<div class="instalar sobe"><p><b>Adicione à tela inicial</b><br>Toque em Compartilhar e depois em “Adicionar à Tela de Início”. Funciona offline.</p><button class="btn" data-fechar-instalar>Ok</button></div>';
+  }
+
+  // ---------- roteador ----------
+  let profAnterior = -1, abaAtual = 'aulas', rotaAtual = '';
+  function resolve(hash) {
+    const [, a, b] = hash.split('?')[0].split('/');
+    if (!a || a === 'aulas') return telaAulas();
+    if (a === 'mec' || a === 'nu' || a === 'el') return b ? telaLista(a, b) : telaIndice(a);
+    if (a === 'aula') return telaLista('aula', b);
+    if (a === 'todas') return telaLista('todas');
+    if (a === 'salvos') return telaLista('salvos');
+    if (a === 'r') return telaDetalhe(b);
+    if (a === 'busca') return telaBusca();
+    return null;
+  }
+  const TITULOS = { aulas: 'Aulas', mec: 'Mecanismos', nu: 'Nucleófilos', el: 'Eletrófilos', salvos: 'Salvos' };
+
+  function mostra() {
+    if (!D) return;
+    fechaZoom();
+    let hash = location.hash || '#/aulas';
+    const t = resolve(hash) || (hash = '#/aulas', telaAulas());
+    if (t.aba !== undefined && t.aba !== null) abaAtual = t.aba;
+    else if (t.aba === null) abaAtual = abaAtual;
+    const dir = profAnterior < 0 ? '' : t.prof > profAnterior ? 'frente' : t.prof < profAnterior ? 'tras' : '';
+    profAnterior = t.prof;
+    rotaAtual = hash;
+    titulo.textContent = t.prof === 0 && TITULOS[t.aba] && hash.split('/').length < 3 ? (t.aba === 'aulas' ? 'Atlas Orgânico' : TITULOS[t.aba]) : t.titulo;
+    voltar.hidden = t.prof === 0;
+    document.title = (t.titulo === 'Atlas Orgânico' ? '' : t.titulo + ' · ') + 'Atlas de Reações Orgânicas';
+    tela.innerHTML = `<div class="tela ${dir}">${t.html}</div>`;
+    window.scrollTo(0, 0);
+    hidrata(tela);
+    t.depois && t.depois();
+    marcaAba();
+  }
+
+  function marcaAba() {
+    abas.querySelectorAll('a').forEach((a) => a.classList.toggle('on', a.dataset.aba === abaAtual));
+    const on = abas.querySelector('a.on');
+    if (!on) { pilula.style.opacity = 0; return; }
+    const r = on.getBoundingClientRect(), b = abas.getBoundingClientRect();
+    pilula.style.opacity = 1;
+    pilula.style.transform = `translateX(${r.left - b.left + (r.width - 56) / 2}px)`;
+  }
+  window.addEventListener('resize', marcaAba);
+  window.addEventListener('hashchange', mostra);
+  window.addEventListener('scroll', () => topo.classList.toggle('rolou', scrollY > 6), { passive: true });
+
+  voltar.addEventListener('click', () => {
+    if (history.length > 1 && profAnterior > 0 && document.referrer !== undefined && window.__navegou) history.back();
+    else { const p = rotaAtual.split('/'); location.hash = p.length > 2 && p[1] !== 'r' ? '#/' + (TITULOS[abaAtual] ? abaAtual : 'aulas') : '#/' + abaAtual; }
+  });
+  window.addEventListener('hashchange', () => { window.__navegou = true; });
+  $('#buscar').addEventListener('click', () => { location.hash = '#/busca'; });
+
+  // ---------- cliques ----------
+  document.addEventListener('click', (e) => {
+    const t = e.target;
+    const sv = t.closest('[data-salvar]');
+    if (sv) {
+      e.preventDefault();
+      const on = alternarSalvo(+sv.dataset.salvar);
+      sv.classList.toggle('on', on); sv.setAttribute('aria-pressed', on);
+      sv.classList.remove('pop'); void sv.offsetWidth; sv.classList.add('pop');
+      if (rotaAtual === '#/salvos' && !on) setTimeout(mostra, 260);
+      return;
+    }
+    const sd = t.closest('[data-salvar-d]');
+    if (sd) { const on = alternarSalvo(+sd.dataset.salvarD); sd.classList.toggle('on', on); sd.querySelector('span').textContent = on ? 'Salvo' : 'Salvar'; return; }
+    if (t.closest('[data-compartilhar]')) { navigator.share({ title: document.title, url: location.href }).catch(() => {}); return; }
+    const ir = t.closest('[data-ir]'); if (ir) { location.hash = ir.dataset.ir; return; }
+    if (t.closest('[data-instalar]') && promptInstalar) { promptInstalar.prompt(); promptInstalar.userChoice.finally(() => { promptInstalar = null; $('#instalar').innerHTML = ''; }); return; }
+    if (t.closest('[data-fechar-instalar]')) { guarda.gravar('atlas.instalar', true); $('#instalar').innerHTML = ''; return; }
+    if (t.closest('[data-verificar]')) { verifica(true); return; }
+    const tl = t.closest('.tile');
+    if (tl && tl.querySelector('svg') && !zoom.contains(tl)) abreZoom(tl);
+  });
+  function abreZoom(tl) { zoomConteudo.innerHTML = tl.innerHTML; zoomConteudo.style.setProperty('--w', tl.style.getPropertyValue('--w') || 200); zoom.hidden = false; }
+  function fechaZoom() { zoom.hidden = true; zoomConteudo.innerHTML = ''; }
+  zoom.addEventListener('click', fechaZoom);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fechaZoom(); });
+
+  // ---------- versão nova ----------
+  // Mesmo comportamento do PILATESRUN MOVE: confere versao.json ao abrir, ao voltar
+  // para o app e a cada poucos minutos. Nunca recarrega sozinho: só quando toca em Atualizar.
+  let dispensado = false, tempoAviso;
+  function mostraAviso(txt, botao) {
+    clearTimeout(tempoAviso);
+    avisoTexto.textContent = txt;
+    avisoOk.hidden = !botao; avisoX.hidden = !botao;
+    aviso.hidden = false;
+    aviso.style.animation = 'none'; void aviso.offsetWidth; aviso.style.animation = '';
+    if (!botao) tempoAviso = setTimeout(() => (aviso.hidden = true), 2600);
+  }
+  async function verifica(manual) {
+    if (manual) mostraAviso('Verificando…', false);
+    try {
+      const r = await fetch('versao.json?t=' + Date.now(), { cache: 'no-store' });
+      const { build } = await r.json();
+      if (build && build !== BUILD) {
+        navigator.serviceWorker?.getRegistration().then((g) => g && g.update()).catch(() => {});
+        if (!dispensado || manual) { dispensado = false; mostraAviso('Saiu uma versão nova', true); }
+      } else if (manual) mostraAviso('Você já está na versão mais recente', false);
+    } catch { if (manual) mostraAviso('Sem conexão para verificar', false); }
+  }
+  avisoOk.addEventListener('click', () => {
+    avisoOk.textContent = 'Atualizando…';
+    const recarrega = () => location.reload();
+    Promise.race([navigator.serviceWorker?.getRegistration().then((g) => g && g.update()), new Promise((r) => setTimeout(r, 1200))]).catch(() => {}).finally(recarrega);
+  });
+  avisoX.addEventListener('click', () => { dispensado = true; aviso.hidden = true; });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') verifica(false); });
+  window.addEventListener('online', () => verifica(false));
+  setInterval(() => verifica(false), 5 * 60 * 1000);
+
+  if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+
+  // ---------- início ----------
+  tela.innerHTML = '<div class="tela"><div class="vazio">Carregando…</div></div>';
+  get('dados.json?v=' + BUILD).then((d) => {
+    prepara(d);
+    if (!location.hash) history.replaceState(null, '', '#/aulas');
+    mostra();
+    setTimeout(() => verifica(false), 2500);
+    return get('svgs.json?v=' + BUILD);
+  }).then((s) => { S = s; hidrata(tela); }).catch(() => {
+    if (!D) tela.innerHTML = '<div class="tela"><div class="vazio">Sem conexão e ainda sem dados guardados.<br>Abra uma vez com internet.</div></div>';
+  });
+})();
