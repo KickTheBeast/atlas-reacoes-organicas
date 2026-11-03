@@ -35,7 +35,7 @@ function scheme(r) {
 function card(r) {
   const c = document.createElement('article'); c.className = 'card';
   const tags = r.categories.map(id => `<span class="tag">${CATS.find(x => x.id === id).nome}</span>`).join('');
-  c.innerHTML = `<h2>${r.nome}</h2><div class="tags">${tags}</div>`;
+  c.innerHTML = `<h2>${r.nome}</h2>${r.aula ? '<p class="fonte">'+r.aula+' · slides '+r.slides+'</p>' : ''}<div class="tags">${tags}</div>`;
   c.append(scheme(r));
   if (r.notas) { const p = document.createElement('p'); p.className = 'notes'; p.innerHTML = r.notas; c.append(p); }
   if (r.mecanismo && r.mecanismo.length) {
