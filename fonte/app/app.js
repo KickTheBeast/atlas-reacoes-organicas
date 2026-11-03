@@ -121,15 +121,65 @@
   const marca = (t) => String(t).replace(/^(✓)/, '<span class="ok">$1</span>').replace(/^(✗)/, '<span class="no">$1</span>');
   const celulaHtml = (c) => Array.isArray(c) ? `<div class="multi">${c.map(celulaHtml).join('')}</div>`
     : c && typeof c === 'object' ? `<div class="tile mini carrega" data-m="${c.s}" role="button" aria-label="Ampliar estrutura"></div>` : marca(c);
-  const tabelaHtml = (b) => `<div class="cartao tabela sobe"><h3 class="tb-titulo">${esc(b.t)}</h3><div class="tb-wrap"><table class="tb"><thead><tr>${b.cols.map((c) => `<th>${c}</th>`).join('')}</tr></thead><tbody>${b.rows.map((l) => `<tr>${l.map((c, i) => (i === 0 ? '<th scope="row">' : '<td>') + celulaHtml(c) + (i === 0 ? '</th>' : '</td>')).join('')}</tr>`).join('')}</tbody></table></div><div class="tb-dica" hidden>deslize para ver mais <span class="nudge">→</span></div>${b.nota ? `<p class="tb-nota">${esc(b.nota)}</p>` : ''}</div>`;
+  // Tabelas "Fator | Favorece | Desfavorece" viram cartões (sem rolagem lateral); "Propriedade | valor" vira lista.
+  const limpa = (t) => String(t || '').replace(/^[✓✗]\s*/, '');
+  const ordemHtml = (o) => `<div class="ordem">${o.map(([r, n], i) => (i ? '<span class="gt">›</span>' : '') + `<span class="oc n${n}">${esc(r)}</span>`).join('')}</div>`;
+  const fatoresHtml = (b) => `<div class="cartao tabela sobe"><h3 class="tb-titulo">${esc(b.t)}</h3>${b.rows.map((l) => `<div class="fator"><h4>${esc(l[0])}</h4>${b.ord && b.ord[l[0]] ? ordemHtml(b.ord[l[0]]) : ''}${l[1] ? `<div class="fav">${limpa(l[1])}</div>` : ''}${l[2] ? `<div class="des">${limpa(l[2])}</div>` : ''}</div>`).join('')}${b.nota ? `<p class="tb-nota">${esc(b.nota)}</p>` : ''}</div>`;
+  const kvHtml = (b) => `<div class="cartao tabela sobe"><h3 class="tb-titulo">${esc(b.t)}</h3><dl class="kv">${b.rows.map((l) => `<div><dt>${esc(l[0])}</dt><dd>${celulaHtml(l[1])}</dd></div>`).join('')}</dl>${b.nota ? `<p class="tb-nota">${esc(b.nota)}</p>` : ''}</div>`;
+
+  // Seletor interativo: escolha o substrato e o reagente e veja o mecanismo
+  const MEC_INFO = {
+    SN2: 'Uma etapa, ataque pela retaguarda: inversão de configuração.',
+    SN1: 'Passa por carbocátion: racemização e possível rearranjo.',
+    E2: 'Base forte retira o H anti ao grupo abandonador: Zaitsev (Hofmann se a base é volumosa).',
+    E1: 'Passa por carbocátion, favorecida por calor: Zaitsev e possível rearranjo.',
+  };
+  const rotCol = (c) => c.split(/<br\s*\/?>/i)[0].replace(/<[^>]+>/g, '');
+  const subCol = (c) => ((/<small>(.*?)<\/small>/.exec(c) || [])[1] || '');
+  function resultadoSel(b, r, c) {
+    const cel = String(b.rows[r][c + 1]);
+    const txt = cel.replace(/<[^>]+>/g, ' ');
+    const mecs = [...new Set(txt.match(/SN1|SN2|E1|E2/g) || [])];
+    if (!mecs.length) return `<div class="sel-badges"><span class="badge-m m-sem">Sem reação</span></div><p class="sel-nota">${esc(txt.replace(/[✗×]/g, '').trim())}. Nu e base fracos não atacam substrato primário nem metila nessas condições.</p>`;
+    return `<div class="sel-badges">${mecs.map((m) => `<a class="badge-m m-${m}" href="#/guia/${m.toLowerCase()}">${m}</a>`).join('')}</div>
+      ${txt.replace(/SN1|SN2|E1|E2|[\/+()]/g, '').trim().length > 2 ? `<p class="sel-nota"><b>${cel}</b></p>` : ''}${mecs.map((m) => `<p class="sel-info"><b>${m}</b>: ${MEC_INFO[m]}</p>`).join('')}`;
+  }
+  function seletorHtml(b) {
+    const r0 = Math.min(2, b.rows.length - 1), c0 = 1;
+    return `<div class="cartao seletor sobe" data-r="${r0}" data-c="${c0}"><h3 class="tb-titulo">Qual mecanismo ocorre?</h3>
+      <div class="sel-corpo"><div class="sel-grupo"><span>1. Substrato</span><div class="sel-chips">${b.rows.map((l, i) => `<button class="chip${i === r0 ? ' on' : ''}" data-sr="${i}">${String(l[0])}</button>`).join('')}</div></div>
+      <div class="sel-grupo"><span>2. Reagente</span><div class="sel-chips">${b.cols.slice(1).map((cl, i) => `<button class="chip${i === c0 ? ' on' : ''}" data-sc="${i}">${esc(rotCol(cl))}</button>`).join('')}</div><small class="sel-sub">${subCol(b.cols[c0 + 1])}</small></div>
+      <div class="sel-res" aria-live="polite">${resultadoSel(b, r0, c0)}</div></div></div>`;
+  }
+  function ligaSeletor(b) {
+    const box = document.querySelector('.seletor');
+    if (!box) return;
+    box.addEventListener('click', (e) => {
+      const sr = e.target.closest('[data-sr]'), sc = e.target.closest('[data-sc]');
+      if (!sr && !sc) return;
+      if (sr) box.dataset.r = sr.dataset.sr;
+      if (sc) box.dataset.c = sc.dataset.sc;
+      box.querySelectorAll('[data-sr]').forEach((x) => x.classList.toggle('on', x.dataset.sr === box.dataset.r));
+      box.querySelectorAll('[data-sc]').forEach((x) => x.classList.toggle('on', x.dataset.sc === box.dataset.c));
+      box.querySelector('.sel-sub').innerHTML = subCol(b.cols[+box.dataset.c + 1]);
+      const res = box.querySelector('.sel-res');
+      res.innerHTML = resultadoSel(b, +box.dataset.r, +box.dataset.c);
+      if (usaMotion) M.animate(res.children, { opacity: [0, 1], y: [10, 0] }, { type: 'spring', stiffness: 380, damping: 26, delay: M.stagger(0.05) });
+    });
+  }
+
+  const tabelaPadrao = (b) => `<div class="cartao tabela sobe"><h3 class="tb-titulo">${esc(b.t)}</h3><div class="tb-wrap"><table class="tb"><thead><tr>${b.cols.map((c) => `<th>${c}</th>`).join('')}</tr></thead><tbody>${b.rows.map((l) => `<tr>${l.map((c, i) => (i === 0 ? '<th scope="row">' : '<td>') + celulaHtml(c) + (i === 0 ? '</th>' : '</td>')).join('')}</tr>`).join('')}</tbody></table></div><div class="tb-dica" hidden>deslize para ver mais <span class="nudge">→</span></div>${b.nota ? `<p class="tb-nota">${esc(b.nota)}</p>` : ''}</div>`;
+
+  const tabelaHtml = (b) => (b.cols.length === 3 && b.cols[0] === 'Fator' ? fatoresHtml(b) : b.cols.length === 2 && b.cols[0] === 'Propriedade' ? kvHtml(b) : tabelaPadrao(b));
 
   function telaGuia(id) {
     const g = guiaPorId.get(id);
     if (!g) return null;
     const e = g.esq;
+    const primeira = g.id === 'decisao' ? g.bl.find((b) => b.k === 't') : null;
     const blocos = g.bl.map((b) => b.k === 'l'
       ? `<div class="cartao dicas sobe"><h3 class="tb-titulo">${esc(b.t)}</h3><ul>${b.itens.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>`
-      : tabelaHtml(b)).join('');
+      : (b === primeira ? seletorHtml(b) : '') + tabelaHtml(b)).join('');
     const ver = g.cats.filter((c) => nomes.mec[c]).map((c) => `<a class="btn" href="#/mec/${c}">Ver reações de ${esc(nomes.mec[c])}<span class="n">${D.categorias.find((x) => x.id === c).n}</span></a>`).join('');
     return {
       titulo: g.topo || g.t, aba: 'mec', prof: 1,
@@ -139,7 +189,7 @@
         <div class="cartao sobe" style="--i:3"><div class="rotulo-c">Esquema</div><div class="esquema">${lado(e.r)}${seta(e.rg, e.cd)}${lado(e.p, e.r.length)}</div>${e.leg ? `<p class="tb-nota">${esc(e.leg)}</p>` : ''}</div>
         ${blocos}
         <div class="rotulo">Exemplos nas aulas</div><div class="acoes colunas">${ver}</div></article>`,
-      depois: () => document.querySelectorAll('.tb-wrap').forEach((w) => { if (w.scrollWidth > w.clientWidth + 4) w.nextElementSibling.hidden = false; w.addEventListener('scroll', () => { w.nextElementSibling.hidden = true; }, { passive: true, once: true }); }),
+      depois: () => { if (primeira) ligaSeletor(primeira); document.querySelectorAll('.tb-wrap').forEach((w) => { if (w.scrollWidth > w.clientWidth + 4) w.nextElementSibling.hidden = false; w.addEventListener('scroll', () => { w.nextElementSibling.hidden = true; }, { passive: true, once: true }); }); },
     };
   }
 

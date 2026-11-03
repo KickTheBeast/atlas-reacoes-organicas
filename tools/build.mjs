@@ -245,7 +245,7 @@ const guias = GUIAS.map((g) => ({
   id: g.id, curto: g.curto, topo: g.topo || '', t: g.titulo, sub: g.sub, cats: g.cats, intro: g.intro,
   esq: { r: g.esquema.r.map(desenhar), rg: g.esquema.rg, cd: g.esquema.cd, p: g.esquema.p.map(desenhar), leg: g.esquema.leg },
   bl: g.blocos.map((b) => b.k === 'l' ? { k: 'l', t: b.titulo, itens: b.itens } :
-    { k: 't', t: b.titulo, cols: b.cols, rows: b.rows.map((l) => l.map(celula)), nota: b.nota || '' }),
+    { k: 't', t: b.titulo, cols: b.cols, rows: b.rows.map((l) => l.map(celula)), nota: b.nota || '', ord: b.ordens || null }),
 }));
 
 // ---------- build ----------

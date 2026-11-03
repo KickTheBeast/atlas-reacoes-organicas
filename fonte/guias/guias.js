@@ -58,6 +58,7 @@ window.GUIAS = [
     esquema: { r: ['CCCCBr'], rg: 'Nu⁻ (ex.: NaCN)', cd: 'DMSO', p: ['CCCCC#N'], leg: '1-Bromobutano + cianeto → pentanonitrila. Ataque a 180° do Br: inversão de configuração.' },
     blocos: [
       { k: 't', titulo: 'O que favorece a SN2',
+        ordens: { 'Substrato': [['CH₃–X', 4], ['1º', 3], ['2º', 2], ['3º', 0]], 'Grupo abandonador': [['TsO⁻', 4], ['I⁻', 4], ['Br⁻', 3], ['Cl⁻', 2], ['F⁻', 0]] },
         cols: ['Fator', 'Favorece', 'Desfavorece'],
         rows: [
           ['Substrato', '✓ CH₃–X > 1º > 2º (pouco impedimento estérico). Alílico e benzílico aceleram.', '✗ 3º e neopentila (impedimento). Vinílico e arílico não reagem.'],
@@ -103,6 +104,7 @@ window.GUIAS = [
     esquema: { r: ['CC(C)(C)Br'], rg: 'H₂O', cd: 'solvólise', p: ['CC(C)(C)O'], leg: 'Brometo de terc-butila em água: ionização lenta, ataque da água, perda de H⁺.' },
     blocos: [
       { k: 't', titulo: 'O que favorece a SN1',
+        ordens: { 'Substrato': [['benzílico', 4], ['3º', 4], ['2º', 2], ['1º', 0], ['CH₃–X', 0]], 'Grupo abandonador': [['TsO⁻', 4], ['I⁻', 4], ['Br⁻', 3], ['Cl⁻', 2], ['F⁻', 0]] },
         cols: ['Fator', 'Favorece', 'Desfavorece'],
         rows: [
           ['Substrato', '✓ 3º > 2º. Alílico e benzílico (cátion com ressonância).', '✗ 1º e metila (cátion instável).'],
@@ -145,6 +147,7 @@ window.GUIAS = [
     esquema: { r: ['CCC(C)Br'], rg: 'EtONa', cd: 'EtOH, Δ', p: ['CC=CC', 'C=CCC'], leg: '2-Bromobutano: majoritário but-2-eno (Zaitsev); minoritário but-1-eno.' },
     blocos: [
       { k: 't', titulo: 'O que favorece a E2',
+        ordens: { 'Substrato': [['3º', 4], ['2º', 3], ['1º', 2], ['CH₃–X', 0]] },
         cols: ['Fator', 'Favorece', 'Desfavorece'],
         rows: [
           ['Substrato', '✓ 3º > 2º > 1º (alceno mais substituído e estável).', '✗ Metila (sem β-H).'],
@@ -183,6 +186,7 @@ window.GUIAS = [
     esquema: { r: ['CCC(C)(C)Br'], rg: 'EtOH', cd: 'Δ', p: ['CC=C(C)C', 'C=C(C)CC'], leg: 'Majoritário: 2-metilbut-2-eno (Zaitsev); minoritário: 2-metilbut-1-eno.' },
     blocos: [
       { k: 't', titulo: 'O que favorece a E1',
+        ordens: { 'Substrato': [['benzílico', 4], ['3º', 4], ['2º', 2], ['1º', 0]] },
         cols: ['Fator', 'Favorece', 'Desfavorece'],
         rows: [
           ['Substrato', '✓ 3º > 2º; benzílico e alílico.', '✗ 1º e metila.'],
