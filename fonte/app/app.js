@@ -425,142 +425,36 @@
     });
   }
 
-  // ---------- créditos: o dinossauro vermelho (mancha de pincel + linha preta fina) ----------
-  // Silhueta e linhas desenhadas num quadro de 600 x 650.
-  const RED = '#ee1c25';
-  const SILHUETA = {
-    cauda: 'M64 108C30 150 22 230 52 292C80 345 128 366 176 372L250 372L250 296L204 300C152 290 118 250 108 205C100 170 84 130 64 108Z',
-    corpo: 'M196 300C206 240 250 160 330 118C370 98 430 84 500 80C545 78 576 92 572 118C566 140 540 142 520 150L470 156C488 180 520 214 560 236L548 262C520 252 480 238 458 216C440 260 462 300 480 340L440 372C420 392 380 410 340 424L318 440C300 470 296 520 306 566L300 590L160 598L152 560C168 500 180 440 174 380Z',
-    perna: 'M430 366L500 330L548 436L566 470L512 494L466 440Z',
-    bracoD: 'M452 218L548 258L556 292L520 288L462 250Z',
-  };
-  const DINO_AVATAR = `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="49" fill="#fff" stroke="#e4e0d8" stroke-width="2"/><g transform="translate(9 12) scale(.148)"><g fill="${RED}"><path d="${SILHUETA.cauda}"/><path d="${SILHUETA.corpo}"/><path d="${SILHUETA.perna}"/><path d="${SILHUETA.bracoD}"/></g><g fill="none" stroke="#111" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"><path d="M270 96L286 138L300 100L322 128L338 96L356 118L376 80L396 108L420 62L440 96L470 50"/><path d="M54 138L112 142L70 160L128 168L84 188L132 204L98 222L130 256"/><path d="M218 518L300 524L226 540L306 548L224 566L298 576"/><path d="M496 444L556 458L506 466L562 476L512 484"/></g></g></svg>`;
-  const BD = `<svg class="bd" viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Dinossauro vermelho em pincel e traço preto">
-    <defs>
-      <filter id="pincel" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="3" seed="11" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G"/></filter>
-      <filter id="fio" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="5" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="G" yChannelSelector="R"/></filter>
-      <filter id="seco" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.015 0.35" numOctaves="2" seed="9"/><feColorMatrix values="0 0 0 0 .96  0 0 0 0 .95  0 0 0 0 .92  0 0 0 1.5 -.98"/></filter>
-      <filter id="papel" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="2"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 -.18"/></filter>
-    </defs>
-    <rect width="390" height="844" fill="#f6f3ec"/>
-    <rect width="390" height="844" filter="url(#papel)" opacity=".55"/>
-    <g class="bd-titulo" filter="url(#fio)" font-family="Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif" font-weight="900" fill="#111">
-      <text x="28" y="100" font-size="20" letter-spacing="4" transform="rotate(-3 28 100)">FEITO POR</text>
-      <text x="26" y="168" font-size="66" letter-spacing="1" transform="rotate(-3 26 168)">MUTANO</text>
-      <path d="M30 188 l18 -12 l18 12 l18 -12 l18 12 l18 -12 l18 12 l18 -12 l18 12 l18 -12 l18 12 l18 -12 l18 12" fill="none" stroke="${RED}" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-3 28 188)"/>
-    </g>
-    <g class="bd-pos" transform="translate(-1 256) scale(.64)">
-      <g class="bd-dino">
-        <g class="d-cauda"><g filter="url(#pincel)"><path d="${SILHUETA.cauda}" fill="${RED}"/></g>
-          <path class="d-zz-cauda" d="M54 138L112 142L70 160L128 168L84 188L132 204L98 222L130 256L100 282" fill="none" stroke="#111" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" filter="url(#fio)"/></g>
-        <g class="d-massa" filter="url(#pincel)"><path d="${SILHUETA.corpo}" fill="${RED}"/><path d="${SILHUETA.perna}" fill="${RED}"/><path class="d-braco-d" d="${SILHUETA.bracoD}" fill="${RED}"/></g>
-        <g filter="url(#seco)" opacity=".75"><rect x="0" y="0" width="600" height="650"/></g>
-        <g class="d-linhas" fill="none" stroke="#111" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" filter="url(#fio)">
-          <path class="d-espinhos" d="M270 96L286 138L300 100L322 128L338 96L356 118L376 80L396 108L420 62L440 96L470 50L486 84"/>
-          <path d="M268 98L292 140"/>
-          <g class="d-braco"><path d="M312 110L326 214L420 204L424 238L362 268"/><path d="M262 202C292 214 318 222 346 218"/><path d="M352 224L366 272L378 228L392 270L404 228L418 252"/></g>
-          <path d="M312 300L350 412"/><path d="M262 404L346 398M262 418L340 424M258 440L330 436"/>
-          <g class="d-dentes"><path d="M500 124L512 152L520 126L528 158L538 130L548 160"/><path d="M468 158L520 152"/></g>
-          <g class="d-garras-e"><path d="M218 518L300 524L226 540L306 548L224 566L298 576L206 584L282 604"/></g>
-          <g class="d-garras-d"><path d="M496 444L556 458L506 466L562 476L512 484L556 494"/><path d="M462 266L520 254L500 278L542 266L520 298"/></g>
-        </g>
-        <g class="d-olho" filter="url(#fio)"><ellipse class="d-pupila" cx="498" cy="108" rx="17" ry="7" fill="#fff" stroke="#111" stroke-width="3"/><circle class="d-pupila" cx="500" cy="108" r="4" fill="#111"/><g class="d-xis" opacity="0"><path d="M484 96L514 120M514 96L484 120" stroke="#111" stroke-width="6" fill="none" stroke-linecap="round"/></g></g>
-      </g>
-    </g>
-    <g class="bd-marcas" filter="url(#fio)" font-family="Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif" font-weight="900">
-      <text class="bd-fala" x="26" y="742" font-size="28" fill="#111" transform="rotate(-2 26 742)">FAÇA CARINHO.</text>
-      <path class="bd-tally" d="" fill="none" stroke="#111" stroke-width="4.5" stroke-linecap="round"/>
-      <text class="bd-cont" x="296" y="812" font-size="26" fill="${RED}" transform="rotate(3 296 812)">×0</text>
-    </g>
-  </svg>`;
-  const FRASES = ['OK.', 'MAIS.', 'NÃO PARE.', 'HA!', 'RRRRR.', 'ISSO.', 'AGORA SIM.'];
-  const MARCOS = { 10: '10! AGORA SOMOS AMIGOS.', 25: 'PROVA DE ORGÂNICA II? PODE VIR.', 50: 'MUTANO APROVA.', 100: 'REI DO CARINHO.' };
+  // ---------- easter egg: créditos ----------
+  const DINO_AVATAR = `<img src="dino.png?v=${BUILD}" alt="" width="54" height="54">`;
   let creditosEl = null;
 
   function abreCreditos() {
     if (creditosEl) return;
-    let n = guarda.ler('atlas.carinhos', 0);
     const el = document.createElement('div');
     el.className = 'creditos';
-    el.innerHTML = `${BD}<button class="cr-fechar" aria-label="Fechar"><svg viewBox="0 0 40 40"><path d="M8 9 L32 31 M31 8 L9 33" /></svg></button><div class="cr-marcas" aria-hidden="true"></div>`;
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-label', 'Créditos');
+    el.innerHTML = `<button class="cr-fechar" aria-label="Fechar"><svg viewBox="0 0 40 40"><path d="M8 9 L32 31 M31 8 L9 33" /></svg></button>
+      <div class="cr-conteudo">
+        <p class="cr-peq">Feito por Mutano</p>
+        <img class="cr-img" src="dino.png?v=${BUILD}" alt="Dinossauro vermelho">
+        <h2 class="cr-msg">Boa prova de<br>Química Orgânica II</h2>
+      </div>`;
     document.body.appendChild(el);
     creditosEl = el;
     document.body.style.overflow = 'hidden';
-    const q = (s) => el.querySelector(s);
-    const [corpo, cauda, braco, dentes, espinhos, garrasE, garrasD, pupila, xis, tally, cont, fala, marcas] =
-      ['.bd-dino', '.d-cauda', '.d-braco', '.d-dentes', '.d-espinhos', '.d-garras-e', '.d-garras-d', '.d-olho .d-pupila', '.d-xis', '.bd-tally', '.bd-cont', '.bd-fala', '.cr-marcas'].map(q);
-    const pupilas = el.querySelectorAll('.d-pupila');
-    // Contagem em risquinhos de cinco (como quem conta dias na parede)
-    const risca = () => {
-      const max = 30, v = Math.min(n, max);
-      let d = '';
-      for (let k = 0; k < v; k++) {
-        const grupo = Math.floor(k / 5), pos = k % 5, x0 = 26 + (grupo % 6) * 34, y0 = 772 + Math.floor(grupo / 6) * 28;
-        d += pos < 4 ? `M${x0 + pos * 6} ${y0} l${(k % 3) - 1} 22 ` : `M${x0 - 4} ${y0 + 18} l28 -14 `;
-      }
-      tally.setAttribute('d', d);
-      cont.textContent = '×' + n;
-    };
-    risca();
-    if (n) fala.textContent = 'DE NOVO?';
     if (usaMotion) {
-      M.animate(el, { clipPath: ['inset(100% 0 0 0)', 'inset(0% 0 0 0)'] }, { duration: 0.55, ease: [0.7, 0, 0.2, 1] });
-      M.animate('.bd-titulo text, .bd-titulo path', { opacity: [0, 1], x: [-30, 0] }, { delay: M.stagger(0.1, { startDelay: 0.45 }), duration: 0.35 });
-      M.animate(corpo, { y: [70, 0], opacity: [0, 1] }, { type: 'spring', stiffness: 150, damping: 16, delay: 0.5 });
-      M.animate(cauda, { rotate: [-1.6, 1.6] }, { duration: 2.2, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' });
-      M.animate(dentes, { x: [0, 3] }, { duration: 0.9, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' });
+      M.animate(el, { opacity: [0, 1] }, { duration: 0.25 });
+      M.animate('.cr-img', { opacity: [0, 1], scale: [0.96, 1] }, { duration: 0.5, delay: 0.1, ease: [0.2, 0.8, 0.2, 1] });
+      M.animate('.cr-peq, .cr-msg', { opacity: [0, 1], y: [10, 0] }, { duration: 0.4, delay: M.stagger(0.12, { startDelay: 0.2 }) });
     }
     const fecha = () => {
-      clearTimeout(volta);
       const sai = () => { el.remove(); creditosEl = null; document.body.style.overflow = ''; };
-      if (usaMotion) M.animate(el, { clipPath: ['inset(0% 0 0 0)', 'inset(0 0 100% 0)'] }, { duration: 0.4, ease: [0.7, 0, 0.2, 1] }).then(sai, sai); else sai();
+      if (usaMotion) M.animate(el, { opacity: [1, 0] }, { duration: 0.2 }).then(sai, sai); else sai();
     };
-    el.addEventListener('click', (e) => { if (e.target.closest('.cr-fechar')) fecha(); });
+    el.addEventListener('click', fecha);
     document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape' && creditosEl) { fecha(); document.removeEventListener('keydown', esc); } });
-
-    // carinho: o bicho balança o rabo e o braço, os dentes e as garras tremem, o olho vira X
-    let volta, ultimo = 0, ultimoXY = null;
-    const SINAIS = ['©', 'HA!', 'OK', '✕', '!!', 'SN2', 'MUTANO', '⚡'];
-    const CORES = ['#111', '#111', RED, RED];
-    const marca = (x, y) => {
-      const s = document.createElement('span');
-      s.className = 'marca'; s.textContent = SINAIS[(Math.random() * SINAIS.length) | 0];
-      s.style.left = x + 'px'; s.style.top = y + 'px';
-      s.style.color = CORES[(Math.random() * CORES.length) | 0];
-      s.style.fontSize = 22 + Math.random() * 28 + 'px';
-      s.style.rotate = (Math.random() - 0.5) * 50 + 'deg';
-      marcas.appendChild(s);
-      const fim = () => s.remove();
-      if (usaMotion) M.animate(s, { y: [0, -90 - Math.random() * 90], x: [0, (Math.random() - 0.5) * 80], opacity: [1, 1, 0], scale: [0.5, 1.15] }, { duration: 1.1, ease: 'easeOut' }).then(fim, fim);
-      else setTimeout(fim, 900);
-    };
-    const carinho = (x, y) => {
-      for (let i = 0; i < 2; i++) marca(x + (Math.random() - 0.5) * 30, y);
-      n++; guarda.gravar('atlas.carinhos', n); risca();
-      fala.textContent = MARCOS[n] || FRASES[(Math.random() * FRASES.length) | 0];
-      pupilas.forEach((p) => { p.style.opacity = 0; }); xis.style.opacity = 1;
-      if (usaMotion) {
-        M.animate(cauda, { rotate: [-7, 7] }, { duration: 0.12, repeat: 5, repeatType: 'reverse' });
-        M.animate(braco, { rotate: [-10, 8] }, { duration: 0.1, repeat: 5, repeatType: 'reverse' });
-        M.animate(dentes, { y: [0, 5] }, { duration: 0.07, repeat: 7, repeatType: 'reverse' });
-        M.animate([garrasE, garrasD], { x: [-4, 4] }, { duration: 0.06, repeat: 7, repeatType: 'reverse' });
-        M.animate(espinhos, { y: [0, -5] }, { duration: 0.09, repeat: 3, repeatType: 'reverse' });
-        M.animate(corpo, { x: [-5, 5, 0], scale: [1, 1.015, 1] }, { duration: 0.28 });
-      }
-      clearTimeout(volta);
-      volta = setTimeout(() => { pupilas.forEach((p) => { p.style.opacity = 1; }); xis.style.opacity = 0; }, 1200);
-    };
-    el.addEventListener('pointerdown', (e) => {
-      if (e.target.closest('.cr-fechar')) return;
-      el.setPointerCapture?.(e.pointerId); ultimo = performance.now(); ultimoXY = [e.clientX, e.clientY]; carinho(e.clientX, e.clientY);
-    });
-    el.addEventListener('pointermove', (e) => {
-      const apertado = e.buttons || e.pointerType === 'touch';
-      if (!apertado && e.pointerType !== 'mouse') return;
-      const agora = performance.now();
-      const d = ultimoXY ? Math.hypot(e.clientX - ultimoXY[0], e.clientY - ultimoXY[1]) : 99;
-      if (agora - ultimo > 170 && d > 14) { ultimo = agora; ultimoXY = [e.clientX, e.clientY]; carinho(e.clientX, e.clientY); }
-    });
   }
 
   // ---------- cliques ----------

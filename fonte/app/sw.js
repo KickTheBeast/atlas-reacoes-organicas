@@ -15,7 +15,7 @@ const BUILD = '__BUILD__';
 const CACHE = 'atlas-' + BUILD;
 const V = '?v=' + BUILD;
 const PRE = ['./', 'motion.js' + V, 'app.js' + V, 'style.css' + V, 'dados.json' + V, 'svgs.json' + V,
-  'manifest.webmanifest', 'icone.svg', 'icone-192.png'];
+  'manifest.webmanifest', 'icone.svg', 'icone-192.png', 'dino.png' + V];
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();

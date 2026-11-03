@@ -267,7 +267,7 @@ const motionJs = fs.readFileSync(path.join(raiz, 'tools/node_modules/motion/dist
 const swFonte = fs.readFileSync(path.join(FONTE, 'app/sw.js'), 'utf8');
 const htmlFonte = fs.readFileSync(path.join(FONTE, 'app/index.template.html'), 'utf8');
 
-const build = crypto.createHash('sha1').update(dadosTxt).update(svgsTxt).update(css).update(js).update(motionJs).update(swFonte).update(htmlFonte)
+const build = crypto.createHash('sha1').update(dadosTxt).update(svgsTxt).update(css).update(js).update(motionJs).update(fs.readFileSync(path.join(FONTE, 'app/dino.png'))).update(swFonte).update(htmlFonte)
   .digest('hex').slice(0, 10);
 
 const V = `?v=${build}`;
@@ -284,6 +284,7 @@ write('sw.js', sw);
 write('versao.json', JSON.stringify({ build }) + '\n');
 fs.copyFileSync(path.join(FONTE, 'app/manifest.webmanifest'), path.join(SITE, 'manifest.webmanifest'));
 fs.copyFileSync(path.join(FONTE, 'app/icone.svg'), path.join(SITE, 'icone.svg'));
+fs.copyFileSync(path.join(FONTE, 'app/dino.png'), path.join(SITE, 'dino.png'));
 for (const [nome, t] of [['icone-192.png', 192], ['icone-512.png', 512], ['apple-touch-icon.png', 180]]) {
   await sharp(path.join(FONTE, 'app/icone.svg'), { density: 384 }).resize(t, t).png().toFile(path.join(SITE, nome));
 }
