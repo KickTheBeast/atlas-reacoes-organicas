@@ -157,8 +157,8 @@ function desenharComSetas(smiles, setas, coords) {
   const mb = lerMolblock(mol.get_molblock());
   const s = mol.get_svg_with_highlights(OPCOES_SVG);
   mol.delete();
-  const { pos, rotulados } = posicoesAtomos(s, mb);
-  const { svg: marcas, ext, avisos } = marcarSetas(pos, rotulados, mb.ligacoes, setas);
+  const { pos, rotulados, caixas } = posicoesAtomos(s, mb);
+  const { svg: marcas, ext, avisos } = marcarSetas(pos, rotulados, mb.ligacoes, setas, caixas);
   avisos.forEach((a) => avisosSetas.push(`${smiles}: ${a}`));
   const [vx, vy, vw, vh] = (/viewBox='([^']+)'/.exec(s)?.[1] || '0 0 200 150').split(/\s+/).map(Number);
   const x0 = Math.min(vx, ext[0] - 8), y0 = Math.min(vy, ext[1] - 8), x1 = Math.max(vx + vw, ext[2] + 8), y1 = Math.max(vy + vh, ext[3] + 8);

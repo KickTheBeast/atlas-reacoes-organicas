@@ -2,7 +2,7 @@
 // Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
 (() => {
   'use strict';
-  const BUILD = '84c3915572';
+  const BUILD = 'ab85412e0c';
   const $ = (s) => document.querySelector(s);
   const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
   const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
@@ -684,6 +684,14 @@
     const splitMsg = SplitText.create(q('.cr-msg'), { type: 'chars', mask: 'chars', aria: 'auto' });
     const splitNome = SplitText.create(q('.cr-mutano'), { type: 'chars', aria: 'auto' });
     const zz = q('.cr-zz path'), peq = q('.cr-peq'), contagem = q('.cr-contagem');
+
+    // Impact não existe em celulares: a fonte substituta é mais larga. Cada linha é encolhida até caber na tela.
+    const cabe = (e) => {
+      e.style.fontSize = '';
+      for (let k = 0; k < 3 && e.scrollWidth > e.clientWidth + 1; k++) e.style.fontSize = (parseFloat(getComputedStyle(e).fontSize) * (e.clientWidth / e.scrollWidth) * 0.97).toFixed(1) + 'px';
+    };
+    const ajusta = () => { if (!el.isConnected) return removeEventListener('resize', ajusta); qa('.cr-peq,.cr-mutano,.cr-msg,.cr-marco').forEach(cabe); };
+    ajusta(); addEventListener('resize', ajusta);
 
     // ---- contagem em risquinhos de cinco ----
     const tally = q('.tally');

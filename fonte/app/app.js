@@ -685,6 +685,14 @@
     const splitNome = SplitText.create(q('.cr-mutano'), { type: 'chars', aria: 'auto' });
     const zz = q('.cr-zz path'), peq = q('.cr-peq'), contagem = q('.cr-contagem');
 
+    // Impact não existe em celulares: a fonte substituta é mais larga. Cada linha é encolhida até caber na tela.
+    const cabe = (e) => {
+      e.style.fontSize = '';
+      for (let k = 0; k < 3 && e.scrollWidth > e.clientWidth + 1; k++) e.style.fontSize = (parseFloat(getComputedStyle(e).fontSize) * (e.clientWidth / e.scrollWidth) * 0.97).toFixed(1) + 'px';
+    };
+    const ajusta = () => { if (!el.isConnected) return removeEventListener('resize', ajusta); qa('.cr-peq,.cr-mutano,.cr-msg,.cr-marco').forEach(cabe); };
+    ajusta(); addEventListener('resize', ajusta);
+
     // ---- contagem em risquinhos de cinco ----
     const tally = q('.tally');
     const MAXR = 40;

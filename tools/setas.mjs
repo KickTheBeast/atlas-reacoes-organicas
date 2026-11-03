@@ -79,27 +79,27 @@ export function posicoesAtomos(svg, { atomos, ligacoes }) {
   }
   const med = (v) => { const s = [...v].sort((p, q) => p - q); return s.length ? s[s.length >> 1] : null; };
   let tx = med(resX), ty = med(resY);
+  const bb = new Map(); // caixa de cada rótulo (átomo -> [x0, y0, x1, y1])
+  for (const m of svg.matchAll(/<path\b([^>]*)>/g)) {
+    const cls = (/class='([^']*)'/.exec(m[1]) || [])[1];
+    const d = (/\sd='([^']*)'/.exec(m[1]) || [])[1];
+    if (!cls || !/^atom-\d+$/.test(cls.split(/\s+/)[0]) || !d) continue;
+    const i = +cls.split(/\s+/)[0].slice(5), n = num(d);
+    const b = bb.get(i) || [1e9, 1e9, -1e9, -1e9];
+    for (let k = 0; k + 1 < n.length; k += 2) { b[0] = Math.min(b[0], n[k]); b[1] = Math.min(b[1], n[k + 1]); b[2] = Math.max(b[2], n[k]); b[3] = Math.max(b[3], n[k + 1]); }
+    bb.set(i, b);
+  }
   if (tx === null) { // sem âncoras: usa o centro dos rótulos
-    const bb = new Map();
-    for (const m of svg.matchAll(/<path\b([^>]*)>/g)) {
-      const cls = (/class='([^']*)'/.exec(m[1]) || [])[1];
-      const d = (/\sd='([^']*)'/.exec(m[1]) || [])[1];
-      if (!cls || !/^atom-\d+$/.test(cls.split(/\s+/)[0]) || !d) continue;
-      const i = +cls.split(/\s+/)[0].slice(5), n = num(d);
-      const b = bb.get(i) || [1e9, 1e9, -1e9, -1e9];
-      for (let k = 0; k + 1 < n.length; k += 2) { b[0] = Math.min(b[0], n[k]); b[1] = Math.min(b[1], n[k + 1]); b[2] = Math.max(b[2], n[k]); b[3] = Math.max(b[3], n[k + 1]); }
-      bb.set(i, b);
-    }
     const rx = [], ry = [];
     for (const [i, b] of bb) { rx.push((b[0] + b[2]) / 2 - escala * atomos[i].x); ry.push((b[1] + b[3]) / 2 + escala * atomos[i].y); }
     tx = med(rx) ?? 0; ty = med(ry) ?? 0;
   }
   const pos = atomos.map((a) => [escala * a.x + tx, -escala * a.y + ty]);
-  return { pos, rotulados, escala };
+  return { pos, rotulados, escala, caixas: bb };
 }
 
 /** Gera o SVG (curvas + pontas) das setas e os limites que elas ocupam. */
-export function marcarSetas(pos, rotulados, ligacoes, setas) {
+export function marcarSetas(pos, rotulados, ligacoes, setas, caixas = new Map()) {
   const viz = pos.map(() => []);
   for (const [a, b] of ligacoes) { viz[a].push(b); viz[b].push(a); }
   const raio = (i) => (rotulados.has(i) ? 9.5 : 2.5);
@@ -123,7 +123,18 @@ export function marcarSetas(pos, rotulados, ligacoes, setas) {
         d = Math.hypot(sx, sy) < 0.3 ? unit(alvo[0] - p[0], alvo[1] - p[1]) : unit(-sx, -sy);
       } else d = unit(alvo[0] - p[0], alvo[1] - p[1]);
       if (s.de.dir) d = unit(...s.de.dir);
-      S = [p[0] + d[0] * (raio(i) + 2.5), p[1] + d[1] * (raio(i) + 2.5)];
+      const cx = caixas.get(i);
+      if (cx) { // rótulo (O, N, Br...): o par fica logo depois da letra, com a seta nascendo dele
+        const c = [(cx[0] + cx[2]) / 2, (cx[1] + cx[3]) / 2];
+        const t = Math.min(((cx[2] - cx[0]) / 2) / (Math.abs(d[0]) || 1e-6), ((cx[3] - cx[1]) / 2) / (Math.abs(d[1]) || 1e-6));
+        const q = [c[0] + d[0] * (t + 2.6), c[1] + d[1] * (t + 2.6)], n = [-d[1], d[0]];
+        for (const sg of [-1, 1]) {
+          const o = [q[0] + n[0] * sg * 1.7, q[1] + n[1] * sg * 1.7];
+          svg += `<circle class="seta-p" cx="${o[0].toFixed(1)}" cy="${o[1].toFixed(1)}" r="1.15" fill="${AZUL}"/>`;
+          toca(o);
+        }
+        S = [q[0] + d[0] * 2, q[1] + d[1] * 2];
+      } else S = [p[0] + d[0] * (raio(i) + 2.5), p[1] + d[1] * (raio(i) + 2.5)];
     } else {
       const [a, b] = s.de.lig;
       const m = [(pos[a][0] + pos[b][0]) / 2, (pos[a][1] + pos[b][1]) / 2];
