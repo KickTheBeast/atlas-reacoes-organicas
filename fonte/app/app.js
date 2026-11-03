@@ -91,7 +91,7 @@
         <a class="guia-link sobe" style="--i:2" href="#/mec"><span class="gl-ic">vs</span><span class="gl-tx"><b>Guias rápidos de mecanismos</b><small>SN1, SN2, E1, E2, alcenos e mais</small></span>${SETA_IR}</a>
         <div class="sec"><h3>Por aula</h3><span>${D.aulas.length} aulas</span></div>${itens}
         <a class="aula sobe" style="--i:${D.aulas.length + 3}" href="#/todas"><div class="num">∑</div><div class="tx"><b>Todas as reações</b><small>${plural(D.reacoes.length, 'reação', 'reações')}</small></div>${SETA_IR}</a>
-        <div class="rodape">Versão ${BUILD}<br><button data-verificar>Verificar atualização</button></div>`,
+        <div class="rodape"><button class="avatar" data-creditos aria-label="Créditos">${DINO_AVATAR}</button><br>Versão ${BUILD}<br><button data-verificar>Verificar atualização</button></div>`,
       depois: () => { montaInstalar(); contaAte(tela); },
     };
   }
@@ -425,6 +425,116 @@
     });
   }
 
+  // ---------- créditos e o dinossauro ----------
+  const DINO_AVATAR = '<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="#d9f5e4"/><path d="M14 17l3-6 3 5M22 14l3-6 3 6M30 17l3-5 2 6" fill="#4fb286"/><ellipse cx="22" cy="28" rx="15" ry="12.5" fill="#7ed3a8"/><ellipse cx="35" cy="31" rx="9" ry="7" fill="#7ed3a8"/><circle cx="25" cy="23" r="3.4" fill="#fff"/><circle cx="25.6" cy="23.4" r="2" fill="#1c2b26"/><circle cx="26.2" cy="22.6" r=".7" fill="#fff"/><ellipse cx="18" cy="32" rx="3.6" ry="2.4" fill="#ff9db0" opacity=".75"/><path d="M33 35c2 1.6 5 1.4 6.6-.4" fill="none" stroke="#1c2b26" stroke-width="1.6" stroke-linecap="round"/><circle cx="38" cy="29" r=".9" fill="#1c2b26"/></svg>';
+  const DINO = `<svg class="dino" viewBox="0 0 260 230" aria-label="Dinossauro fofo" role="img">
+    <ellipse cx="128" cy="212" rx="78" ry="9" fill="#000" opacity=".12"/>
+    <g class="d-tail"><path d="M76 150C34 156 12 128 20 98c10 14 26 22 58 22z" fill="#6cc79b"/><path d="M26 108c4 10 12 16 22 19" fill="none" stroke="#4fb286" stroke-width="3" stroke-linecap="round"/></g>
+    <g class="d-corpo">
+      <path d="M92 98l8-20 10 18zM116 90l10-22 10 20zM142 92l10-20 8 20z" fill="#4fb286"/>
+      <ellipse cx="124" cy="146" rx="64" ry="50" fill="#7ed3a8"/>
+      <ellipse cx="136" cy="158" rx="40" ry="32" fill="#d9f5e4"/>
+      <rect x="92" y="178" width="26" height="28" rx="12" fill="#6cc79b"/><ellipse cx="102" cy="206" rx="17" ry="7" fill="#5bb88b"/>
+      <rect x="134" y="178" width="26" height="28" rx="12" fill="#6cc79b"/><ellipse cx="146" cy="206" rx="17" ry="7" fill="#5bb88b"/>
+      <ellipse class="d-braco" cx="166" cy="152" rx="11" ry="7" fill="#6cc79b" transform="rotate(25 166 152)"/>
+    </g>
+    <g class="d-cabeca">
+      <path d="M156 66l6-14 8 12M176 62l8-14 6 14" fill="#4fb286"/>
+      <ellipse cx="172" cy="98" rx="42" ry="36" fill="#7ed3a8"/>
+      <ellipse cx="204" cy="108" rx="24" ry="18" fill="#7ed3a8"/>
+      <circle cx="212" cy="100" r="2.4" fill="#1c2b26" opacity=".7"/>
+      <ellipse class="d-rosa" cx="160" cy="112" rx="10" ry="6.5" fill="#ff8fa6" opacity=".35"/>
+      <g class="d-olhos"><circle cx="170" cy="90" r="10" fill="#fff"/><circle cx="172" cy="91" r="6" fill="#1c2b26"/><circle cx="174" cy="88.5" r="2.2" fill="#fff"/></g>
+      <path class="d-feliz" d="M160 92q10-12 20 0" fill="none" stroke="#1c2b26" stroke-width="4" stroke-linecap="round" opacity="0"/>
+      <path class="d-boca" d="M190 118c6 5 16 4 22-2" fill="none" stroke="#1c2b26" stroke-width="3" stroke-linecap="round"/>
+    </g>
+  </svg>`;
+  const FRASES = ['Hmm, que gostoso…', 'rrrrrr…', 'Mais um pouquinho!', 'Atrás da orelha, por favor.', 'Você é gente boa!', 'Isso, assim mesmo.', 'Já posso até tirar uma soneca…'];
+  const MARCOS = { 10: '10 carinhos! Agora somos amigos.', 25: 'Vou te ajudar na prova de Orgânica II!', 50: 'Mutano aprova você. 💚', 100: 'Lenda do carinho!' };
+  let creditosEl = null;
+
+  function abreCreditos() {
+    if (creditosEl) return;
+    let n = guarda.ler('atlas.carinhos', 0);
+    const el = document.createElement('div');
+    el.className = 'creditos';
+    el.innerHTML = `<div class="cr-folha" role="dialog" aria-modal="true" aria-label="Créditos">
+      <button class="icone-btn cr-fechar" aria-label="Fechar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <div class="cr-alca"></div>
+      <p class="cr-peq">Atlas de Reações Orgânicas</p>
+      <h2 class="cr-titulo">Feito por <span>Mutano</span></h2>
+      <div class="cr-palco" aria-label="Faça carinho no dinossauro">${DINO}</div>
+      <p class="cr-fala">Faça carinho no dinossauro: toque ou arraste o dedo sobre ele.</p>
+      <p class="cr-cont">Carinhos: <b>${n}</b></p>
+    </div>`;
+    document.body.appendChild(el);
+    creditosEl = el;
+    document.body.style.overflow = 'hidden';
+    const folha = el.querySelector('.cr-folha'), palco = el.querySelector('.cr-palco'), fala = el.querySelector('.cr-fala'), cont = el.querySelector('.cr-cont b');
+    const q = (s) => el.querySelector(s);
+    const [cabeca, cauda, corpo, olhos, feliz, rosa, boca] = ['.d-cabeca', '.d-tail', '.d-corpo', '.d-olhos', '.d-feliz', '.d-rosa', '.d-boca'].map(q);
+    if (usaMotion) {
+      M.animate(el, { opacity: [0, 1] }, { duration: 0.2 });
+      M.animate(folha, { y: [420, 0] }, { type: 'spring', stiffness: 260, damping: 26 });
+      M.animate(corpo, { scaleY: [1, 1.035, 1] }, { duration: 3.2, repeat: Infinity, ease: 'easeInOut' });
+      M.animate(cabeca, { rotate: [-1.5, 1.5] }, { duration: 2.6, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' });
+    }
+    // piscar de vez em quando
+    const pisca = setInterval(() => {
+      if (feliz.style.opacity === '1') return;
+      olhos.style.transform = 'scaleY(.1)'; setTimeout(() => { olhos.style.transform = ''; }, 130);
+    }, 3200);
+    const fecha = () => {
+      clearInterval(pisca); clearTimeout(volta);
+      const sai = () => { el.remove(); creditosEl = null; document.body.style.overflow = ''; };
+      if (usaMotion) { M.animate(el, { opacity: [1, 0] }, { duration: 0.2 }); M.animate(folha, { y: [0, 420] }, { duration: 0.25, ease: 'easeIn' }).then(sai, sai); } else sai();
+    };
+    el.addEventListener('click', (e) => { if (e.target === el || e.target.closest('.cr-fechar')) fecha(); });
+    document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape' && creditosEl) { fecha(); document.removeEventListener('keydown', esc); } });
+
+    // carinho
+    let volta, ultimo = 0, ultimoXY = null;
+    const coracao = (x, y) => {
+      const h = document.createElement('span');
+      h.className = 'coracao'; h.textContent = '♥';
+      h.style.left = x + 'px'; h.style.top = y + 'px';
+      h.style.color = ['#ff6f91', '#ff8fa6', '#ff5c7c', '#ffb3c1'][(Math.random() * 4) | 0];
+      h.style.fontSize = 16 + Math.random() * 14 + 'px';
+      palco.appendChild(h);
+      const fim = () => h.remove();
+      if (usaMotion) M.animate(h, { y: [0, -70 - Math.random() * 50], x: [0, (Math.random() - 0.5) * 60], opacity: [1, 0], scale: [0.6, 1.25] }, { duration: 1, ease: 'easeOut' }).then(fim, fim);
+      else { h.classList.add('sobe-c'); h.addEventListener('animationend', fim); }
+    };
+    const carinho = (clientX, clientY) => {
+      const r = palco.getBoundingClientRect();
+      const x = clientX - r.left, y = clientY - r.top;
+      for (let i = 0; i < 2; i++) coracao(x + (Math.random() - 0.5) * 26, y - 10);
+      n++; cont.textContent = n; guarda.gravar('atlas.carinhos', n);
+      fala.textContent = MARCOS[n] || (n % 6 === 0 ? FRASES[(n / 6) % FRASES.length | 0] : fala.textContent);
+      if (!MARCOS[n] && n === 1) fala.textContent = 'Hmm, que gostoso…';
+      olhos.style.opacity = 0; feliz.style.opacity = 1; rosa.style.opacity = 0.85;
+      boca.setAttribute('d', 'M188 116c6 10 18 10 24-2');
+      if (usaMotion) {
+        M.animate(cauda, { rotate: [-9, 11] }, { duration: 0.16, repeat: 5, repeatType: 'reverse' });
+        M.animate(cabeca, { rotate: [0, x > r.width / 2 ? 5 : -4] }, { type: 'spring', stiffness: 300, damping: 14 });
+        M.animate(el.querySelector('.dino'), { y: [0, -7, 0], scaleX: [1, 1.02, 1] }, { duration: 0.34, ease: 'easeOut' });
+      }
+      clearTimeout(volta);
+      volta = setTimeout(() => {
+        feliz.style.opacity = 0; olhos.style.opacity = 1; rosa.style.opacity = 0.35;
+        boca.setAttribute('d', 'M190 118c6 5 16 4 22-2');
+      }, 1300);
+    };
+    palco.addEventListener('pointerdown', (e) => { palco.setPointerCapture?.(e.pointerId); ultimo = performance.now(); ultimoXY = [e.clientX, e.clientY]; carinho(e.clientX, e.clientY); });
+    palco.addEventListener('pointermove', (e) => {
+      const apertado = e.buttons || e.pointerType === 'touch';
+      if (!apertado && e.pointerType !== 'mouse') return;
+      const agora = performance.now();
+      const d = ultimoXY ? Math.hypot(e.clientX - ultimoXY[0], e.clientY - ultimoXY[1]) : 99;
+      if (agora - ultimo > 170 && d > 14) { ultimo = agora; ultimoXY = [e.clientX, e.clientY]; carinho(e.clientX, e.clientY); }
+    });
+  }
+
   // ---------- cliques ----------
   document.addEventListener('click', (e) => {
     const t = e.target;
@@ -445,6 +555,7 @@
     if (t.closest('[data-instalar]') && promptInstalar) { promptInstalar.prompt(); promptInstalar.userChoice.finally(() => { promptInstalar = null; $('#instalar').innerHTML = ''; }); return; }
     if (t.closest('[data-fechar-instalar]')) { guarda.gravar('atlas.instalar', true); $('#instalar').innerHTML = ''; return; }
     if (t.closest('[data-verificar]')) { verifica(true); return; }
+    if (t.closest('[data-creditos]')) { abreCreditos(); return; }
     const tl = t.closest('.tile');
     if (tl && tl.querySelector('svg') && !zoom.contains(tl)) abreZoom(tl);
   });
