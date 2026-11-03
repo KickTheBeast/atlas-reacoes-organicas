@@ -2,7 +2,7 @@
   --bg:#f4f7f5;--card:#fff;--ink:#10201b;--mut:#5b6e67;--bd:#e0e9e5;--ac:#14806a;--ac-ink:#fff;--ac-soft:#dff3ed;
   --nu:#2c6bd6;--nu-soft:#e4edfc;--el:#c2570c;--el-soft:#fdeadb;--mec:#7a3fc9;--mec-soft:#efe5fb;
   --tile:#fff;--sombra:0 1px 2px rgba(16,32,27,.06),0 6px 20px rgba(16,32,27,.06);
-  --topo:56px;--aba:68px;--gap:12px;--r:16px;
+  --topo:56px;--aba:58px;--gap:10px;--r:16px;
   --seg:env(safe-area-inset-bottom,0px);--top:env(safe-area-inset-top,0px);
   color-scheme:light dark;
 }
@@ -244,7 +244,7 @@ a.etq{transition:transform .15s}a.etq:active{transform:scale(.92)}
 .cr-mutano{margin:2px 0 0;font:900 clamp(68px,24vw,116px)/.92 Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif;letter-spacing:-.005em;transform:rotate(-3deg);filter:url(#cr-fio)}
 .cr-mutano div{display:inline-block}
 .cr-zz{display:block;width:min(78vw,340px);height:16px;margin-top:2px;transform:rotate(-3deg);overflow:visible}
-.cr-zz path{fill:none;stroke:#ee1c25;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+.cr-zz path{fill:none;stroke:#1f9e5a;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
 .dv-caixa{width:min(78vw,400px);touch-action:none}
 .dv{display:block;width:100%;height:auto;overflow:visible}
 .dv .v-red{fill:var(--vermelho,#f60507);stroke:none}
@@ -267,7 +267,7 @@ mark{background:color-mix(in srgb,#f4b400 40%,transparent);color:inherit;border-
 
 /* dock flutuante (vidro) */
 .abas{position:fixed;left:50%;bottom:calc(var(--seg) + var(--gap));z-index:20;width:min(calc(100% - 28px),420px);height:var(--aba);transform:translateX(-50%);
-  display:flex;align-items:stretch;padding:5px;border-radius:32px;isolation:isolate;
+  display:flex;align-items:stretch;padding:4px;border-radius:28px;isolation:isolate;
   background:rgba(255,255,255,.55);
   -webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);
   border:1px solid rgba(16,32,27,.09);
@@ -280,16 +280,16 @@ mark{background:color-mix(in srgb,#f4b400 40%,transparent);color:inherit;border-
   box-shadow:0 12px 34px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.35)}
   .abas::before{background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,0) 55%)}}
 @keyframes dock-entra{from{opacity:0;transform:translateX(-50%) translateY(40px) scale(.94)}to{opacity:1;transform:translateX(-50%)}}
-.abas a{position:relative;z-index:1;flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-  color:var(--mut);font-size:.62rem;font-weight:650;border-radius:26px;transition:color .25s,transform .2s}
+.abas a{position:relative;z-index:1;flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  color:var(--mut);font-size:.6rem;font-weight:650;border-radius:26px;transition:color .25s,transform .2s}
 .abas a:active{transform:scale(.9)}
 .abas a.on{color:#0c5f4e}
 @media (prefers-color-scheme:dark){.abas a.on{color:var(--ac)}}
 .abas a span{line-height:1;white-space:nowrap}
-.abas svg{width:24px;height:24px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.abas .glifo{display:flex;align-items:center;justify-content:center;width:30px;height:24px;font-size:.98rem;line-height:1;letter-spacing:-.04em;white-space:nowrap}
+.abas svg{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.abas .glifo{display:flex;align-items:center;justify-content:center;width:30px;height:22px;font-size:.98rem;line-height:1;letter-spacing:-.04em;white-space:nowrap}
 .abas .glifo sup{font-size:.62em;line-height:1;margin-left:1px;position:relative;top:-.42em}
-.pilula{position:absolute;top:5px;bottom:5px;left:0;width:60px;border-radius:27px;opacity:0;pointer-events:none;z-index:0;
+.pilula{position:absolute;top:4px;bottom:4px;left:0;width:60px;border-radius:24px;opacity:0;pointer-events:none;z-index:0;
   background:rgba(20,128,106,.14);
   transition:transform .42s cubic-bezier(.3,1.3,.5,1),width .42s cubic-bezier(.3,1.3,.5,1),opacity .2s}
 @media (prefers-color-scheme:dark){.pilula{background:rgba(255,255,255,.13)}}

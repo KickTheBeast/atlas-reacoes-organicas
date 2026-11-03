@@ -15,7 +15,7 @@ from scipy import ndimage as ndi
 from skimage import measure, morphology
 
 RAIZ = Path(__file__).resolve().parent.parent
-entrada = RAIZ / 'fonte/app/dino.png'
+entrada = RAIZ / 'tools/ref/dino-original.png'
 saida = RAIZ / 'fonte/app/dino-vetor.json'
 
 im = np.asarray(Image.open(entrada).convert('RGB')).astype(int)
@@ -34,7 +34,7 @@ silhueta = morphology.remove_small_objects(silhueta, 400)
 silhueta = morphology.opening(silhueta, morphology.disk(1))
 cor = vermelho.nonzero()
 rgb = [int(im[..., c][cor].mean()) for c in range(3)]
-cor_hex = '#%02x%02x%02x' % tuple(rgb)
+cor_hex = '#1f9e5a'  # verde do easter egg (a imagem original é vermelha)
 
 # ---------- partes móveis (polígonos em px da imagem) ----------
 POLIGONOS = {
