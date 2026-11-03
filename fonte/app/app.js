@@ -425,67 +425,52 @@
     });
   }
 
-  // ---------- créditos: o dinossauro (traço cru, tela cheia) ----------
-  const COROA = 'M8 56 L12 14 L30 38 L46 6 L62 38 L80 14 L84 56 Z';
-  const DINO_AVATAR = `<svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="24" fill="#111"/><path d="M11 33 L13 17 L21 26 L24 13 L27 26 L35 17 L37 33 Z" fill="#f4c20d" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="M11 37h26" stroke="#e63a2e" stroke-width="3" stroke-linecap="round"/></svg>`;
-  const BD = `<svg class="bd" viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Dinossauro desenhado em traço cru">
+  // ---------- créditos: o dinossauro vermelho (mancha de pincel + linha preta fina) ----------
+  // Silhueta e linhas desenhadas num quadro de 600 x 650.
+  const RED = '#ee1c25';
+  const SILHUETA = {
+    cauda: 'M64 108C30 150 22 230 52 292C80 345 128 366 176 372L250 372L250 296L204 300C152 290 118 250 108 205C100 170 84 130 64 108Z',
+    corpo: 'M196 300C206 240 250 160 330 118C370 98 430 84 500 80C545 78 576 92 572 118C566 140 540 142 520 150L470 156C488 180 520 214 560 236L548 262C520 252 480 238 458 216C440 260 462 300 480 340L440 372C420 392 380 410 340 424L318 440C300 470 296 520 306 566L300 590L160 598L152 560C168 500 180 440 174 380Z',
+    perna: 'M430 366L500 330L548 436L566 470L512 494L466 440Z',
+    bracoD: 'M452 218L548 258L556 292L520 288L462 250Z',
+  };
+  const DINO_AVATAR = `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="49" fill="#fff" stroke="#e4e0d8" stroke-width="2"/><g transform="translate(9 12) scale(.148)"><g fill="${RED}"><path d="${SILHUETA.cauda}"/><path d="${SILHUETA.corpo}"/><path d="${SILHUETA.perna}"/><path d="${SILHUETA.bracoD}"/></g><g fill="none" stroke="#111" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"><path d="M270 96L286 138L300 100L322 128L338 96L356 118L376 80L396 108L420 62L440 96L470 50"/><path d="M54 138L112 142L70 160L128 168L84 188L132 204L98 222L130 256"/><path d="M218 518L300 524L226 540L306 548L224 566L298 576"/><path d="M496 444L556 458L506 466L562 476L512 484"/></g></g></svg>`;
+  const BD = `<svg class="bd" viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Dinossauro vermelho em pincel e traço preto">
     <defs>
-      <filter id="rug" x="-6%" y="-6%" width="112%" height="112%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G"/></filter>
-      <filter id="rug2" x="-6%" y="-6%" width="112%" height="112%"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="21" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="G" yChannelSelector="R"/></filter>
-      <filter id="grao"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 -.18"/></filter>
+      <filter id="pincel" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="3" seed="11" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G"/></filter>
+      <filter id="fio" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="5" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="G" yChannelSelector="R"/></filter>
+      <filter id="seco" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.015 0.35" numOctaves="2" seed="9"/><feColorMatrix values="0 0 0 0 .96  0 0 0 0 .95  0 0 0 0 .92  0 0 0 1.5 -.98"/></filter>
+      <filter id="papel" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="2"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 -.18"/></filter>
     </defs>
-    <g class="bd-fundo" filter="url(#rug2)">
-      <rect x="-20" y="-20" width="430" height="884" fill="#1a3fa6"/>
-      <path d="M-20 560 L140 520 L410 560 L430 880 L-20 880 Z" fill="#e8452c"/>
-      <path d="M-20 700 L200 668 L430 720 L430 880 L-20 880 Z" fill="#f4c20d"/>
-      <path d="M270 -20 L430 -20 L430 150 L300 120 Z" fill="#f4c20d"/>
-      <path d="M-20 -20 L120 -20 L90 70 L-20 40 Z" fill="#e8452c"/>
-      <g stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".75" fill="none"><path d="M20 590 l30 -10 M30 610 l40 -12 M40 630 l30 -8 M300 600 l34 -8 M310 620 l40 -10 M295 640 l44 -9"/></g>
-      <g stroke="#111" stroke-width="3" stroke-linecap="round" opacity=".7" fill="none"><path d="M330 20 l40 14 M336 44 l36 12 M326 70 l44 10 M20 740 l60 -8 M26 760 l66 -10 M300 770 l60 10 M296 790 l66 8"/></g>
+    <rect width="390" height="844" fill="#f6f3ec"/>
+    <rect width="390" height="844" filter="url(#papel)" opacity=".55"/>
+    <g class="bd-titulo" filter="url(#fio)" font-family="Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif" font-weight="900" fill="#111">
+      <text x="28" y="100" font-size="20" letter-spacing="4" transform="rotate(-3 28 100)">FEITO POR</text>
+      <text x="26" y="168" font-size="66" letter-spacing="1" transform="rotate(-3 26 168)">MUTANO</text>
+      <path d="M30 188 l18 -12 l18 12 l18 -12 l18 12 l18 -12 l18 12 l18 -12 l18 12 l18 -12 l18 12 l18 -12 l18 12" fill="none" stroke="${RED}" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-3 28 188)"/>
     </g>
-    <g class="bd-doodles" filter="url(#rug2)" font-family="Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif" font-weight="900" fill="#fff" stroke="#111" stroke-width="1.2" paint-order="stroke">
-      <path d="M52 262 L72 250 L92 262 L92 286 L72 298 L52 286 Z" fill="none" stroke="#fff" stroke-width="3.5" stroke-linejoin="round"/>
-      <path d="M58 270 l26 -10 M58 284 l28 -12" stroke="#fff" stroke-width="2.5" fill="none"/>
-      <text x="22" y="330" font-size="26" transform="rotate(-9 22 330)">SN2</text>
-      <path d="M20 340 l48 -16 m-10 -4 l12 4 l-6 12" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      <text x="300" y="392" font-size="24" transform="rotate(8 300 392)" fill="#f4c20d">C=C</text>
-      <text x="318" y="432" font-size="19" transform="rotate(-6 318 432)">E2 ✕</text>
+    <g class="bd-pos" transform="translate(-1 256) scale(.64)">
+      <g class="bd-dino">
+        <g class="d-cauda"><g filter="url(#pincel)"><path d="${SILHUETA.cauda}" fill="${RED}"/></g>
+          <path class="d-zz-cauda" d="M54 138L112 142L70 160L128 168L84 188L132 204L98 222L130 256L100 282" fill="none" stroke="#111" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" filter="url(#fio)"/></g>
+        <g class="d-massa" filter="url(#pincel)"><path d="${SILHUETA.corpo}" fill="${RED}"/><path d="${SILHUETA.perna}" fill="${RED}"/><path class="d-braco-d" d="${SILHUETA.bracoD}" fill="${RED}"/></g>
+        <g filter="url(#seco)" opacity=".75"><rect x="0" y="0" width="600" height="650"/></g>
+        <g class="d-linhas" fill="none" stroke="#111" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" filter="url(#fio)">
+          <path class="d-espinhos" d="M270 96L286 138L300 100L322 128L338 96L356 118L376 80L396 108L420 62L440 96L470 50L486 84"/>
+          <path d="M268 98L292 140"/>
+          <g class="d-braco"><path d="M312 110L326 214L420 204L424 238L362 268"/><path d="M262 202C292 214 318 222 346 218"/><path d="M352 224L366 272L378 228L392 270L404 228L418 252"/></g>
+          <path d="M312 300L350 412"/><path d="M262 404L346 398M262 418L340 424M258 440L330 436"/>
+          <g class="d-dentes"><path d="M500 124L512 152L520 126L528 158L538 130L548 160"/><path d="M468 158L520 152"/></g>
+          <g class="d-garras-e"><path d="M218 518L300 524L226 540L306 548L224 566L298 576L206 584L282 604"/></g>
+          <g class="d-garras-d"><path d="M496 444L556 458L506 466L562 476L512 484L556 494"/><path d="M462 266L520 254L500 278L542 266L520 298"/></g>
+        </g>
+        <g class="d-olho" filter="url(#fio)"><ellipse class="d-pupila" cx="498" cy="108" rx="17" ry="7" fill="#fff" stroke="#111" stroke-width="3"/><circle class="d-pupila" cx="500" cy="108" r="4" fill="#111"/><g class="d-xis" opacity="0"><path d="M484 96L514 120M514 96L484 120" stroke="#111" stroke-width="6" fill="none" stroke-linecap="round"/></g></g>
+      </g>
     </g>
-    <g class="bd-titulo" filter="url(#rug)" font-family="Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif" font-weight="900" stroke="#111" paint-order="stroke" stroke-linejoin="round">
-      <text x="30" y="92" font-size="24" fill="#fff" stroke-width="5" transform="rotate(-4 30 92)" letter-spacing="3">FEITO POR</text>
-      <text x="26" y="150" font-size="56" fill="#fff" stroke-width="6" transform="rotate(-3 26 150)" letter-spacing="1" opacity=".95">MUTANO</text>
-      <path d="M18 132 L238 106 M22 112 L232 146 M20 148 L236 120" stroke="#111" stroke-width="7" stroke-linecap="round" fill="none"/>
-      <text x="24" y="222" font-size="86" fill="#f4c20d" stroke-width="9" transform="rotate(-3 24 222)" letter-spacing="-1">MUTANO</text>
-      <text x="322" y="96" font-size="46" fill="#fff" stroke-width="6" transform="rotate(8 322 96)">©</text>
-      
-    </g>
-    <g transform="translate(-14 8) scale(.955)"><g class="bd-dino" filter="url(#rug)" stroke="#111" stroke-linejoin="round" stroke-linecap="round">
-      <g class="d-cauda-corpo">
-        <path d="M24 548 C70 536 108 500 138 462 C168 424 206 392 244 354 L258 318 C262 286 286 262 320 262 C352 262 376 280 376 306 L366 322 L330 330 C304 338 292 352 292 376 C292 420 276 462 250 492 C232 514 212 528 192 536 L182 610 L160 668 L92 668 L106 628 L100 580 C78 590 54 580 24 548 Z" fill="#f4c20d" stroke-width="9"/>
-        <path d="M196 452 C236 458 266 430 280 392" fill="#e8452c" stroke="none"/>
-        <path d="M170 520 C200 540 236 520 262 480 C250 506 226 540 188 548 Z" fill="#e8452c" stroke="none"/>
-      </g>
-      <g class="d-ossos" fill="none" stroke="#111" stroke-width="5">
-        <path d="M150 478 q40 -26 76 -22"/><path d="M168 456 q34 -26 70 -26"/><path d="M188 432 q30 -26 60 -26"/><path d="M206 408 q26 -22 52 -24"/>
-        <path d="M120 520 q34 -6 62 -30"/>
-      </g>
-      <g class="d-espinha" fill="none" stroke="#111" stroke-width="4.5"><path d="M44 536 C90 518 128 484 156 450 C188 410 222 380 250 346"/><path d="M62 528 l-2 -16 M84 518 l-2 -18 M106 504 l-4 -18 M128 486 l-6 -18 M150 462 l-8 -16 M174 436 l-10 -14 M198 412 l-10 -12 M222 388 l-10 -12"/></g>
-      <g class="d-perna" fill="none" stroke="#111" stroke-width="6"><path d="M160 668 l-22 14 M130 668 l-16 16 M100 668 l-10 18"/><path d="M146 620 q10 -30 6 -64"/></g>
-      <g class="d-braco" transform-origin="262 446"><path d="M252 436 C276 440 298 454 308 476 L296 484 C288 470 270 462 248 458 Z" fill="#f4c20d" stroke-width="7"/><path d="M308 476 l16 8 M304 486 l16 14 M296 490 l8 18" fill="none" stroke-width="5"/></g>
-      <g class="d-mandibula" transform-origin="318 330"><path d="M312 336 C336 338 366 346 378 360 L374 384 C346 394 322 388 304 372 Z" fill="#f4c20d" stroke-width="8"/><path d="M322 346 l8 -16 l8 16 M342 352 l8 -16 l8 18 M362 360 l7 -14 l6 18" fill="#fff" stroke-width="3.5"/></g>
-      <g class="d-dentes-sup" fill="#fff" stroke-width="3.5"><path d="M326 330 l8 24 l8 -24 M346 328 l8 26 l8 -26 M366 322 l6 20 l6 -22"/></g>
-      <g class="d-olho">
-        <circle cx="318" cy="288" r="21" fill="#fff" stroke-width="7"/>
-        <g class="d-pupila"><path d="M318 288 m0 0 c3 -9 14 -6 12 4 c-2 12 -18 10 -18 -4 c0 -16 24 -14 24 4" fill="none" stroke-width="5"/><circle cx="320" cy="290" r="4" fill="#111" stroke="none"/></g>
-        <g class="d-xis" opacity="0"><path d="M304 274 L334 304 M334 274 L304 304" stroke="#e8452c" stroke-width="8" fill="none"/></g>
-        <path d="M296 262 q22 -18 46 -4" fill="none" stroke-width="6"/>
-      </g>
-      <g class="d-coroa"><path d="M276 252 L282 208 L300 232 L318 196 L336 232 L354 208 L360 252 Z" fill="#e8452c" stroke-width="7"/><circle cx="282" cy="204" r="6" fill="#fff" stroke-width="3.5"/><circle cx="318" cy="192" r="7" fill="#fff" stroke-width="3.5"/><circle cx="354" cy="204" r="6" fill="#fff" stroke-width="3.5"/><path d="M280 244 h76" fill="none" stroke="#fff" stroke-width="3"/></g>
-    </g></g>
-    <g class="bd-marcas" filter="url(#rug2)" font-family="Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif" font-weight="900">
-      <text class="bd-fala" x="20" y="748" font-size="30" fill="#fff" stroke="#111" stroke-width="7" paint-order="stroke" stroke-linejoin="round" transform="rotate(-3 20 748)">FAÇA CARINHO.</text>
-      <g class="bd-tally" stroke="#111" stroke-width="5" stroke-linecap="round" fill="none"></g>
-      <text class="bd-cont" x="278" y="810" font-size="26" fill="#f4c20d" stroke="#111" stroke-width="6" paint-order="stroke" stroke-linejoin="round" transform="rotate(4 278 810)">×0</text>
+    <g class="bd-marcas" filter="url(#fio)" font-family="Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif" font-weight="900">
+      <text class="bd-fala" x="26" y="742" font-size="28" fill="#111" transform="rotate(-2 26 742)">FAÇA CARINHO.</text>
+      <path class="bd-tally" d="" fill="none" stroke="#111" stroke-width="4.5" stroke-linecap="round"/>
+      <text class="bd-cont" x="296" y="812" font-size="26" fill="${RED}" transform="rotate(3 296 812)">×0</text>
     </g>
   </svg>`;
   const FRASES = ['OK.', 'MAIS.', 'NÃO PARE.', 'HA!', 'RRRRR.', 'ISSO.', 'AGORA SIM.'];
@@ -497,32 +482,33 @@
     let n = guarda.ler('atlas.carinhos', 0);
     const el = document.createElement('div');
     el.className = 'creditos';
-    el.innerHTML = `${BD}<button class="cr-fechar" aria-label="Fechar"><svg viewBox="0 0 40 40"><path d="M7 9 L33 31 M32 7 L9 33" /></svg></button><div class="cr-marcas" aria-hidden="true"></div>`;
+    el.innerHTML = `${BD}<button class="cr-fechar" aria-label="Fechar"><svg viewBox="0 0 40 40"><path d="M8 9 L32 31 M31 8 L9 33" /></svg></button><div class="cr-marcas" aria-hidden="true"></div>`;
     document.body.appendChild(el);
     creditosEl = el;
     document.body.style.overflow = 'hidden';
     const q = (s) => el.querySelector(s);
-    const [cabeca, coroa, mand, pupila, xis, braco, corpo, tally, cont, fala, marcas] =
-      ['.d-coroa', '.d-coroa', '.d-mandibula', '.d-pupila', '.d-xis', '.d-braco', '.bd-dino', '.bd-tally', '.bd-cont', '.bd-fala', '.cr-marcas'].map(q);
+    const [corpo, cauda, braco, dentes, espinhos, garrasE, garrasD, pupila, xis, tally, cont, fala, marcas] =
+      ['.bd-dino', '.d-cauda', '.d-braco', '.d-dentes', '.d-espinhos', '.d-garras-e', '.d-garras-d', '.d-olho .d-pupila', '.d-xis', '.bd-tally', '.bd-cont', '.bd-fala', '.cr-marcas'].map(q);
+    const pupilas = el.querySelectorAll('.d-pupila');
     // Contagem em risquinhos de cinco (como quem conta dias na parede)
     const risca = () => {
-      const g = 5, max = 30, v = Math.min(n, max);
+      const max = 30, v = Math.min(n, max);
       let d = '';
       for (let k = 0; k < v; k++) {
-        const grupo = Math.floor(k / g), pos = k % g, x0 = 22 + (grupo % 6) * 34, y0 = 772 + Math.floor(grupo / 6) * 28;
+        const grupo = Math.floor(k / 5), pos = k % 5, x0 = 26 + (grupo % 6) * 34, y0 = 772 + Math.floor(grupo / 6) * 28;
         d += pos < 4 ? `M${x0 + pos * 6} ${y0} l${(k % 3) - 1} 22 ` : `M${x0 - 4} ${y0 + 18} l28 -14 `;
       }
-      tally.setAttribute('d', d); tally.innerHTML = `<path d="${d}"/>`;
+      tally.setAttribute('d', d);
       cont.textContent = '×' + n;
     };
     risca();
     if (n) fala.textContent = 'DE NOVO?';
     if (usaMotion) {
       M.animate(el, { clipPath: ['inset(100% 0 0 0)', 'inset(0% 0 0 0)'] }, { duration: 0.55, ease: [0.7, 0, 0.2, 1] });
-      M.animate('.bd-titulo text', { opacity: [0, 1], x: [-40, 0] }, { delay: M.stagger(0.12, { startDelay: 0.45 }), duration: 0.35 });
-      M.animate(corpo, { y: [60, 0], opacity: [0, 1] }, { type: 'spring', stiffness: 160, damping: 16, delay: 0.5 });
-      M.animate(coroa, { rotate: [-3, 3] }, { duration: 1.6, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' });
-      M.animate(mand, { rotate: [0, 4] }, { duration: 1.1, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' });
+      M.animate('.bd-titulo text, .bd-titulo path', { opacity: [0, 1], x: [-30, 0] }, { delay: M.stagger(0.1, { startDelay: 0.45 }), duration: 0.35 });
+      M.animate(corpo, { y: [70, 0], opacity: [0, 1] }, { type: 'spring', stiffness: 150, damping: 16, delay: 0.5 });
+      M.animate(cauda, { rotate: [-1.6, 1.6] }, { duration: 2.2, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' });
+      M.animate(dentes, { x: [0, 3] }, { duration: 0.9, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' });
     }
     const fecha = () => {
       clearTimeout(volta);
@@ -532,16 +518,16 @@
     el.addEventListener('click', (e) => { if (e.target.closest('.cr-fechar')) fecha(); });
     document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape' && creditosEl) { fecha(); document.removeEventListener('keydown', esc); } });
 
-    // carinho: o bicho reage com riscos, olho riscado e mandíbula tremendo
+    // carinho: o bicho balança o rabo e o braço, os dentes e as garras tremem, o olho vira X
     let volta, ultimo = 0, ultimoXY = null;
-    const SINAIS = ['©', 'HA!', 'OK', '✕', '♛', '!!', 'SN2', 'MUTANO'];
-    const CORES = ['#f4c20d', '#fff', '#e8452c', '#111'];
+    const SINAIS = ['©', 'HA!', 'OK', '✕', '!!', 'SN2', 'MUTANO', '⚡'];
+    const CORES = ['#111', '#111', RED, RED];
     const marca = (x, y) => {
       const s = document.createElement('span');
       s.className = 'marca'; s.textContent = SINAIS[(Math.random() * SINAIS.length) | 0];
       s.style.left = x + 'px'; s.style.top = y + 'px';
       s.style.color = CORES[(Math.random() * CORES.length) | 0];
-      s.style.fontSize = 22 + Math.random() * 30 + 'px';
+      s.style.fontSize = 22 + Math.random() * 28 + 'px';
       s.style.rotate = (Math.random() - 0.5) * 50 + 'deg';
       marcas.appendChild(s);
       const fim = () => s.remove();
@@ -552,15 +538,17 @@
       for (let i = 0; i < 2; i++) marca(x + (Math.random() - 0.5) * 30, y);
       n++; guarda.gravar('atlas.carinhos', n); risca();
       fala.textContent = MARCOS[n] || FRASES[(Math.random() * FRASES.length) | 0];
-      pupila.style.opacity = 0; xis.style.opacity = 1;
+      pupilas.forEach((p) => { p.style.opacity = 0; }); xis.style.opacity = 1;
       if (usaMotion) {
-        M.animate(mand, { rotate: [0, 9] }, { duration: 0.07, repeat: 7, repeatType: 'reverse' });
-        M.animate(coroa, { rotate: [-8, 8], y: [-6, 0] }, { duration: 0.12, repeat: 3, repeatType: 'reverse' });
-        M.animate(braco, { rotate: [-18, 12] }, { duration: 0.1, repeat: 5, repeatType: 'reverse' });
+        M.animate(cauda, { rotate: [-7, 7] }, { duration: 0.12, repeat: 5, repeatType: 'reverse' });
+        M.animate(braco, { rotate: [-10, 8] }, { duration: 0.1, repeat: 5, repeatType: 'reverse' });
+        M.animate(dentes, { y: [0, 5] }, { duration: 0.07, repeat: 7, repeatType: 'reverse' });
+        M.animate([garrasE, garrasD], { x: [-4, 4] }, { duration: 0.06, repeat: 7, repeatType: 'reverse' });
+        M.animate(espinhos, { y: [0, -5] }, { duration: 0.09, repeat: 3, repeatType: 'reverse' });
         M.animate(corpo, { x: [-5, 5, 0], scale: [1, 1.015, 1] }, { duration: 0.28 });
       }
       clearTimeout(volta);
-      volta = setTimeout(() => { pupila.style.opacity = 1; xis.style.opacity = 0; }, 1200);
+      volta = setTimeout(() => { pupilas.forEach((p) => { p.style.opacity = 1; }); xis.style.opacity = 0; }, 1200);
     };
     el.addEventListener('pointerdown', (e) => {
       if (e.target.closest('.cr-fechar')) return;

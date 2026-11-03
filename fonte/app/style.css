@@ -232,21 +232,26 @@ a.etq{transition:transform .15s}a.etq:active{transform:scale(.92)}
 .sel-info b{color:var(--ink)}
 
 /* créditos: dinossauro em tela cheia */
-.avatar{display:block;width:50px;height:50px;border-radius:50%;padding:0;margin:0 auto 10px;background:none;box-shadow:var(--sombra);transition:transform .2s}
+.avatar{display:block;width:54px;height:54px;border-radius:50%;padding:0;margin:0 auto 10px;background:none;transition:transform .2s}
+.rodape .avatar{padding:0;border:0;background:none;margin:0 auto 10px;border-radius:50%}
 .avatar:active{transform:scale(.88) rotate(-8deg)}
-.avatar svg{width:50px;height:50px}
-.creditos{position:fixed;inset:0;z-index:70;background:#1a3fa6;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;overflow:hidden}
+.avatar svg{width:54px;height:54px}
+.creditos{position:fixed;inset:0;z-index:70;background:#f6f3ec;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;overflow:hidden}
 .creditos .bd{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
-.bd .bd-dino{transform-box:view-box;transform-origin:200px 520px}
-.bd .d-coroa{transform-box:view-box;transform-origin:318px 250px}
-.bd .d-mandibula{transform-box:view-box;transform-origin:318px 330px}
-.bd .d-braco{transform-box:view-box;transform-origin:262px 446px}
+.bd .bd-dino,.bd .d-cauda,.bd .d-braco,.bd .d-dentes,.bd .d-espinhos,.bd .d-garras-e,.bd .d-garras-d{transform-box:view-box}
+.bd .bd-dino{transform-origin:300px 380px}
+.bd .d-cauda{transform-origin:196px 330px}
+.bd .d-braco{transform-origin:318px 214px}
+.bd .d-dentes{transform-origin:500px 140px}
+.bd .d-espinhos{transform-origin:360px 100px}
+.bd .d-garras-e{transform-origin:260px 540px}
+.bd .d-garras-d{transform-origin:520px 460px}
 .bd .d-pupila,.bd .d-xis{transition:opacity .1s}
-.cr-fechar{position:absolute;right:max(14px,env(safe-area-inset-right));top:calc(12px + var(--top));width:52px;height:52px;display:grid;place-items:center;background:#111;border-radius:6px;transform:rotate(-4deg);box-shadow:4px 4px 0 #f4c20d;z-index:3}
-.cr-fechar svg{width:30px;height:30px;fill:none;stroke:#fff;stroke-width:6;stroke-linecap:round}
+.cr-fechar{position:absolute;right:max(10px,env(safe-area-inset-right));top:calc(10px + var(--top));width:56px;height:56px;display:grid;place-items:center;z-index:3}
+.cr-fechar svg{width:30px;height:30px;fill:none;stroke:#111;stroke-width:4.5;stroke-linecap:round}
 .cr-fechar:active{transform:rotate(3deg) scale(.92)}
 .cr-marcas{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:2}
-.marca{position:absolute;pointer-events:none;font:900 26px Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif;line-height:1;transform:translate(-50%,-50%);-webkit-text-stroke:2.5px #111;paint-order:stroke fill;text-shadow:3px 3px 0 #111;white-space:nowrap}
+.marca{position:absolute;pointer-events:none;font:900 26px Impact,'Haettenschweiler','Arial Narrow Bold','Helvetica Neue',Arial,sans-serif;line-height:1;transform:translate(-50%,-50%);white-space:nowrap}
 
 /* busca */
 .campo{position:sticky;top:calc(var(--topo) + var(--top));z-index:5;padding:6px 0 10px;background:linear-gradient(var(--bg) 75%,transparent)}
