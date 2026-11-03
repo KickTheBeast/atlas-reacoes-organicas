@@ -628,11 +628,10 @@
   // Acessórios do Mutaninho (desenhados nas coordenadas do dinossauro). Ganham-se acertando 100% num simulado.
   const ACESSORIOS = [{
     id: 'oculos', slot: 'rosto', nome: 'Óculos de sol', como: 'Acerte 100% em um simulado', vb: '436 76 100 48',
-    arte: `<path d="M471 92 L441 85" stroke="#111" stroke-width="5.5" stroke-linecap="round" fill="none"/>
-      <path d="M513 91 L529 94" stroke="#111" stroke-width="5" stroke-linecap="round" fill="none"/>
-      <path d="M469 91 Q490 84 514 89 Q518 104 506 112 Q488 117 474 109 Q466 100 469 91 Z" fill="#111" stroke="#111" stroke-width="2.4" stroke-linejoin="round"/>
-      <path d="M467 88 Q491 81 517 87" stroke="#111" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <path d="M477 95 L492 92 M497 94 L503 93" stroke="#f6f3ec" stroke-width="3.2" stroke-linecap="round" fill="none" opacity=".9"/>`,
+    arte: `<path d="M481 91 L452 86" stroke="#111" stroke-width="4" stroke-linecap="round" fill="none"/>
+      <path d="M481 90 L526 87 Q529 104 518 111 Q500 117 487 109 Q479 101 481 90 Z" fill="#111" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M479 89.5 L528 86.5" stroke="#111" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+      <path d="M489 97 L498 93.5 M500.5 99 L504 97.5" stroke="#f6f3ec" stroke-width="3" stroke-linecap="round" fill="none" opacity=".92"/>`,
   }];
   const lerAcess = () => { const a = guarda.ler('atlas.acessorios', null); return a && Array.isArray(a.tem) ? a : { tem: [], uso: [] }; };
   function ganhaAcessorio(id) {

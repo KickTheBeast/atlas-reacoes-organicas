@@ -2,7 +2,7 @@
 // Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
 (() => {
   'use strict';
-  const BUILD = '57bda292f8';
+  const BUILD = 'e1462e9ae2';
   const $ = (s) => document.querySelector(s);
   const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
   const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
@@ -628,11 +628,10 @@
   // Acessórios do Mutaninho (desenhados nas coordenadas do dinossauro). Ganham-se acertando 100% num simulado.
   const ACESSORIOS = [{
     id: 'oculos', slot: 'rosto', nome: 'Óculos de sol', como: 'Acerte 100% em um simulado', vb: '436 76 100 48',
-    arte: `<path d="M471 92 L441 85" stroke="#111" stroke-width="5.5" stroke-linecap="round" fill="none"/>
-      <path d="M513 91 L529 94" stroke="#111" stroke-width="5" stroke-linecap="round" fill="none"/>
-      <path d="M469 91 Q490 84 514 89 Q518 104 506 112 Q488 117 474 109 Q466 100 469 91 Z" fill="#111" stroke="#111" stroke-width="2.4" stroke-linejoin="round"/>
-      <path d="M467 88 Q491 81 517 87" stroke="#111" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <path d="M477 95 L492 92 M497 94 L503 93" stroke="#f6f3ec" stroke-width="3.2" stroke-linecap="round" fill="none" opacity=".9"/>`,
+    arte: `<path d="M481 91 L452 86" stroke="#111" stroke-width="4" stroke-linecap="round" fill="none"/>
+      <path d="M481 90 L526 87 Q529 104 518 111 Q500 117 487 109 Q479 101 481 90 Z" fill="#111" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M479 89.5 L528 86.5" stroke="#111" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+      <path d="M489 97 L498 93.5 M500.5 99 L504 97.5" stroke="#f6f3ec" stroke-width="3" stroke-linecap="round" fill="none" opacity=".92"/>`,
   }];
   const lerAcess = () => { const a = guarda.ler('atlas.acessorios', null); return a && Array.isArray(a.tem) ? a : { tem: [], uso: [] }; };
   function ganhaAcessorio(id) {
@@ -1103,7 +1102,7 @@
     const barras = D.aulas.filter((a) => a.id !== '00').map((a, i) => { const p = progressoAula(a.id); return `<a class="prog-linha sobe" style="--i:${i + 8}" href="#/aula/${a.id}"><span class="prog-rot">Aula ${rotuloAula(a.id)}</span><span class="prog-barra"><i data-pct="${p.pct.toFixed(1)}"></i></span><span class="prog-num">${p.dom}/${p.total}</span></a>`; }).join('');
     return {
       titulo: 'Estudar', aba: 'estudar', prof: 0,
-      html: `<h2 class="titulo-lista sobe">Estudar</h2>
+      html: `
         <div class="cartao hoje sobe" style="--i:1">
           <div class="hoje-anel" id="anel-geral"></div>
           <div class="hoje-tx"><b>${g.dom} de ${g.total}</b> dominadas<small>${seq ? `🔥 ${seq} ${seq === 1 ? 'dia' : 'dias'} seguidos` : 'Comece hoje a sua sequência'} · ${feitasHoje} ${feitasHoje === 1 ? 'revisão' : 'revisões'} hoje</small></div>

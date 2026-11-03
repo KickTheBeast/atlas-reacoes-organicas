@@ -121,7 +121,7 @@
     const barras = D.aulas.filter((a) => a.id !== '00').map((a, i) => { const p = progressoAula(a.id); return `<a class="prog-linha sobe" style="--i:${i + 8}" href="#/aula/${a.id}"><span class="prog-rot">Aula ${rotuloAula(a.id)}</span><span class="prog-barra"><i data-pct="${p.pct.toFixed(1)}"></i></span><span class="prog-num">${p.dom}/${p.total}</span></a>`; }).join('');
     return {
       titulo: 'Estudar', aba: 'estudar', prof: 0,
-      html: `<h2 class="titulo-lista sobe">Estudar</h2>
+      html: `
         <div class="cartao hoje sobe" style="--i:1">
           <div class="hoje-anel" id="anel-geral"></div>
           <div class="hoje-tx"><b>${g.dom} de ${g.total}</b> dominadas<small>${seq ? `🔥 ${seq} ${seq === 1 ? 'dia' : 'dias'} seguidos` : 'Comece hoje a sua sequência'} · ${feitasHoje} ${feitasHoje === 1 ? 'revisão' : 'revisões'} hoje</small></div>
