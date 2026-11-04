@@ -760,11 +760,6 @@
       <path d="M472 150 L463 176 L474 196 L486 176 L477 150 Z" fill="#d93a2f" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
       <path d="M465 146 L482 146 L479 154 L468 154 Z" fill="#d93a2f" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
       <path d="M470 166 L479 163 M468 176 L482 172" stroke="#111" stroke-width="2.2" stroke-linecap="round" opacity=".5"/></g>`,
-  }, {
-    id: 'chifres', slot: 'chifres', secreto: true, nome: 'Chifrinhos', como: '???', vb: '432 28 120 72',
-    arte: `<path d="M466 70 Q455 52 466 36 Q476 50 482 66 Z" fill="#7a1010" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
-      <path d="M498 66 Q501 48 516 36 Q518 54 511 71 Z" fill="#7a1010" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
-      <path d="M467 52 L472 58 M509 53 L505 59" stroke="#d94a4a" stroke-width="2" stroke-linecap="round" opacity=".7"/>`,
   }];
   const lerAcess = () => { const a = guarda.ler('atlas.acessorios', null); return a && Array.isArray(a.tem) ? a : { tem: [], uso: [] }; };
   function ganhaAcessorio(id) {
@@ -776,7 +771,7 @@
     return ac;
   }
   // sorteia um acessório que ainda não é seu
-  const sorteiaAcessorio = () => { const a = lerAcess(), falta = ACESSORIOS.filter((x) => !x.secreto && !a.tem.includes(x.id)); return falta.length ? ganhaAcessorio(falta[Math.floor(Math.random() * falta.length)].id) : null; };
+  const sorteiaAcessorio = () => { const a = lerAcess(), falta = ACESSORIOS.filter((x) => !a.tem.includes(x.id)); return falta.length ? ganhaAcessorio(falta[Math.floor(Math.random() * falta.length)].id) : null; };
   const arteAcess = (uso) => uso.map((id) => { const a = ACESSORIOS.find((x) => x.id === id); return a ? `<g class="acc" data-acc="${id}">${a.arte}</g>` : ''; }).join('');
 
   function dinoSvg(V, op = {}) {
@@ -790,7 +785,7 @@
         <g class="g-corpo">${tr('corpo')}${tr('bracoE')}</g>
         <g class="g-espinhos">${tr('espinhos')}</g>
         <g class="g-garras">${tr('garrasE')}${tr('garrasD')}</g>
-        <g class="p-cabeca">${parte('cabeca')}${tr('cabeca')}${arteAcess(op.uso || [])}</g>
+        <g class="p-cabeca">${parte('cabeca')}${tr('cabeca')}${arteAcess(op.uso || [])}${op.diabo ? CHIFRES : ''}</g>
       </g></g></g></svg>`;
   }
 
@@ -801,7 +796,9 @@
     <filter id="cr-fio" x="-5%" y="-10%" width="110%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="5" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="G" yChannelSelector="R"/></filter>
     <filter id="cr-papel" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="2"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 -.18"/></filter></defs></svg>
     <svg class="cr-papel" preserveAspectRatio="none" aria-hidden="true"><rect width="100%" height="100%" filter="url(#cr-papel)" opacity=".55"/></svg>`;
+  // Easter egg: com exatamente 666 carinhos o Mutaninho fica vermelho e ganha chifrinhos; no 667º tudo volta ao normal.
   const DIABO = 666, VERMELHO = '#d62828';
+  const CHIFRES = `<g class="chifres"><path d="M462 85 Q452 68 462 52 Q474 66 482 82 Z" fill="#7a1010" stroke="#111" stroke-width="3" stroke-linejoin="round"/><path d="M497 80 Q500 64 516 51 Q518 68 511 85 Z" fill="#7a1010" stroke="#111" stroke-width="3" stroke-linejoin="round"/><path d="M464 66 L469 72 M510 67 L506 73" stroke="#d94a4a" stroke-width="2" stroke-linecap="round" opacity=".7"/></g>`;
   const MARCOS = { 666: '666. MUTANO ENDIABRADO.', 10: '10 CARINHOS. AGORA SOMOS AMIGOS.', 25: 'PROVA DE ORGÂNICA II? PODE VIR.', 50: 'MUTANO APROVA.', 100: 'LENDA DO CARINHO.' };
 
   function abreCreditos(ev, loja) {
@@ -820,13 +817,12 @@
   function montaCreditos(V, origem, abrirLoja) {
     const gsap = window.gsap, SplitText = window.SplitText;
     let n = guarda.ler('atlas.carinhos', 0);
-    if (n >= DIABO) ganhaAcessorio('chifres');
     const el = document.createElement('div');
     el.className = 'creditos';
     el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Créditos');
     el.innerHTML = `${FILTROS}<button class="cr-fechar" aria-label="Fechar"><svg viewBox="0 0 40 40"><path d="M8 9 L32 31 M31 8 L9 33" /></svg></button>
       <div class="cr-conteudo">${CABECALHO}
-        <div class="dv-caixa">${dinoSvg(V, { uso: lerAcess().uso, diabo: guarda.ler('atlas.carinhos', 0) >= DIABO })}</div>
+        <div class="dv-caixa">${dinoSvg(V, { uso: lerAcess().uso, diabo: guarda.ler('atlas.carinhos', 0) === DIABO })}</div>
         <h2 class="cr-msg">Boa prova de<br>Química Orgânica II</h2>
         <div class="cr-contagem"><svg class="cr-tally" viewBox="0 0 240 60" aria-hidden="true"><g class="tally"></g></svg><span class="cr-n">×${n}</span></div>
         <p class="cr-marco" aria-live="polite"></p>
@@ -942,21 +938,22 @@
       gsap.to(braco, { y: 0, duration: 1, ease: 'elastic.out(1,0.45)', overwrite: 'auto' });
       gsap.to(idleTL, { timeScale: 1, duration: 1.2, ease: 'power2.inOut', overwrite: 'auto' });
     };
+    const diabo = (on) => { // rápido de propósito: quem clica depressa quase nem vê
+      gsap.to(q('.dv'), { '--vermelho': on ? VERMELHO : V.cor, duration: 0.14, overwrite: 'auto' });
+      const h = cabeca.querySelector('.chifres');
+      if (on && !h) {
+        cabeca.insertAdjacentHTML('beforeend', CHIFRES);
+        gsap.fromTo(cabeca.querySelector('.chifres'), { y: 9, scaleY: 0.2, opacity: 0, svgOrigin: '490 84' }, { y: 0, scaleY: 1, opacity: 1, duration: 0.16, ease: 'back.out(3)' });
+        navigator.vibrate && navigator.vibrate([30, 20, 30]);
+      } else if (!on && h) gsap.to(h, { opacity: 0, y: 6, duration: 0.1, onComplete: () => h.remove() });
+    };
     const conta = () => {
       n++; guarda.gravar('atlas.carinhos', n);
       navigator.vibrate && navigator.vibrate(10);
       if (n <= MAXR) { const p = risco(n - 1); gsap.fromTo(p, { drawSVG: '0%' }, { drawSVG: '100%', duration: 0.3, ease: 'power2.out' }); }
       gsap.to(numEstado, { v: n, duration: 0.45, ease: 'power2.out', onUpdate: mostraNum });
       gsap.fromTo(numEl, { scale: 1.45, rotation: gsap.utils.random(-6, 6) }, { scale: 1, rotation: 0, duration: 0.7, ease: 'elastic.out(1,0.4)' });
-      if (n === DIABO) { // easter egg: fica vermelho e ganha chifrinhos (para sempre)
-        navigator.vibrate && navigator.vibrate([60, 40, 60, 40, 160]);
-        const svg = q('.dv');
-        gsap.to(svg, { '--vermelho': VERMELHO, duration: 1.6, ease: 'power2.inOut' });
-        gsap.fromTo(el, { backgroundColor: '#f6f3ec' }, { backgroundColor: '#f3d9d4', duration: 0.5, yoyo: true, repeat: 1 });
-        gsap.fromTo(par, { x: -9 }, { x: 0, duration: 1.2, ease: 'elastic.out(1,0.15)' });
-        ganhaAcessorio('chifres');
-        setTimeout(() => poeAcessorios(true), 500);
-      }
+      if (n === DIABO) diabo(true); else if (n === DIABO + 1) diabo(false);
       if (MARCOS[n]) {
         const m = q('.cr-marco'); m.textContent = MARCOS[n];
         gsap.fromTo(m, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4 });
@@ -989,7 +986,7 @@
       loja = document.createElement('div'); loja.className = 'cr-loja'; loja.setAttribute('role', 'dialog'); loja.setAttribute('aria-label', 'Loja do Mutaninho');
       loja.innerHTML = `<div class="cl-topo"><h3>Loja</h3><button class="cl-x" aria-label="Fechar a loja"><svg viewBox="0 0 40 40"><path d="M8 9 L32 31 M31 8 L9 33"/></svg></button></div>
         <p class="cl-sub">Acessórios do Mutaninho</p>
-        <div class="cl-grade">${ACESSORIOS.filter((a) => !a.secreto || lerAcess().tem.includes(a.id)).map(cartaoLoja).join('')}<div class="cl-card breve"><div class="cl-prev"><span class="cl-int">?</span></div><b>Mais em breve</b><small>Novos acessórios por vir</small></div></div>`;
+        <div class="cl-grade">${ACESSORIOS.map(cartaoLoja).join('')}<div class="cl-card breve"><div class="cl-prev"><span class="cl-int">?</span></div><b>Mais em breve</b><small>Novos acessórios por vir</small></div></div>`;
       el.appendChild(loja);
       gsap.fromTo(loja, { yPercent: 105 }, { yPercent: 0, duration: 0.55, ease: 'power3.out' });
       gsap.from(loja.querySelectorAll('.cl-card'), { y: 30, opacity: 0, rotation: () => gsap.utils.random(-4, 4), duration: 0.5, ease: 'back.out(1.6)', stagger: 0.08, delay: 0.25 });
