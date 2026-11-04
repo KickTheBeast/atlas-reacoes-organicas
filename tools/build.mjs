@@ -373,7 +373,7 @@ const guias = GUIAS.map((g) => ({
 
 // ---------- mapas de reações (diagramas e jogo) ----------
 const no = (x) => ({ s: desenhar(x.s), n: x.nome, rg: x.rg, nt: x.nota || undefined, r: x.ramos ? x.ramos.map(no) : undefined });
-const mapas = DIAGRAMAS.map((d) => ({ id: d.id, curto: d.curto, t: d.titulo, sub: d.sub, c: { s: desenhar(d.centro.s), n: d.centro.nome }, r: d.ramos.map(no) }));
+const mapas = DIAGRAMAS.map((d) => ({ id: d.id, curto: d.curto, t: d.titulo, sub: d.sub, lg: d.legenda || undefined, c: { s: desenhar(d.centro.s), n: d.centro.nome }, r: d.ramos.map(no) }));
 
 // ---------- build ----------
 fs.mkdirSync(SITE, { recursive: true });

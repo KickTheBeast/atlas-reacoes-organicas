@@ -606,7 +606,7 @@ html.mo .item,html.mo .aula,html.mo .ficha,html.mo .guia-link,html.mo .nav-det a
 
 /* diagrama radial dos mapas */
 .rad-wrap{position:relative;margin:6px -4px 14px}
-.radial{overflow:auto;height:min(72vh,640px);min-height:380px;border-radius:20px;border:1px solid var(--bd);background:radial-gradient(circle at center,color-mix(in srgb,var(--ac) 7%,var(--card)),var(--card));-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.radial{overflow:auto;height:min(72vh,640px);min-height:300px;border-radius:20px;border:1px solid var(--bd);background:radial-gradient(circle at center,color-mix(in srgb,var(--ac) 7%,var(--card)),var(--card));-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .rad-tela{position:relative;transform-origin:0 0}
 .rad-arestas{position:absolute;inset:0;pointer-events:none}
 .rad-lin{stroke:var(--ac);stroke-width:2.2;stroke-linecap:round;fill:none}
@@ -627,3 +627,5 @@ html.mo .item,html.mo .aula,html.mo .ficha,html.mo .guia-link,html.mo .nav-det a
 .rad-nota b{display:block;font-size:.95rem}
 .rad-nota .rg{display:inline-block;margin:4px 0;font-weight:700;font-size:.8rem;padding:3px 9px;border-radius:10px;background:color-mix(in srgb,var(--ac) 14%,var(--card));border:1px solid color-mix(in srgb,var(--ac) 35%,transparent)}
 .rad-nota p{margin:0;color:var(--mut);font-size:.85rem;line-height:1.4}
+
+.mapa-lg{margin-top:-4px;padding:8px 12px;border-radius:12px;background:color-mix(in srgb,var(--ac) 10%,var(--card));border:1px solid color-mix(in srgb,var(--ac) 25%,transparent);font-size:.85rem}

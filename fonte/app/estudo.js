@@ -359,19 +359,26 @@
   // ----- diagrama radial: o composto de partida no centro, os produtos em volta, o reagente em cada seta -----
   function layoutRadial(m) {
     const folhas = (n) => (n.r && n.r.length ? n.r.reduce((t, c) => t + folhas(c), 0) : 1);
-    const R1 = Math.max(190, m.r.length * 38), PASSO = 200, EX = 1.32; // elipse: mais larga que alta, porque os rótulos são largos
+    const nR = m.r.length, R1 = nR > 7 ? 250 : Math.max(190, nR * 34), PASSO = 170, EX = 1.3; // elipse: mais larga que alta, porque os rótulos são largos
     const nos = [{ n: m.c.n, s: m.c.s, x: 0, y: 0, d: 0 }], arestas = [];
     const coloca = (pai, filhos, a0, a1, d) => {
       const tot = filhos.reduce((t, c) => t + folhas(c), 0); let a = a0;
       filhos.forEach((c) => {
-        const fa = ((a1 - a0) * folhas(c)) / tot, mid = a + fa / 2, r = R1 + (d - 1) * PASSO;
+        const fa = ((a1 - a0) * folhas(c)) / tot, mid = a + fa / 2;
+        const r = R1 + (d - 1) * PASSO - (d === 1 && nR > 7 && filhos.indexOf(c) % 2 ? 70 : 0); // com muitos ramos, alterna dois anéis para ficar compacto
         const no = { n: c.n, s: c.s, nt: c.nt, rg: c.rg, d, x: Math.cos(mid) * r * EX, y: Math.sin(mid) * r };
         nos.push(no); arestas.push({ de: pai, para: no, rg: c.rg });
         if (c.r) coloca(no, c.r, a, a + fa, d + 1);
         a += fa;
       });
     };
-    coloca(nos[0], m.r, -Math.PI / 2, (3 * Math.PI) / 2, 1);
+    // gira o anel para o ramo mais fundo ficar em cima: subir/descer custa menos largura que ir para os lados
+    const prof = (n) => 1 + Math.max(0, ...(n.r || []).map(prof));
+    const totF = m.r.reduce((t, c) => t + folhas(c), 0);
+    let acum = 0, ini = -Math.PI / 2;
+    const fundo = m.r.reduce((b, c) => (prof(c) * 100 + folhas(c) > prof(b) * 100 + folhas(b) ? c : b), m.r[0]);
+    for (const c of m.r) { const fa = (2 * Math.PI * folhas(c)) / totF; if (c === fundo) { ini = -Math.PI / 2 - (acum + fa / 2); break; } acum += fa; }
+    coloca(nos[0], m.r, ini, ini + 2 * Math.PI, 1);
     const LX = 70, LY = 70, PAD = 24;
     const x0 = Math.min(...nos.map((n) => n.x)) - LX - PAD, y0 = Math.min(...nos.map((n) => n.y)) - LY - PAD;
     nos.forEach((n) => { n.x -= x0; n.y -= y0; });
@@ -391,7 +398,7 @@
     const notas = L.nos.filter((n) => n.nt).map((n) => `<div class="rad-nota"><b>${esc(n.n)}</b><span class="rg">${esc(n.rg)}</span><p>${esc(n.nt)}</p></div>`).join('');
     return {
       titulo: 'Mapa', aba: 'mec', prof: 1,
-      html: `<h2 class="titulo-lista sobe">${esc(m.t)}</h2><p class="sub-lista sobe" style="--i:1">${esc(m.sub)}. Arraste para ver tudo.</p>
+      html: `<h2 class="titulo-lista sobe">${esc(m.t)}</h2><p class="sub-lista sobe" style="--i:1">${esc(m.sub)}. Arraste para ver tudo.</p>${m.lg ? `<p class="sub-lista mapa-lg">${esc(m.lg)}</p>` : ''}
         <div class="rad-wrap sobe" style="--i:2"><div class="radial" id="radial"><div class="rad-dim" id="rad-dim"><div class="rad-tela" id="rad-tela" style="width:${L.W}px;height:${L.H}px">
           <svg class="rad-arestas" width="${L.W}" height="${L.H}" aria-hidden="true"><defs><marker id="rad-ponta" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="rad-ponta" d="M1 1 L9 5 L1 9 L3 5 Z"/></marker></defs>${linhas}</svg>
           ${rgs}${nosHtml}</div></div></div>
@@ -404,6 +411,7 @@
           const cx = (cont.scrollLeft + cont.clientWidth / 2) / z, cy = (cont.scrollTop + cont.clientHeight / 2) / z;
           z = Math.min(1.4, Math.max(0.25, nz));
           dim.style.width = L.W * z + 'px'; dim.style.height = L.H * z + 'px'; tela.style.transform = `scale(${z})`;
+          cont.style.height = Math.min(innerHeight * 0.72, Math.max(300, L.H * z + 2)) + 'px'; // sem sobra em branco quando o mapa cabe
           const [px, py] = centro || [cx, cy];
           cont.scrollLeft = px * z - cont.clientWidth / 2; cont.scrollTop = py * z - cont.clientHeight / 2;
         };

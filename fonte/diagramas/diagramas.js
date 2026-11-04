@@ -16,27 +16,19 @@ window.DIAGRAMAS = [
     ],
   },
   {
-    id: 'diazonio', curto: 'N₂⁺', titulo: 'Do benzeno ao sal de diazônio',
-    sub: 'Nitração, redução e reações de Sandmeyer',
-    centro: { s: 'c1ccccc1', nome: 'Benzeno' },
-    ramos: [{
-      rg: 'HNO₃, H₂SO₄', s: 'O=[N+]([O-])c1ccccc1', nome: 'Nitrobenzeno',
-      ramos: [{
-        rg: 'H₂, Pt', s: 'Nc1ccccc1', nome: 'Anilina',
-        ramos: [{
-          rg: 'NaNO₂, HCl, 0–5 °C', s: 'c1ccccc1[N+]#N', nome: 'Cloreto de benzenodiazônio', nota: 'Só é estável a baixa temperatura; troca-se o N₂ por vários grupos.',
-          ramos: [
-            { rg: 'CuCl', s: 'Clc1ccccc1', nome: 'Clorobenzeno' },
-            { rg: 'CuBr', s: 'Brc1ccccc1', nome: 'Bromobenzeno' },
-            { rg: 'KI', s: 'Ic1ccccc1', nome: 'Iodobenzeno' },
-            { rg: 'HBF₄, Δ', s: 'Fc1ccccc1', nome: 'Fluorobenzeno' },
-            { rg: 'CuCN', s: 'N#Cc1ccccc1', nome: 'Benzonitrila', ramos: [{ rg: '1) LiAlH₄  2) H₂O', s: 'NCc1ccccc1', nome: 'Benzilamina' }] },
-            { rg: 'H₂O, Δ', s: 'Oc1ccccc1', nome: 'Fenol' },
-            { rg: 'H₃PO₂', s: 'c1ccccc1', nome: 'Benzeno', nota: 'Remove o grupo diazônio e devolve o H: útil para usar o –NH₂ só como diretor.' },
-          ],
-        }],
-      }],
-    }],
+    id: 'diazonio', curto: 'N₂⁺', titulo: 'Sal de diazônio: o grande ponto de partida',
+    sub: 'Reações de Sandmeyer e afins',
+    legenda: 'Como chegar nele: benzeno → (HNO₃, H₂SO₄) nitrobenzeno → (H₂, Pt) anilina → (NaNO₂, HCl, 0–5 °C) sal de diazônio.',
+    centro: { s: 'c1ccccc1[N+]#N', nome: 'Cloreto de benzenodiazônio' },
+    ramos: [
+      { rg: 'CuCl', s: 'Clc1ccccc1', nome: 'Clorobenzeno' },
+      { rg: 'CuBr', s: 'Brc1ccccc1', nome: 'Bromobenzeno' },
+      { rg: 'KI', s: 'Ic1ccccc1', nome: 'Iodobenzeno' },
+      { rg: 'HBF₄, Δ', s: 'Fc1ccccc1', nome: 'Fluorobenzeno' },
+      { rg: 'CuCN', s: 'N#Cc1ccccc1', nome: 'Benzonitrila', ramos: [{ rg: '1) LiAlH₄  2) H₂O', s: 'NCc1ccccc1', nome: 'Benzilamina' }] },
+      { rg: 'H₂O, Δ', s: 'Oc1ccccc1', nome: 'Fenol' },
+      { rg: 'H₃PO₂', s: 'c1ccccc1', nome: 'Benzeno', nota: 'Remove o grupo diazônio e devolve o H: útil para usar o –NH₂ só como diretor.' },
+    ],
   },
   {
     id: 'tolueno', curto: 'Tol', titulo: 'Tolueno: anel e cadeia lateral',
@@ -52,17 +44,22 @@ window.DIAGRAMAS = [
       { rg: 'NBS, hν', s: 'BrCc1ccccc1', nome: 'Brometo de benzila', nota: 'Bromação radicalar na posição benzílica.',
         ramos: [
           { rg: 'NaOCH₂CH₃', s: 'CCOCc1ccccc1', nome: 'Benzil etil éter', nota: 'SN2 acelerada pelo anel.' },
-          { rg: 'CH₃C≡CNa', s: 'CC#CCc1ccccc1', nome: '1-Fenilbut-2-ino', nota: 'O acetileto é nucleófilo e faz SN2.',
-            ramos: [
-              { rg: 'H₂, Pd/CaCO₃ (Lindlar)', s: 'C/C=C\\Cc1ccccc1', nome: '(Z)-1-Fenilbut-2-eno' },
-              { rg: 'Na, NH₃ (l)', s: 'C/C=C/Cc1ccccc1', nome: '(E)-1-Fenilbut-2-eno' },
-              { rg: 'H₂ (excesso), Pt', s: 'CCCCc1ccccc1', nome: 'Butilbenzeno' },
-              { rg: 'Br₂ (1 equiv.)', s: 'CC(Br)=C(Br)Cc1ccccc1', nome: 'Dibromoalqueno' },
-            ] },
         ] },
       { rg: 'Cl₂, FeCl₃', s: 'Cc1ccc(Cl)cc1', nome: '4-Clorotolueno', nota: 'O –CH₃ é orto/para dirigente (forma também o 2-cloro).' },
       { rg: 'Br₂, FeBr₃', s: 'Cc1ccc(Br)cc1', nome: '4-Bromotolueno' },
       { rg: 'H₂SO₄ conc., Δ', s: 'Cc1ccc(S(=O)(=O)O)cc1', nome: 'Ácido 4-metilbenzenossulfônico' },
+    ],
+  },
+  {
+    id: 'alcino-benzilico', curto: 'C≡C', titulo: 'Alcino benzílico: o que ele pode virar',
+    sub: 'Redução (cis, trans, alcano) e adição de bromo',
+    legenda: 'Como chegar nele: tolueno → (NBS, hν) brometo de benzila → (CH₃C≡CNa) 1-fenilbut-2-ino.',
+    centro: { s: 'CC#CCc1ccccc1', nome: '1-Fenilbut-2-ino' },
+    ramos: [
+      { rg: 'H₂, Pd/CaCO₃ (Lindlar)', s: 'C/C=C\\Cc1ccccc1', nome: '(Z)-1-Fenilbut-2-eno' },
+      { rg: 'Na, NH₃ (l)', s: 'C/C=C/Cc1ccccc1', nome: '(E)-1-Fenilbut-2-eno' },
+      { rg: 'H₂ (excesso), Pt', s: 'CCCCc1ccccc1', nome: 'Butilbenzeno' },
+      { rg: 'Br₂ (1 equiv.)', s: 'CC(Br)=C(Br)Cc1ccccc1', nome: 'Dibromoalqueno' },
     ],
   },
   {
