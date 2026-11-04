@@ -384,6 +384,24 @@
     nos.forEach((n) => { n.x -= x0; n.y -= y0; });
     return { nos, arestas, W: Math.max(...nos.map((n) => n.x)) + LX + PAD, H: Math.max(...nos.map((n) => n.y)) + LY + PAD };
   }
+  function zoomRadial(L) {
+    const cont = $('#radial'), dim = $('#rad-dim'), tela = $('#rad-tela');
+        let z = 1;
+        const aplica = (nz, centro) => {
+          const cx = (cont.scrollLeft + cont.clientWidth / 2) / z, cy = (cont.scrollTop + cont.clientHeight / 2) / z;
+          z = Math.min(1.4, Math.max(0.25, nz));
+          dim.style.width = L.W * z + 'px'; dim.style.height = L.H * z + 'px'; tela.style.transform = `scale(${z})`;
+          cont.style.height = Math.min(innerHeight * 0.72, Math.max(300, L.H * z + 2)) + 'px'; // sem sobra em branco quando o mapa cabe
+          const [px, py] = centro || [cx, cy];
+          cont.scrollLeft = px * z - cont.clientWidth / 2; cont.scrollTop = py * z - cont.clientHeight / 2;
+        };
+        const raiz = L.nos[0];
+        const ajusta = () => aplica(Math.min(1, Math.max(0.78, cont.clientWidth / L.W)), [raiz.x, raiz.y]);
+        ajusta();
+        $('#rad-mais').addEventListener('click', () => aplica(z * 1.2));
+        $('#rad-menos').addEventListener('click', () => aplica(z / 1.2));
+        $('#rad-fit').addEventListener('click', () => aplica(Math.min(1.4, Math.max(0.25, Math.min(cont.clientWidth / L.W, cont.clientHeight / L.H))), [L.W / 2, L.H / 2]));
+  }
   function telaMapa(id) {
     const m = mapaPorId(id); if (!m) return null;
     const L = layoutRadial(m);
@@ -405,22 +423,7 @@
           <div class="rad-ctl"><button id="rad-mais" aria-label="Aumentar">+</button><button id="rad-menos" aria-label="Diminuir">−</button><button id="rad-fit" aria-label="Ajustar à tela">⤢</button></div></div>
         ${notas ? `<div class="sec"><h3>Para lembrar</h3><span>${plural(L.nos.filter((n) => n.nt).length, 'nota', 'notas')}</span></div>${notas}` : ''}`,
       depois: () => {
-        const cont = $('#radial'), dim = $('#rad-dim'), tela = $('#rad-tela');
-        let z = 1;
-        const aplica = (nz, centro) => {
-          const cx = (cont.scrollLeft + cont.clientWidth / 2) / z, cy = (cont.scrollTop + cont.clientHeight / 2) / z;
-          z = Math.min(1.4, Math.max(0.25, nz));
-          dim.style.width = L.W * z + 'px'; dim.style.height = L.H * z + 'px'; tela.style.transform = `scale(${z})`;
-          cont.style.height = Math.min(innerHeight * 0.72, Math.max(300, L.H * z + 2)) + 'px'; // sem sobra em branco quando o mapa cabe
-          const [px, py] = centro || [cx, cy];
-          cont.scrollLeft = px * z - cont.clientWidth / 2; cont.scrollTop = py * z - cont.clientHeight / 2;
-        };
-        const raiz = L.nos[0];
-        const ajusta = () => aplica(Math.min(1, Math.max(0.78, cont.clientWidth / L.W)), [raiz.x, raiz.y]);
-        ajusta();
-        $('#rad-mais').addEventListener('click', () => aplica(z * 1.2));
-        $('#rad-menos').addEventListener('click', () => aplica(z / 1.2));
-        $('#rad-fit').addEventListener('click', () => aplica(Math.min(1.4, Math.max(0.25, Math.min(cont.clientWidth / L.W, cont.clientHeight / L.H))), [L.W / 2, L.H / 2]));
+        zoomRadial(L);
         mo(document.querySelectorAll('.rad-in'), { opacity: [0, 1], scale: [0.7, 1] }, { type: 'spring', stiffness: 300, damping: 22, delay: M && M.stagger ? M.stagger(0.05, { startDelay: 0.1 }) : 0 });
         mo(document.querySelectorAll('.rad-lin,.rad-rg'), { opacity: [0, 1] }, { duration: 0.4, delay: M && M.stagger ? M.stagger(0.03, { startDelay: 0.3 }) : 0 });
       },
@@ -437,19 +440,26 @@
   }
   function telaJogoMapa(id) {
     const m = mapaPorId(id); if (!m) return null;
-    let k = 0; const arestas = [];
-    const no = (n, raiz) => `<div class="mp-no${raiz ? ' raiz' : ''}">${tile(n.s, 0)}<div class="mp-tx"><b>${esc(n.n)}</b></div></div>`;
-    const ramos = (lista) => `<div class="mp-filhos">${lista.map((n) => {
-      const i = k++; arestas[i] = n.rg;
-      return `<div class="mp-ramo"><div class="mp-rg">${SETA_MP}<button class="mp-slot" data-slot="${i}"><span>?</span></button></div>${no(n)}${n.r ? ramos(n.r) : ''}</div>`;
-    }).join('')}</div>`;
+    const L = layoutRadial(m);
+    const arestas = L.arestas.map((e) => e.rg);
+    const linhas = L.arestas.map((e) => {
+      const dx = e.para.x - e.de.x, dy = e.para.y - e.de.y, len = Math.hypot(dx, dy), ux = dx / len, uy = dy / len;
+      const ini = [e.de.x + ux * (e.de.d ? 58 : 66), e.de.y + uy * (e.de.d ? 52 : 60)], fim = [e.para.x - ux * 64, e.para.y - uy * 58];
+      e.lx = ini[0] + (fim[0] - ini[0]) * 0.52; e.ly = ini[1] + (fim[1] - ini[1]) * 0.52;
+      return `<line class="rad-lin" x1="${ini[0].toFixed(1)}" y1="${ini[1].toFixed(1)}" x2="${fim[0].toFixed(1)}" y2="${fim[1].toFixed(1)}" marker-end="url(#rad-ponta)"/>`;
+    }).join('');
+    const nosHtml = L.nos.map((n) => `<div class="rad-no${n.d ? '' : ' raiz'}" style="left:${n.x.toFixed(1)}px;top:${n.y.toFixed(1)}px"><div class="rad-in">${tile(n.s, 0)}<b>${esc(n.n)}</b></div></div>`).join('');
+    const slots = L.arestas.map((e, i) => `<div class="rad-rg jogo" style="left:${e.lx.toFixed(1)}px;top:${e.ly.toFixed(1)}px"><button class="mp-slot" data-slot="${i}"><span>?</span></button></div>`).join('');
     return {
       titulo: 'Jogo', aba: 'estudar', prof: 2,
       html: `<h2 class="titulo-lista sobe">${esc(m.t)}</h2><p class="sub-lista sobe" style="--i:1">Toque num reagente e depois no <b>?</b> da seta certa (ou o contrário). Toque num reagente colocado para tirá-lo.</p>
         <div class="mp-banco" id="mp-banco"></div>
-        <div class="mapa jogo">${no(m.c, true)}${ramos(m.r)}</div>
+        <div class="rad-wrap sobe" style="--i:2"><div class="radial" id="radial"><div class="rad-dim" id="rad-dim"><div class="rad-tela" id="rad-tela" style="width:${L.W}px;height:${L.H}px">
+          <svg class="rad-arestas" width="${L.W}" height="${L.H}" aria-hidden="true"><defs><marker id="rad-ponta" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="rad-ponta" d="M1 1 L9 5 L1 9 L3 5 Z"/></marker></defs>${linhas}</svg>
+          ${nosHtml}${slots}</div></div></div>
+          <div class="rad-ctl"><button id="rad-mais" aria-label="Aumentar">+</button><button id="rad-menos" aria-label="Diminuir">−</button><button id="rad-fit" aria-label="Ajustar à tela">⤢</button></div></div>
         <div class="mp-fim"><div id="mp-res" aria-live="polite"></div><div class="resumo-acoes"><button class="btn-grande pequeno" id="mp-verif"><b>Verificar</b></button><button class="btn" id="mp-reinicia">Recomeçar</button></div></div>`,
-      depois: () => iniciaJogoMapa(m, arestas),
+      depois: () => { zoomRadial(L); iniciaJogoMapa(m, arestas); },
     };
   }
   function iniciaJogoMapa(m, arestas) {
@@ -479,7 +489,7 @@
       const ci = +b.dataset.chip;
       if (selSlot !== null) poe(ci, selSlot); else { selChip = selChip === ci ? null : ci; pinta(); }
     });
-    document.querySelector('.mapa.jogo').addEventListener('click', (e) => {
+    document.querySelector('#rad-tela').addEventListener('click', (e) => {
       const b = e.target.closest('.mp-slot'); if (!b) return;
       const k = +b.dataset.slot;
       if (selChip !== null) { poe(selChip, k); return; }

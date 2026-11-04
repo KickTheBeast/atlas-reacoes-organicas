@@ -51,6 +51,18 @@ const AULAS = {
   '08': 'Eliminação α, Carbenos, Radicais e Redução de Alcinos',
   '09': 'Adição Eletrofílica de Alcenos (p1)',
   '10': 'Adição Eletrofílica de Alcenos (p2)',
+  '11': 'Exercícios de Revisão (SN/E, alcenos, alcinos)',
+  '13': 'Posição Benzílica e Substituição Eletrofílica Aromática',
+  '14': 'Orientação em SEAr, Aminas e Sais de Diazônio',
+  '15': 'Acoplamento Azo e Fenóis',
+  '16': 'Reações de Fenóis e Éteres',
+  '17': 'Substituição Nucleofílica Aromática',
+  '18': 'Orbitais e Adição Conjugada (p1)',
+  '19': 'Adição Conjugada (p2) e Cupratos',
+  '20': 'Enóis e Enolatos',
+  '21': 'Reações de Enóis e Enolatos',
+  '22': 'Condensações de Compostos Carbonílicos',
+  '23': 'Exercícios finais',
 };
 function idAula(txt) {
   const m = /Aula\s+(\d+)([ab]?)/i.exec(txt || '');

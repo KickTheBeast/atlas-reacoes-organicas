@@ -12,6 +12,15 @@ window.CATEGORIES = [
   { id: 'radicais', nome: 'Radicais' },
   { id: 'reducao-alcinos', nome: 'Redução de alcinos' },
   { id: 'mecanismos-gerais', nome: 'Mecanismos gerais' },
+  { id: 'aromaticidade', nome: 'Aromaticidade' },
+  { id: 'cadeia-lateral', nome: 'Posição benzílica e Birch' },
+  { id: 'sea', nome: 'Substituição eletrofílica aromática' },
+  { id: 'diazonio', nome: 'Sais de diazônio' },
+  { id: 'fenois-eteres', nome: 'Fenóis e éteres' },
+  { id: 'san', nome: 'Substituição nucleofílica aromática' },
+  { id: 'adicao-conjugada', nome: 'Adição conjugada' },
+  { id: 'enolatos', nome: 'Enóis e enolatos' },
+  { id: 'condensacao', nome: 'Condensação de carbonílicos' },
 ];
 
 window.REACTIONS = [
