@@ -1,8 +1,8 @@
 // Prefixa todas as regras do tema.css com :root[data-visual="vidro"], para o tema Vidro só valer quando escolhido.
 import postcss from 'postcss';
-export function escopaVidro(css) {
+export function escopaVidro(css, nome = 'vidro') {
   const raiz = postcss.parse(css);
-  const P = ':root[data-visual="vidro"]';
+  const P = `:root[data-visual="${nome}"]`;
   raiz.walkRules((r) => {
     if (r.parent && r.parent.type === 'atrule' && /keyframes$/i.test(r.parent.name)) return;
     r.selectors = r.selectors.map((s) => {

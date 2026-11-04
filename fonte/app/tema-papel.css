@@ -1,0 +1,92 @@
+/* ===== TEMA "ARTIGO": papel envelhecido, tipografia serifada, tabelas e legendas de artigo científico (retrô) ===== */
+:root{
+  --bg:#f1ead8;--card:#f8f3e5;--ink:#1d1a14;--mut:#5b5446;--faint:#8c8470;--bd:#2a251b;--bd2:#b9ae92;
+  --ac:#1f5a3c;--ac-ink:#f8f3e5;--ac-soft:#e4e8d4;
+  --nu:#1d4f91;--nu-soft:#dfe5ee;--el:#9a4a12;--el-soft:#efe0cb;--mec:#6a3a8c;--mec-soft:#e7dde9;
+  --r:2px;--sombra:none;--topo:58px;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;
+  --mono:"Courier New",Courier,ui-monospace,monospace;
+  --regra:1px solid #2a251b;
+  --papel-ruido:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='3'/><feColorMatrix values='0 0 0 0 .35  0 0 0 0 .28  0 0 0 0 .15  0 0 0 .22 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+body{font-family:var(--serif);font-size:16.5px;line-height:1.55;background-color:var(--bg);background-image:var(--papel-ruido),radial-gradient(120% 70% at 50% 0%,rgba(255,250,235,.7),transparent 70%),linear-gradient(90deg,rgba(120,95,50,.07),transparent 6%,transparent 94%,rgba(120,95,50,.07));color:var(--ink);letter-spacing:0;overscroll-behavior-y:none}
+body *{font-variant-numeric:oldstyle-nums}
+.tela{counter-reset:fig sec}
+/* topo: cabeçalho corrente de periódico */
+.topo{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none;border-bottom:3px double #2a251b;border-color:#2a251b}
+.topo.rolou{border-color:#2a251b}
+.topo h1{font-family:var(--serif);font-variant:small-caps;font-weight:700;font-size:1.02rem;letter-spacing:.07em;text-align:center}
+.topo .icone-btn{border-radius:2px;background:transparent;box-shadow:none;border:0}
+.topo .icone-btn svg{stroke-width:1.6}
+/* dock: barra de abas de índice de livro */
+.abas{left:0;right:0;bottom:0;transform:none;width:100%;max-width:none;height:calc(54px + var(--seg));padding:0 6px var(--seg);border-radius:0;background:var(--bg);border:0;border-top:3px double #2a251b;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;animation:none}
+.abas::before{display:none}
+.pilula{border-radius:0;top:0;bottom:var(--seg);background:transparent;border:1px solid #2a251b;border-top:0;background:var(--card);box-shadow:none;margin:0}
+.abas a{font-family:var(--serif);font-variant:small-caps;font-size:.66rem;letter-spacing:0;font-weight:600;color:var(--mut)}
+.abas a.on{color:var(--ink)}
+main{padding-bottom:calc(var(--aba) + var(--seg) + 36px)}
+/* blocos: quadros com filete, sem sombra */
+.cartao,.item,.aula,.ficha,.busca-falsa,.atalho,.aula-card,.modo,.reag,.cl-card,.mp-banco,.visual,.aviso{background:var(--card);border:var(--regra);border-top-width:3px;border-top-style:double;border-radius:2px;box-shadow:none;transition:background .15s}
+.aula:active,.item:active,.atalho:active,.aula-card:active,.modo:active,.ficha:active{background:#ece3c9;transform:none}
+.item{border-left:var(--regra)}
+.ficha{border-left:4px solid var(--ac)}
+.item b,.aula .tx b,.aula-card b,.ficha b{font-weight:700}
+.item .linha,.sec h3,.capa-tag,.stats span,.ac-num,.chip,.etq,.mini-prog+*{font-variant:small-caps;letter-spacing:.06em}
+/* seções numeradas */
+.sec{margin:26px 0 10px;border-bottom:var(--regra);padding-bottom:3px}
+.sec h3{font-size:.92rem;color:var(--ink);font-weight:700;text-transform:none;letter-spacing:.08em;font-variant:small-caps}
+.sec h3::before{counter-increment:sec;content:counter(sec) ". ";}
+.sec span{font-style:italic;color:var(--mut);font-size:.82rem}
+.titulo-lista{font-weight:700;font-size:1.6rem;letter-spacing:-.01em;line-height:1.15}
+.sub-lista{font-style:italic;color:var(--mut)}
+/* capa: bloco de título de artigo */
+.capa{background:transparent;border:0;border-top:3px double #2a251b;border-bottom:3px double #2a251b;border-radius:0;box-shadow:none;color:var(--ink);padding:22px 4px 18px;margin:6px 0 14px;text-align:center;overflow:visible}
+.capa::before,.capa::after{display:none}
+.capa .hex{display:none}
+.capa-tag{background:none;color:var(--mut);padding:0;font-size:.74rem;display:block;font-style:italic;text-transform:none;letter-spacing:.04em}
+.capa h2{font-family:var(--serif);font-weight:700;font-size:2.15rem;line-height:1.08;letter-spacing:-.015em;margin:10px 0 6px;color:var(--ink)}
+.capa h2::after{content:"";display:block;width:70px;margin:12px auto 0;border-top:1px solid #2a251b}
+.capa p{font-style:italic;color:var(--mut);opacity:1;max-width:none;margin:0 auto}
+.capa-busca{background:transparent;border:0;border-bottom:1px solid #2a251b;border-radius:0;color:var(--mut);box-shadow:none;font-family:var(--serif);font-style:italic;-webkit-backdrop-filter:none;backdrop-filter:none;padding:0 4px;height:42px}
+.capa .stats{justify-content:center;gap:0;margin-top:14px;border-top:1px solid #2a251b;border-bottom:1px solid #2a251b}
+.capa .stats>div{flex:1;padding:8px 4px;border:0;border-right:1px solid #2a251b;background:none}
+.capa .stats>div:last-child{border-right:0}
+.capa .stats b{color:var(--ink);font-size:1.3rem}
+.capa .stats span{color:var(--mut);opacity:1;text-transform:none}
+/* ícones viram selos de tinta */
+.at-ic,.md-ic,.aula .num,.ac-num,.jogo-ic{background:transparent!important;color:var(--ac)!important;border:1px solid var(--ac);border-radius:50%;box-shadow:none;font-family:var(--serif)}
+.ac-num{border-radius:2px;height:28px}
+.aula .num{border-radius:50%}
+.chip,.sel-estudo,.trans-sel select,.campo input,.mp-chip{background:transparent;border:1px solid #2a251b;border-radius:2px;box-shadow:none;font-family:var(--serif);font-size:.82rem;color:var(--ink)}
+.chip.on,.mp-chip.sel{background:var(--ink);color:var(--card);border-color:var(--ink);box-shadow:none}
+.modo-busca,.tema{background:transparent;border:1px solid #2a251b;border-radius:2px;box-shadow:none;padding:0;gap:0}
+.modo-busca a,.tema button{border-radius:0;border-right:1px solid #2a251b;font-variant:small-caps}
+.modo-busca a:last-child,.tema button:last-child{border-right:0}
+.modo-busca a.on,.tema button.on{background:var(--ink);color:var(--card);box-shadow:none}
+.btn-grande,.btn-aviso,.cr-lojabtn,.btn{background:var(--ink);color:var(--card);border:1px solid var(--ink);border-radius:2px;box-shadow:none;font-variant:small-caps;letter-spacing:.06em}
+.btn{background:transparent;color:var(--ink)}
+.guia-link{background:var(--card);color:var(--ink);border:var(--regra);border-top:3px double #2a251b;border-radius:2px;box-shadow:none}
+.guia-link .gl-ic{background:transparent;border:1px solid var(--ink);border-radius:2px}
+.guia-link .seta-ir{stroke:var(--ink)}
+.hero{background:var(--card);color:var(--ink);border:var(--regra);border-radius:2px;box-shadow:none}
+.hero .hex{display:none}
+/* esquemas como figuras com legenda */
+.esquema,.mapa{counter-increment:fig}
+.esquema::after{content:"Figura " counter(fig) ". Esquema da reação (reagentes → produtos)."}
+.esquema::after,.rad-wrap::after{display:block;margin-top:8px;font-size:.78rem;font-style:italic;color:var(--mut);text-align:left;width:100%}
+.rad-wrap::after{content:"Figura. Mapa de reações a partir do composto central."}
+.tile{background:#fff;border:1px solid #2a251b;border-radius:0;box-shadow:none}
+.seta .rg,.rg{font-family:var(--mono);font-size:.8rem;font-weight:700}
+.seta .cd,.cd{font-style:italic}
+.etq{background:transparent!important;border:1px solid currentColor;border-radius:2px}
+.radial{border:var(--regra);border-radius:2px;background:var(--card);box-shadow:none}
+.rad-lin{stroke:#2a251b;stroke-width:1.4}.rad-ponta{fill:#2a251b}
+.rad-rg span,.mp-slot{background:var(--card);border:1px solid #2a251b;border-radius:2px;box-shadow:none;font-family:var(--mono);font-size:.72rem}
+.mini-prog{background:transparent;border:1px solid #2a251b;border-radius:0;height:7px}.mini-prog i{background:repeating-linear-gradient(45deg,var(--ink),var(--ink) 2px,transparent 2px,transparent 4px);border-radius:0}
+.rodape,.tela small{font-style:italic}
+.visual{text-align:left}
+.visual.on{border-color:var(--ac);outline:2px solid var(--ac)}
+.visual i{border-radius:0;border:1px solid #2a251b}
+.visual.v-papel i{background:var(--bg) var(--papel-ruido)}
+.nt,.nota,.notas p{font-size:.94rem}
+::selection{background:#c8d9a6}

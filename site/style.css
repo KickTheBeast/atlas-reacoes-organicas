@@ -4920,8 +4920,527 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
   }
 }
 
+:root[data-visual="papel"] {
+  --bg: #f1ead8;
+  --card: #f8f3e5;
+  --ink: #1d1a14;
+  --mut: #5b5446;
+  --faint: #8c8470;
+  --bd: #2a251b;
+  --bd2: #b9ae92;
+  --ac: #1f5a3c;
+  --ac-ink: #f8f3e5;
+  --ac-soft: #e4e8d4;
+  --nu: #1d4f91;
+  --nu-soft: #dfe5ee;
+  --el: #9a4a12;
+  --el-soft: #efe0cb;
+  --mec: #6a3a8c;
+  --mec-soft: #e7dde9;
+  --r: 2px;
+  --sombra: none;
+  --topo: 58px;
+  --serif: "Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;
+  --mono: "Courier New",Courier,ui-monospace,monospace;
+  --regra: 1px solid #2a251b;
+  --papel-ruido: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='3'/><feColorMatrix values='0 0 0 0 .35  0 0 0 0 .28  0 0 0 0 .15  0 0 0 .22 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+:root[data-visual="papel"] body {
+  font-family: var(--serif);
+  background-color: var(--bg);
+  background-image: var(--papel-ruido),radial-gradient(120% 70% at 50% 0%,#fffaebb3,transparent 70%),linear-gradient(90deg,#785f3212,transparent 6%,transparent 94%,#785f3212);
+  color: var(--ink);
+  letter-spacing: 0;
+  overscroll-behavior-y: none;
+  font-size: 16.5px;
+  line-height: 1.55;
+}
+
+:root[data-visual="papel"] body * {
+  font-variant-numeric: oldstyle-nums;
+}
+
+:root[data-visual="papel"] .tela {
+  counter-reset: fig sec;
+}
+
+:root[data-visual="papel"] .topo {
+  background: var(--bg);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border-color: #2a251b;
+  border-bottom-style: double;
+  border-bottom-width: 3px;
+}
+
+:root[data-visual="papel"] .topo.rolou {
+  border-color: #2a251b;
+}
+
+:root[data-visual="papel"] .topo h1 {
+  font-family: var(--serif);
+  font-variant: small-caps;
+  letter-spacing: .07em;
+  text-align: center;
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+
+:root[data-visual="papel"] .topo .icone-btn {
+  box-shadow: none;
+  background: none;
+  border: 0;
+  border-radius: 2px;
+}
+
+:root[data-visual="papel"] .topo .icone-btn svg {
+  stroke-width: 1.6px;
+}
+
+:root[data-visual="papel"] .abas {
+  width: 100%;
+  max-width: none;
+  height: calc(54px + var(--seg));
+  padding: 0 6px var(--seg);
+  background: var(--bg);
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border: 0;
+  border-top: 3px double #2a251b;
+  border-radius: 0;
+  animation: none;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  transform: none;
+}
+
+:root[data-visual="papel"] .abas:before {
+  display: none;
+}
+
+:root[data-visual="papel"] .pilula {
+  top: 0;
+  bottom: var(--seg);
+  background: none;
+  background: var(--card);
+  box-shadow: none;
+  border: 1px solid #2a251b;
+  border-top: 0;
+  border-radius: 0;
+  margin: 0;
+}
+
+:root[data-visual="papel"] .abas a {
+  font-family: var(--serif);
+  font-variant: small-caps;
+  letter-spacing: 0;
+  color: var(--mut);
+  font-size: .66rem;
+  font-weight: 600;
+}
+
+:root[data-visual="papel"] .abas a.on {
+  color: var(--ink);
+}
+
+:root[data-visual="papel"] main {
+  padding-bottom: calc(var(--aba) + var(--seg) + 36px);
+}
+
+:root[data-visual="papel"] .cartao, :root[data-visual="papel"] .item, :root[data-visual="papel"] .aula, :root[data-visual="papel"] .ficha, :root[data-visual="papel"] .busca-falsa, :root[data-visual="papel"] .atalho, :root[data-visual="papel"] .aula-card, :root[data-visual="papel"] .modo, :root[data-visual="papel"] .reag, :root[data-visual="papel"] .cl-card, :root[data-visual="papel"] .mp-banco, :root[data-visual="papel"] .visual, :root[data-visual="papel"] .aviso {
+  background: var(--card);
+  border: var(--regra);
+  box-shadow: none;
+  border-top-style: double;
+  border-top-width: 3px;
+  border-radius: 2px;
+  transition: background .15s;
+}
+
+:root[data-visual="papel"] .aula:active, :root[data-visual="papel"] .item:active, :root[data-visual="papel"] .atalho:active, :root[data-visual="papel"] .aula-card:active, :root[data-visual="papel"] .modo:active, :root[data-visual="papel"] .ficha:active {
+  background: #ece3c9;
+  transform: none;
+}
+
+:root[data-visual="papel"] .item {
+  border-left: var(--regra);
+}
+
+:root[data-visual="papel"] .ficha {
+  border-left: 4px solid var(--ac);
+}
+
+:root[data-visual="papel"] .item b, :root[data-visual="papel"] .aula .tx b, :root[data-visual="papel"] .aula-card b, :root[data-visual="papel"] .ficha b {
+  font-weight: 700;
+}
+
+:root[data-visual="papel"] .item .linha, :root[data-visual="papel"] .sec h3, :root[data-visual="papel"] .capa-tag, :root[data-visual="papel"] .stats span, :root[data-visual="papel"] .ac-num, :root[data-visual="papel"] .chip, :root[data-visual="papel"] .etq, :root[data-visual="papel"] .mini-prog + * {
+  font-variant: small-caps;
+  letter-spacing: .06em;
+}
+
+:root[data-visual="papel"] .sec {
+  border-bottom: var(--regra);
+  margin: 26px 0 10px;
+  padding-bottom: 3px;
+}
+
+:root[data-visual="papel"] .sec h3 {
+  color: var(--ink);
+  text-transform: none;
+  letter-spacing: .08em;
+  font-variant: small-caps;
+  font-size: .92rem;
+  font-weight: 700;
+}
+
+:root[data-visual="papel"] .sec h3:before {
+  counter-increment: sec;
+  content: counter(sec) ". ";
+}
+
+:root[data-visual="papel"] .sec span {
+  color: var(--mut);
+  font-size: .82rem;
+  font-style: italic;
+}
+
+:root[data-visual="papel"] .titulo-lista {
+  letter-spacing: -.01em;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+:root[data-visual="papel"] .sub-lista {
+  color: var(--mut);
+  font-style: italic;
+}
+
+:root[data-visual="papel"] .capa {
+  box-shadow: none;
+  color: var(--ink);
+  text-align: center;
+  background: none;
+  border: 3px double #2a251b;
+  border-left: 0;
+  border-right: 0;
+  border-radius: 0;
+  margin: 6px 0 14px;
+  padding: 22px 4px 18px;
+  overflow: visible;
+}
+
+:root[data-visual="papel"] .capa:before, :root[data-visual="papel"] .capa:after, :root[data-visual="papel"] .capa .hex {
+  display: none;
+}
+
+:root[data-visual="papel"] .capa-tag {
+  color: var(--mut);
+  text-transform: none;
+  letter-spacing: .04em;
+  background: none;
+  padding: 0;
+  font-size: .74rem;
+  font-style: italic;
+  display: block;
+}
+
+:root[data-visual="papel"] .capa h2 {
+  font-family: var(--serif);
+  letter-spacing: -.015em;
+  color: var(--ink);
+  margin: 10px 0 6px;
+  font-size: 2.15rem;
+  font-weight: 700;
+  line-height: 1.08;
+}
+
+:root[data-visual="papel"] .capa h2:after {
+  content: "";
+  border-top: 1px solid #2a251b;
+  width: 70px;
+  margin: 12px auto 0;
+  display: block;
+}
+
+:root[data-visual="papel"] .capa p {
+  color: var(--mut);
+  opacity: 1;
+  max-width: none;
+  margin: 0 auto;
+  font-style: italic;
+}
+
+:root[data-visual="papel"] .capa-busca {
+  color: var(--mut);
+  box-shadow: none;
+  font-family: var(--serif);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid #2a251b;
+  border-radius: 0;
+  height: 42px;
+  padding: 0 4px;
+  font-style: italic;
+}
+
+:root[data-visual="papel"] .capa .stats {
+  border-top: 1px solid #2a251b;
+  border-bottom: 1px solid #2a251b;
+  justify-content: center;
+  gap: 0;
+  margin-top: 14px;
+}
+
+:root[data-visual="papel"] .capa .stats > div {
+  background: none;
+  border: 0;
+  border-right: 1px solid #2a251b;
+  flex: 1;
+  padding: 8px 4px;
+}
+
+:root[data-visual="papel"] .capa .stats > div:last-child {
+  border-right: 0;
+}
+
+:root[data-visual="papel"] .capa .stats b {
+  color: var(--ink);
+  font-size: 1.3rem;
+}
+
+:root[data-visual="papel"] .capa .stats span {
+  color: var(--mut);
+  opacity: 1;
+  text-transform: none;
+}
+
+:root[data-visual="papel"] .at-ic, :root[data-visual="papel"] .md-ic, :root[data-visual="papel"] .aula .num, :root[data-visual="papel"] .ac-num, :root[data-visual="papel"] .jogo-ic {
+  border: 1px solid var(--ac);
+  box-shadow: none;
+  font-family: var(--serif);
+  border-radius: 50%;
+  color: var(--ac) !important;
+  background: none !important;
+}
+
+:root[data-visual="papel"] .ac-num {
+  border-radius: 2px;
+  height: 28px;
+}
+
+:root[data-visual="papel"] .aula .num {
+  border-radius: 50%;
+}
+
+:root[data-visual="papel"] .chip, :root[data-visual="papel"] .sel-estudo, :root[data-visual="papel"] .trans-sel select, :root[data-visual="papel"] .campo input, :root[data-visual="papel"] .mp-chip {
+  box-shadow: none;
+  font-family: var(--serif);
+  color: var(--ink);
+  background: none;
+  border: 1px solid #2a251b;
+  border-radius: 2px;
+  font-size: .82rem;
+}
+
+:root[data-visual="papel"] .chip.on, :root[data-visual="papel"] .mp-chip.sel {
+  background: var(--ink);
+  color: var(--card);
+  border-color: var(--ink);
+  box-shadow: none;
+}
+
+:root[data-visual="papel"] .modo-busca, :root[data-visual="papel"] .tema {
+  box-shadow: none;
+  background: none;
+  border: 1px solid #2a251b;
+  border-radius: 2px;
+  gap: 0;
+  padding: 0;
+}
+
+:root[data-visual="papel"] .modo-busca a, :root[data-visual="papel"] .tema button {
+  font-variant: small-caps;
+  border-right: 1px solid #2a251b;
+  border-radius: 0;
+}
+
+:root[data-visual="papel"] .modo-busca a:last-child, :root[data-visual="papel"] .tema button:last-child {
+  border-right: 0;
+}
+
+:root[data-visual="papel"] .modo-busca a.on, :root[data-visual="papel"] .tema button.on {
+  background: var(--ink);
+  color: var(--card);
+  box-shadow: none;
+}
+
+:root[data-visual="papel"] .btn-grande, :root[data-visual="papel"] .btn-aviso, :root[data-visual="papel"] .cr-lojabtn, :root[data-visual="papel"] .btn {
+  background: var(--ink);
+  color: var(--card);
+  border: 1px solid var(--ink);
+  box-shadow: none;
+  font-variant: small-caps;
+  letter-spacing: .06em;
+  border-radius: 2px;
+}
+
+:root[data-visual="papel"] .btn {
+  color: var(--ink);
+  background: none;
+}
+
+:root[data-visual="papel"] .guia-link {
+  background: var(--card);
+  color: var(--ink);
+  border: var(--regra);
+  box-shadow: none;
+  border-top: 3px double #2a251b;
+  border-radius: 2px;
+}
+
+:root[data-visual="papel"] .guia-link .gl-ic {
+  border: 1px solid var(--ink);
+  background: none;
+  border-radius: 2px;
+}
+
+:root[data-visual="papel"] .guia-link .seta-ir {
+  stroke: var(--ink);
+}
+
+:root[data-visual="papel"] .hero {
+  background: var(--card);
+  color: var(--ink);
+  border: var(--regra);
+  box-shadow: none;
+  border-radius: 2px;
+}
+
+:root[data-visual="papel"] .hero .hex {
+  display: none;
+}
+
+:root[data-visual="papel"] .esquema, :root[data-visual="papel"] .mapa {
+  counter-increment: fig;
+}
+
+:root[data-visual="papel"] .esquema:after {
+  content: "Figura " counter(fig) ". Esquema da reação (reagentes → produtos).";
+}
+
+:root[data-visual="papel"] .esquema:after, :root[data-visual="papel"] .rad-wrap:after {
+  color: var(--mut);
+  text-align: left;
+  width: 100%;
+  margin-top: 8px;
+  font-size: .78rem;
+  font-style: italic;
+  display: block;
+}
+
+:root[data-visual="papel"] .rad-wrap:after {
+  content: "Figura. Mapa de reações a partir do composto central.";
+}
+
+:root[data-visual="papel"] .tile {
+  box-shadow: none;
+  background: #fff;
+  border: 1px solid #2a251b;
+  border-radius: 0;
+}
+
+:root[data-visual="papel"] .seta .rg, :root[data-visual="papel"] .rg {
+  font-family: var(--mono);
+  font-size: .8rem;
+  font-weight: 700;
+}
+
+:root[data-visual="papel"] .seta .cd, :root[data-visual="papel"] .cd {
+  font-style: italic;
+}
+
+:root[data-visual="papel"] .etq {
+  border: 1px solid;
+  border-radius: 2px;
+  background: none !important;
+}
+
+:root[data-visual="papel"] .radial {
+  border: var(--regra);
+  background: var(--card);
+  box-shadow: none;
+  border-radius: 2px;
+}
+
+:root[data-visual="papel"] .rad-lin {
+  stroke: #2a251b;
+  stroke-width: 1.4px;
+}
+
+:root[data-visual="papel"] .rad-ponta {
+  fill: #2a251b;
+}
+
+:root[data-visual="papel"] .rad-rg span, :root[data-visual="papel"] .mp-slot {
+  background: var(--card);
+  box-shadow: none;
+  font-family: var(--mono);
+  border: 1px solid #2a251b;
+  border-radius: 2px;
+  font-size: .72rem;
+}
+
+:root[data-visual="papel"] .mini-prog {
+  background: none;
+  border: 1px solid #2a251b;
+  border-radius: 0;
+  height: 7px;
+}
+
+:root[data-visual="papel"] .mini-prog i {
+  background: repeating-linear-gradient(45deg,var(--ink),var(--ink) 2px,transparent 2px,transparent 4px);
+  border-radius: 0;
+}
+
+:root[data-visual="papel"] .rodape, :root[data-visual="papel"] .tela small {
+  font-style: italic;
+}
+
+:root[data-visual="papel"] .visual {
+  text-align: left;
+}
+
+:root[data-visual="papel"] .visual.on {
+  border-color: var(--ac);
+  outline: 2px solid var(--ac);
+}
+
+:root[data-visual="papel"] .visual i {
+  border: 1px solid #2a251b;
+  border-radius: 0;
+}
+
+:root[data-visual="papel"] .visual.v-papel i {
+  background: var(--bg) var(--papel-ruido);
+}
+
+:root[data-visual="papel"] .nt, :root[data-visual="papel"] .nota, :root[data-visual="papel"] .notas p {
+  font-size: .94rem;
+}
+
+:root[data-visual="papel"]::selection {
+  background: #c8d9a6;
+}
+
 .visuais {
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin-bottom: 12px;
   display: grid;
@@ -5255,6 +5774,220 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
 
 :root[data-tema="escuro"] .atalho, :root[data-tema="escuro"] .aula-card, :root[data-tema="escuro"] .modo {
   background: linear-gradient(180deg,color-mix(in srgb,#fff 2.6%,var(--card)),var(--card));
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-visual="papel"]:not([data-tema="claro"]) {
+    --bg: #1d1a15;
+    --card: #26221b;
+    --ink: #ece3cc;
+    --mut: #b3a98e;
+    --faint: #8a8168;
+    --bd: #e3d9bf;
+    --bd2: #5a5242;
+    --ac: #8fd0a0;
+    --ac-ink: #14110c;
+    --ac-soft: #2a3328;
+    --nu: #8db4ff;
+    --nu-soft: #1d2636;
+    --el: #ffb27a;
+    --el-soft: #3a2a1a;
+    --mec: #c9a6ff;
+    --mec-soft: #2e2438;
+    --regra: 1px solid #e3d9bf;
+    --lightningcss-light: ;
+    --lightningcss-dark: initial;
+    color-scheme: dark;
+  }
+
+  :root[data-visual="papel"]:not([data-tema="claro"]) body {
+    background-color: var(--bg);
+    background-image: var(--papel-ruido),linear-gradient(90deg,#00000040,transparent 6%,transparent 94%,#00000040);
+  }
+
+  :root[data-visual="papel"]:not([data-tema="claro"]) .topo, :root[data-visual="papel"]:not([data-tema="claro"]) .abas {
+    background: var(--bg);
+    border-color: #e3d9bf;
+  }
+
+  :root[data-visual="papel"]:not([data-tema="claro"]) .capa, :root[data-visual="papel"]:not([data-tema="claro"]) .capa-busca, :root[data-visual="papel"]:not([data-tema="claro"]) .capa .stats, :root[data-visual="papel"]:not([data-tema="claro"]) .capa .stats > div, :root[data-visual="papel"]:not([data-tema="claro"]) .capa h2:after {
+    border-color: #e3d9bf;
+  }
+
+  :root[data-visual="papel"]:not([data-tema="claro"]) .cartao, :root[data-visual="papel"]:not([data-tema="claro"]) .item, :root[data-visual="papel"]:not([data-tema="claro"]) .aula, :root[data-visual="papel"]:not([data-tema="claro"]) .ficha, :root[data-visual="papel"]:not([data-tema="claro"]) .busca-falsa, :root[data-visual="papel"]:not([data-tema="claro"]) .atalho, :root[data-visual="papel"]:not([data-tema="claro"]) .aula-card, :root[data-visual="papel"]:not([data-tema="claro"]) .modo, :root[data-visual="papel"]:not([data-tema="claro"]) .reag, :root[data-visual="papel"]:not([data-tema="claro"]) .cl-card, :root[data-visual="papel"]:not([data-tema="claro"]) .mp-banco, :root[data-visual="papel"]:not([data-tema="claro"]) .visual, :root[data-visual="papel"]:not([data-tema="claro"]) .aviso, :root[data-visual="papel"]:not([data-tema="claro"]) .guia-link, :root[data-visual="papel"]:not([data-tema="claro"]) .hero {
+    background: var(--card);
+    border-color: #e3d9bf;
+  }
+
+  :root[data-visual="papel"]:not([data-tema="claro"]) .aula:active, :root[data-visual="papel"]:not([data-tema="claro"]) .item:active, :root[data-visual="papel"]:not([data-tema="claro"]) .atalho:active, :root[data-visual="papel"]:not([data-tema="claro"]) .aula-card:active, :root[data-visual="papel"]:not([data-tema="claro"]) .modo:active, :root[data-visual="papel"]:not([data-tema="claro"]) .ficha:active {
+    background: #312b21;
+  }
+
+  :root[data-visual="papel"]:not([data-tema="claro"]) .chip, :root[data-visual="papel"]:not([data-tema="claro"]) .sel-estudo, :root[data-visual="papel"]:not([data-tema="claro"]) .trans-sel select, :root[data-visual="papel"]:not([data-tema="claro"]) .campo input, :root[data-visual="papel"]:not([data-tema="claro"]) .mp-chip, :root[data-visual="papel"]:not([data-tema="claro"]) .modo-busca, :root[data-visual="papel"]:not([data-tema="claro"]) .tema, :root[data-visual="papel"]:not([data-tema="claro"]) .tema button, :root[data-visual="papel"]:not([data-tema="claro"]) .modo-busca a {
+    color: var(--ink);
+    border-color: #e3d9bf;
+  }
+
+  :root[data-visual="papel"]:not([data-tema="claro"]) .chip.on, :root[data-visual="papel"]:not([data-tema="claro"]) .mp-chip.sel, :root[data-visual="papel"]:not([data-tema="claro"]) .modo-busca a.on, :root[data-visual="papel"]:not([data-tema="claro"]) .tema button.on, :root[data-visual="papel"]:not([data-tema="claro"]) .btn-grande, :root[data-visual="papel"]:not([data-tema="claro"]) .btn-aviso, :root[data-visual="papel"]:not([data-tema="claro"]) .cr-lojabtn {
+    background: var(--ink);
+    color: #14110c;
+  }
+
+  :root[data-visual="papel"]:not([data-tema="claro"]) .btn {
+    color: var(--ink);
+    border-color: #e3d9bf;
+  }
+
+  :root[data-visual="papel"]:not([data-tema="claro"]) .pilula {
+    background: var(--card);
+    border-color: #e3d9bf;
+  }
+
+  :root[data-visual="papel"]:not([data-tema="claro"]) .sec, :root[data-visual="papel"]:not([data-tema="claro"]) .mini-prog {
+    border-color: #e3d9bf;
+  }
+
+  :root[data-visual="papel"]:not([data-tema="claro"]) .mini-prog i {
+    background: repeating-linear-gradient(45deg,var(--ink),var(--ink) 2px,transparent 2px,transparent 4px);
+  }
+
+  :root[data-visual="papel"]:not([data-tema="claro"]) .tile {
+    background: #fff;
+    border-color: #e3d9bf;
+  }
+
+  :root[data-visual="papel"]:not([data-tema="claro"]) .radial {
+    background: var(--card);
+    border-color: #e3d9bf;
+  }
+
+  :root[data-visual="papel"]:not([data-tema="claro"]) .rad-lin {
+    stroke: #e3d9bf;
+  }
+
+  :root[data-visual="papel"]:not([data-tema="claro"]) .rad-ponta {
+    fill: #e3d9bf;
+  }
+
+  :root[data-visual="papel"]:not([data-tema="claro"]) .rad-rg span, :root[data-visual="papel"]:not([data-tema="claro"]) .mp-slot {
+    background: var(--card);
+    color: var(--ink);
+    border-color: #e3d9bf;
+  }
+
+  :root[data-visual="papel"]:not([data-tema="claro"]) .guia-link {
+    color: var(--ink);
+  }
+
+  :root[data-visual="papel"]:not([data-tema="claro"]) .guia-link .seta-ir {
+    stroke: var(--ink);
+  }
+}
+
+:root[data-visual="papel"][data-tema="escuro"] {
+  --bg: #1d1a15;
+  --card: #26221b;
+  --ink: #ece3cc;
+  --mut: #b3a98e;
+  --faint: #8a8168;
+  --bd: #e3d9bf;
+  --bd2: #5a5242;
+  --ac: #8fd0a0;
+  --ac-ink: #14110c;
+  --ac-soft: #2a3328;
+  --nu: #8db4ff;
+  --nu-soft: #1d2636;
+  --el: #ffb27a;
+  --el-soft: #3a2a1a;
+  --mec: #c9a6ff;
+  --mec-soft: #2e2438;
+  --regra: 1px solid #e3d9bf;
+  --lightningcss-light: ;
+  --lightningcss-dark: initial;
+  color-scheme: dark;
+}
+
+:root[data-visual="papel"][data-tema="escuro"] body {
+  background-color: var(--bg);
+  background-image: var(--papel-ruido),linear-gradient(90deg,#00000040,transparent 6%,transparent 94%,#00000040);
+}
+
+:root[data-visual="papel"][data-tema="escuro"] .topo, :root[data-visual="papel"][data-tema="escuro"] .abas {
+  background: var(--bg);
+  border-color: #e3d9bf;
+}
+
+:root[data-visual="papel"][data-tema="escuro"] .capa, :root[data-visual="papel"][data-tema="escuro"] .capa-busca, :root[data-visual="papel"][data-tema="escuro"] .capa .stats, :root[data-visual="papel"][data-tema="escuro"] .capa .stats > div, :root[data-visual="papel"][data-tema="escuro"] .capa h2:after {
+  border-color: #e3d9bf;
+}
+
+:root[data-visual="papel"][data-tema="escuro"] .cartao, :root[data-visual="papel"][data-tema="escuro"] .item, :root[data-visual="papel"][data-tema="escuro"] .aula, :root[data-visual="papel"][data-tema="escuro"] .ficha, :root[data-visual="papel"][data-tema="escuro"] .busca-falsa, :root[data-visual="papel"][data-tema="escuro"] .atalho, :root[data-visual="papel"][data-tema="escuro"] .aula-card, :root[data-visual="papel"][data-tema="escuro"] .modo, :root[data-visual="papel"][data-tema="escuro"] .reag, :root[data-visual="papel"][data-tema="escuro"] .cl-card, :root[data-visual="papel"][data-tema="escuro"] .mp-banco, :root[data-visual="papel"][data-tema="escuro"] .visual, :root[data-visual="papel"][data-tema="escuro"] .aviso, :root[data-visual="papel"][data-tema="escuro"] .guia-link, :root[data-visual="papel"][data-tema="escuro"] .hero {
+  background: var(--card);
+  border-color: #e3d9bf;
+}
+
+:root[data-visual="papel"][data-tema="escuro"] .aula:active, :root[data-visual="papel"][data-tema="escuro"] .item:active, :root[data-visual="papel"][data-tema="escuro"] .atalho:active, :root[data-visual="papel"][data-tema="escuro"] .aula-card:active, :root[data-visual="papel"][data-tema="escuro"] .modo:active, :root[data-visual="papel"][data-tema="escuro"] .ficha:active {
+  background: #312b21;
+}
+
+:root[data-visual="papel"][data-tema="escuro"] .chip, :root[data-visual="papel"][data-tema="escuro"] .sel-estudo, :root[data-visual="papel"][data-tema="escuro"] .trans-sel select, :root[data-visual="papel"][data-tema="escuro"] .campo input, :root[data-visual="papel"][data-tema="escuro"] .mp-chip, :root[data-visual="papel"][data-tema="escuro"] .modo-busca, :root[data-visual="papel"][data-tema="escuro"] .tema, :root[data-visual="papel"][data-tema="escuro"] .tema button, :root[data-visual="papel"][data-tema="escuro"] .modo-busca a {
+  color: var(--ink);
+  border-color: #e3d9bf;
+}
+
+:root[data-visual="papel"][data-tema="escuro"] .chip.on, :root[data-visual="papel"][data-tema="escuro"] .mp-chip.sel, :root[data-visual="papel"][data-tema="escuro"] .modo-busca a.on, :root[data-visual="papel"][data-tema="escuro"] .tema button.on, :root[data-visual="papel"][data-tema="escuro"] .btn-grande, :root[data-visual="papel"][data-tema="escuro"] .btn-aviso, :root[data-visual="papel"][data-tema="escuro"] .cr-lojabtn {
+  background: var(--ink);
+  color: #14110c;
+}
+
+:root[data-visual="papel"][data-tema="escuro"] .btn {
+  color: var(--ink);
+  border-color: #e3d9bf;
+}
+
+:root[data-visual="papel"][data-tema="escuro"] .pilula {
+  background: var(--card);
+  border-color: #e3d9bf;
+}
+
+:root[data-visual="papel"][data-tema="escuro"] .sec, :root[data-visual="papel"][data-tema="escuro"] .mini-prog {
+  border-color: #e3d9bf;
+}
+
+:root[data-visual="papel"][data-tema="escuro"] .mini-prog i {
+  background: repeating-linear-gradient(45deg,var(--ink),var(--ink) 2px,transparent 2px,transparent 4px);
+}
+
+:root[data-visual="papel"][data-tema="escuro"] .tile {
+  background: #fff;
+  border-color: #e3d9bf;
+}
+
+:root[data-visual="papel"][data-tema="escuro"] .radial {
+  background: var(--card);
+  border-color: #e3d9bf;
+}
+
+:root[data-visual="papel"][data-tema="escuro"] .rad-lin {
+  stroke: #e3d9bf;
+}
+
+:root[data-visual="papel"][data-tema="escuro"] .rad-ponta {
+  fill: #e3d9bf;
+}
+
+:root[data-visual="papel"][data-tema="escuro"] .rad-rg span, :root[data-visual="papel"][data-tema="escuro"] .mp-slot {
+  background: var(--card);
+  color: var(--ink);
+  border-color: #e3d9bf;
+}
+
+:root[data-visual="papel"][data-tema="escuro"] .guia-link {
+  color: var(--ink);
+}
+
+:root[data-visual="papel"][data-tema="escuro"] .guia-link .seta-ir {
+  stroke: var(--ink);
 }
 
 @media (prefers-color-scheme: dark) {
