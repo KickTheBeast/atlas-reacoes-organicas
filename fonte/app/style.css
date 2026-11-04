@@ -603,3 +603,27 @@ html.mo .item,html.mo .aula,html.mo .ficha,html.mo .guia-link,html.mo .nav-det a
 .mp-fim{padding:4px 0 24px}
 .mp-msg{margin:0 0 10px;text-align:center;font-size:1rem}
 .mp-msg.ok{color:#1e9a52;font-weight:700}
+
+/* diagrama radial dos mapas */
+.rad-wrap{position:relative;margin:6px -4px 14px}
+.radial{overflow:auto;height:min(72vh,640px);min-height:380px;border-radius:20px;border:1px solid var(--bd);background:radial-gradient(circle at center,color-mix(in srgb,var(--ac) 7%,var(--card)),var(--card));-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.rad-tela{position:relative;transform-origin:0 0}
+.rad-arestas{position:absolute;inset:0;pointer-events:none}
+.rad-lin{stroke:var(--ac);stroke-width:2.2;stroke-linecap:round;fill:none}
+.rad-ponta{fill:var(--ac)}
+.rad-no{position:absolute;width:132px;transform:translate(-50%,-50%);text-align:center}
+.rad-in{display:flex;flex-direction:column;align-items:center;gap:4px}
+.rad-in b{font-size:.82rem;line-height:1.2;overflow-wrap:anywhere}
+.rad-no .tile{max-width:122px;min-width:56px;min-height:56px;padding:4px}
+.rad-no.raiz{width:150px}
+.rad-no.raiz .tile{border:2px solid var(--ac);box-shadow:0 4px 18px color-mix(in srgb,var(--ac) 30%,transparent)}
+.rad-no.raiz b{font-size:.95rem}
+.rad-rg{position:absolute;transform:translate(-50%,-50%);max-width:136px;text-align:center;pointer-events:none}
+.rad-rg span{display:inline-block;font-size:.76rem;font-weight:700;line-height:1.2;padding:3px 8px;border-radius:10px;background:var(--card);border:1px solid color-mix(in srgb,var(--ac) 45%,transparent);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.rad-ctl{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:6px}
+.rad-ctl button{width:38px;height:38px;border-radius:12px;background:var(--card);border:1px solid var(--bd);font-size:1.2rem;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.rad-ctl button:active{transform:scale(.92)}
+.rad-nota{padding:10px 0;border-bottom:1px solid var(--bd)}
+.rad-nota b{display:block;font-size:.95rem}
+.rad-nota .rg{display:inline-block;margin:4px 0;font-weight:700;font-size:.8rem;padding:3px 9px;border-radius:10px;background:color-mix(in srgb,var(--ac) 14%,var(--card));border:1px solid color-mix(in srgb,var(--ac) 35%,transparent)}
+.rad-nota p{margin:0;color:var(--mut);font-size:.85rem;line-height:1.4}

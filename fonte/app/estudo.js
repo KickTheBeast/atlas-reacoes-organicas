@@ -134,6 +134,7 @@
         <div class="grande-grade">
           <button class="btn-grande cartoes sobe" style="--i:4" data-iniciar="cartoes"><span class="bg-ic">⟳</span><span class="bg-tx"><b>Testar-me</b><small>${venc ? `${venc} para revisar` : 'cartões de revisão'}${novas ? ` · ${novas} novas` : ''}</small></span></button>
           <button class="btn-grande simulado sobe" style="--i:5" data-iniciar="simulado"><span class="bg-ic">✎</span><span class="bg-tx"><b>Simulado</b><small>questões de múltipla escolha</small></span></button>
+          <button class="btn-grande simulado sobe" style="--i:6" data-ir="#/jogo"><span class="bg-ic">⇄</span><span class="bg-tx"><b>Jogo dos reagentes</b><small>preencha as setas dos mapas</small></span></button>
         </div>
         <div class="sec"><h3>Atalhos</h3></div>
         <a class="aula sobe" style="--i:6" href="#/salvos"><div class="num">★</div><div class="tx"><b>Salvos</b><small>${plural(salvos.size, 'reação', 'reações')}</small></div>${SETA_IR}</a>
@@ -355,21 +356,88 @@
   const mapaPorId = (id) => D.mapas.find((m) => m.id === id);
   const SETA_MP = '<svg class="mp-seta" viewBox="0 0 16 22" aria-hidden="true"><path d="M8 1v17M2.5 13 8 19l5.5-6"/></svg>';
   const melhorMapa = (id) => (guarda.ler('atlas.mapas', {})[id] || {}).melhor;
-  function telaMapa(id, modo) {
+  // ----- diagrama radial: o composto de partida no centro, os produtos em volta, o reagente em cada seta -----
+  function layoutRadial(m) {
+    const folhas = (n) => (n.r && n.r.length ? n.r.reduce((t, c) => t + folhas(c), 0) : 1);
+    const R1 = Math.max(190, m.r.length * 38), PASSO = 200, EX = 1.32; // elipse: mais larga que alta, porque os rótulos são largos
+    const nos = [{ n: m.c.n, s: m.c.s, x: 0, y: 0, d: 0 }], arestas = [];
+    const coloca = (pai, filhos, a0, a1, d) => {
+      const tot = filhos.reduce((t, c) => t + folhas(c), 0); let a = a0;
+      filhos.forEach((c) => {
+        const fa = ((a1 - a0) * folhas(c)) / tot, mid = a + fa / 2, r = R1 + (d - 1) * PASSO;
+        const no = { n: c.n, s: c.s, nt: c.nt, rg: c.rg, d, x: Math.cos(mid) * r * EX, y: Math.sin(mid) * r };
+        nos.push(no); arestas.push({ de: pai, para: no, rg: c.rg });
+        if (c.r) coloca(no, c.r, a, a + fa, d + 1);
+        a += fa;
+      });
+    };
+    coloca(nos[0], m.r, -Math.PI / 2, (3 * Math.PI) / 2, 1);
+    const LX = 70, LY = 70, PAD = 24;
+    const x0 = Math.min(...nos.map((n) => n.x)) - LX - PAD, y0 = Math.min(...nos.map((n) => n.y)) - LY - PAD;
+    nos.forEach((n) => { n.x -= x0; n.y -= y0; });
+    return { nos, arestas, W: Math.max(...nos.map((n) => n.x)) + LX + PAD, H: Math.max(...nos.map((n) => n.y)) + LY + PAD };
+  }
+  function telaMapa(id) {
     const m = mapaPorId(id); if (!m) return null;
-    const jogo = modo === 'jogo';
+    const L = layoutRadial(m);
+    const linhas = L.arestas.map((e) => {
+      const dx = e.para.x - e.de.x, dy = e.para.y - e.de.y, len = Math.hypot(dx, dy), ux = dx / len, uy = dy / len;
+      const ini = [e.de.x + ux * (e.de.d ? 58 : 66), e.de.y + uy * (e.de.d ? 52 : 60)], fim = [e.para.x - ux * 64, e.para.y - uy * 58];
+      e.lx = ini[0] + (fim[0] - ini[0]) * 0.52; e.ly = ini[1] + (fim[1] - ini[1]) * 0.52;
+      return `<line class="rad-lin" x1="${ini[0].toFixed(1)}" y1="${ini[1].toFixed(1)}" x2="${fim[0].toFixed(1)}" y2="${fim[1].toFixed(1)}" marker-end="url(#rad-ponta)"/>`;
+    }).join('');
+    const nosHtml = L.nos.map((n) => `<div class="rad-no${n.d ? '' : ' raiz'}" style="left:${n.x.toFixed(1)}px;top:${n.y.toFixed(1)}px"><div class="rad-in">${tile(n.s, 0)}<b>${esc(n.n)}</b></div></div>`).join('');
+    const rgs = L.arestas.map((e) => `<div class="rad-rg" style="left:${e.lx.toFixed(1)}px;top:${e.ly.toFixed(1)}px"><span>${esc(e.rg)}</span></div>`).join('');
+    const notas = L.nos.filter((n) => n.nt).map((n) => `<div class="rad-nota"><b>${esc(n.n)}</b><span class="rg">${esc(n.rg)}</span><p>${esc(n.nt)}</p></div>`).join('');
+    return {
+      titulo: 'Mapa', aba: 'mec', prof: 1,
+      html: `<h2 class="titulo-lista sobe">${esc(m.t)}</h2><p class="sub-lista sobe" style="--i:1">${esc(m.sub)}. Arraste para ver tudo.</p>
+        <div class="rad-wrap sobe" style="--i:2"><div class="radial" id="radial"><div class="rad-dim" id="rad-dim"><div class="rad-tela" id="rad-tela" style="width:${L.W}px;height:${L.H}px">
+          <svg class="rad-arestas" width="${L.W}" height="${L.H}" aria-hidden="true"><defs><marker id="rad-ponta" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="rad-ponta" d="M1 1 L9 5 L1 9 L3 5 Z"/></marker></defs>${linhas}</svg>
+          ${rgs}${nosHtml}</div></div></div>
+          <div class="rad-ctl"><button id="rad-mais" aria-label="Aumentar">+</button><button id="rad-menos" aria-label="Diminuir">−</button><button id="rad-fit" aria-label="Ajustar à tela">⤢</button></div></div>
+        ${notas ? `<div class="sec"><h3>Para lembrar</h3><span>${plural(L.nos.filter((n) => n.nt).length, 'nota', 'notas')}</span></div>${notas}` : ''}`,
+      depois: () => {
+        const cont = $('#radial'), dim = $('#rad-dim'), tela = $('#rad-tela');
+        let z = 1;
+        const aplica = (nz, centro) => {
+          const cx = (cont.scrollLeft + cont.clientWidth / 2) / z, cy = (cont.scrollTop + cont.clientHeight / 2) / z;
+          z = Math.min(1.4, Math.max(0.25, nz));
+          dim.style.width = L.W * z + 'px'; dim.style.height = L.H * z + 'px'; tela.style.transform = `scale(${z})`;
+          const [px, py] = centro || [cx, cy];
+          cont.scrollLeft = px * z - cont.clientWidth / 2; cont.scrollTop = py * z - cont.clientHeight / 2;
+        };
+        const raiz = L.nos[0];
+        const ajusta = () => aplica(Math.min(1, Math.max(0.78, cont.clientWidth / L.W)), [raiz.x, raiz.y]);
+        ajusta();
+        $('#rad-mais').addEventListener('click', () => aplica(z * 1.2));
+        $('#rad-menos').addEventListener('click', () => aplica(z / 1.2));
+        $('#rad-fit').addEventListener('click', () => aplica(Math.min(1.4, Math.max(0.25, Math.min(cont.clientWidth / L.W, cont.clientHeight / L.H))), [L.W / 2, L.H / 2]));
+        mo(document.querySelectorAll('.rad-in'), { opacity: [0, 1], scale: [0.7, 1] }, { type: 'spring', stiffness: 300, damping: 22, delay: M && M.stagger ? M.stagger(0.05, { startDelay: 0.1 }) : 0 });
+        mo(document.querySelectorAll('.rad-lin,.rad-rg'), { opacity: [0, 1] }, { duration: 0.4, delay: M && M.stagger ? M.stagger(0.03, { startDelay: 0.3 }) : 0 });
+      },
+    };
+  }
+
+  // ----- jogo dos reagentes (fica em Estudar): preencha as setas de um mapa -----
+  function telaJogos() {
+    return {
+      titulo: 'Jogo dos reagentes', aba: 'estudar', prof: 1,
+      html: `<h2 class="titulo-lista sobe">Jogo dos reagentes</h2><p class="sub-lista sobe" style="--i:1">Escolha um mapa e coloque o reagente certo em cada seta.</p>
+        ${D.mapas.map((m, i) => `<a class="aula sobe" style="--i:${i + 2}" href="#/jogo/${m.id}"><div class="num guia-num">${esc(m.curto)}</div><div class="tx"><b>${esc(m.t)}</b><small>${esc(m.sub)}${melhorMapa(m.id) != null ? ` · melhor ${melhorMapa(m.id)}%` : ''}</small></div>${SETA_IR}</a>`).join('')}`,
+    };
+  }
+  function telaJogoMapa(id) {
+    const m = mapaPorId(id); if (!m) return null;
     let k = 0; const arestas = [];
-    const no = (n, raiz) => `<div class="mp-no${raiz ? ' raiz' : ''}">${tile(n.s, 0)}<div class="mp-tx"><b>${esc(n.n)}</b>${!jogo && n.nt ? `<small>${esc(n.nt)}</small>` : ''}</div></div>`;
+    const no = (n, raiz) => `<div class="mp-no${raiz ? ' raiz' : ''}">${tile(n.s, 0)}<div class="mp-tx"><b>${esc(n.n)}</b></div></div>`;
     const ramos = (lista) => `<div class="mp-filhos">${lista.map((n) => {
       const i = k++; arestas[i] = n.rg;
-      return `<div class="mp-ramo"><div class="mp-rg">${SETA_MP}${jogo ? `<button class="mp-slot" data-slot="${i}"><span>?</span></button>` : `<span class="rg">${esc(n.rg)}</span>`}</div>${no(n)}${n.r ? ramos(n.r) : ''}</div>`;
+      return `<div class="mp-ramo"><div class="mp-rg">${SETA_MP}<button class="mp-slot" data-slot="${i}"><span>?</span></button></div>${no(n)}${n.r ? ramos(n.r) : ''}</div>`;
     }).join('')}</div>`;
-    const alterna = `<div class="modo-busca"><a href="#/mapa/${id}" class="${jogo ? '' : 'on'}">Mapa</a><a href="#/mapa/${id}/jogo" class="${jogo ? 'on' : ''}">Jogo</a></div>`;
-    const cab = `<h2 class="titulo-lista sobe">${esc(m.t)}</h2><p class="sub-lista sobe" style="--i:1">${esc(m.sub)}</p>${alterna}`;
-    if (!jogo) return { titulo: 'Mapa', aba: 'mec', prof: 1, html: `${cab}<div class="mapa">${no(m.c, true)}${ramos(m.r)}</div>`, depois: () => { mo(document.querySelectorAll('.mp-ramo'), { opacity: [0, 1], x: [-14, 0] }, { duration: 0.35, delay: M && M.stagger ? M.stagger(0.04) : 0 }); } };
     return {
-      titulo: 'Jogo', aba: 'mec', prof: 1,
-      html: `${cab}<p class="sub-lista">Toque num reagente e depois no <b>?</b> da seta certa (ou o contrário). Toque num reagente colocado para tirá-lo.</p>
+      titulo: 'Jogo', aba: 'estudar', prof: 2,
+      html: `<h2 class="titulo-lista sobe">${esc(m.t)}</h2><p class="sub-lista sobe" style="--i:1">Toque num reagente e depois no <b>?</b> da seta certa (ou o contrário). Toque num reagente colocado para tirá-lo.</p>
         <div class="mp-banco" id="mp-banco"></div>
         <div class="mapa jogo">${no(m.c, true)}${ramos(m.r)}</div>
         <div class="mp-fim"><div id="mp-res" aria-live="polite"></div><div class="resumo-acoes"><button class="btn-grande pequeno" id="mp-verif"><b>Verificar</b></button><button class="btn" id="mp-reinicia">Recomeçar</button></div></div>`,

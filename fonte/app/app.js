@@ -264,7 +264,7 @@
       el: ['Eletrófilos', 'Escolha o eletrófilo (substrato ou reagente) e veja as reações.'],
     }[tipo];
     const nota = tipo === 'mec' ? '' : '<p class="sub-lista">Classificação automática a partir dos reagentes e das estruturas: confira no slide em caso de dúvida.</p>';
-    const guias = tipo === 'mec' ? `<div class="sec"><h3>Mapas de reações</h3><span>diagramas e jogo</span></div>${D.mapas.map((m, i) => `<a class="aula sobe" style="--i:${i + 2}" href="#/mapa/${m.id}"><div class="num guia-num">${esc(m.curto)}</div><div class="tx"><b>${esc(m.t)}</b><small>${esc(m.sub)}${melhorMapa(m.id) != null ? ` · melhor jogo ${melhorMapa(m.id)}%` : ''}</small></div>${SETA_IR}</a>`).join('')}<div class="sec"><h3>Guias rápidos</h3><span>tabelas e esquemas</span></div>${D.guias.map((g, i) => `<a class="aula sobe" style="--i:${i + 2}" href="#/guia/${g.id}"><div class="num guia-num">${esc(g.curto)}</div><div class="tx"><b>${esc(g.t)}</b><small>${esc(g.sub)}</small></div>${SETA_IR}</a>`).join('')}<div class="sec"><h3>Reações por mecanismo</h3><span>${D.categorias.length} tipos</span></div>` : '';
+    const guias = tipo === 'mec' ? `<div class="sec"><h3>Mapas de reações</h3><span>diagramas</span></div>${D.mapas.map((m, i) => `<a class="aula sobe" style="--i:${i + 2}" href="#/mapa/${m.id}"><div class="num guia-num">${esc(m.curto)}</div><div class="tx"><b>${esc(m.t)}</b><small>${esc(m.sub)}</small></div>${SETA_IR}</a>`).join('')}<div class="sec"><h3>Guias rápidos</h3><span>tabelas e esquemas</span></div>${D.guias.map((g, i) => `<a class="aula sobe" style="--i:${i + 2}" href="#/guia/${g.id}"><div class="num guia-num">${esc(g.curto)}</div><div class="tx"><b>${esc(g.t)}</b><small>${esc(g.sub)}</small></div>${SETA_IR}</a>`).join('')}<div class="sec"><h3>Reações por mecanismo</h3><span>${D.categorias.length} tipos</span></div>` : '';
     return {
       titulo: info[0], aba: tipo, prof: 0,
       html: `<h2 class="titulo-lista sobe">${info[0]}</h2><p class="sub-lista sobe" style="--i:1">${info[1]}</p>${nota}${guias}
@@ -540,11 +540,12 @@
   let profAnterior = -1, abaAtual = 'aulas', rotaAtual = '';
   const reduzido = matchMedia('(prefers-reduced-motion: reduce)').matches;
   function resolve(hash) {
-    const [, a, b, c] = hash.split('?')[0].split('/');
+    const [, a, b] = hash.split('?')[0].split('/');
     if (!a || a === 'aulas') return telaAulas();
     if (a === 'mec' || a === 'nu' || a === 'el') return b ? telaLista(a, b) : telaIndice(a);
     if (a === 'guia') return telaGuia(b);
-    if (a === 'mapa') return telaMapa(b, c);
+    if (a === 'mapa') return telaMapa(b);
+    if (a === 'jogo') return b ? telaJogoMapa(b) : telaJogos();
     if (a === 'aula') return telaLista('aula', b);
     if (a === 'todas') return telaLista('todas');
     if (a === 'salvos') return telaLista('salvos');
