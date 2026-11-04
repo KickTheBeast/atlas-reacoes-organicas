@@ -283,7 +283,7 @@
         <a class="aula sobe" style="--i:${D.aulas.length + 6}" href="#/todas"><div class="num">∑</div><div class="tx"><b>Todas as reações</b><small>${plural(D.reacoes.length, 'reação', 'reações')}</small></div>${SETA_IR}</a>
         ${typeof VISUAL_HTML !== 'undefined' ? VISUAL_HTML : ''}
         <div class="tema" role="group" aria-label="Tema"><button data-tema="auto">Auto</button><button data-tema="claro">Claro</button><button data-tema="escuro">Escuro</button></div>
-        <div class="rodape"><button class="avatar" data-creditos aria-label="Créditos">${DINO_AVATAR}</button><br><span data-versao>Versão ${BUILD}</span><br><button data-verificar>Verificar atualização</button></div>`,
+        <div class="rodape"><button class="avatar" data-creditos aria-label="Créditos">${DINO_AVATAR}</button><br><button class="versao-btn" data-versao aria-label="Versão">Versão ${BUILD}</button><br><button data-verificar>Verificar atualização</button></div>`,
       depois: () => { montaInstalar(); contaAte(tela); marcaTema(); typeof marcaVisual === 'function' && marcaVisual(); },
     };
   }
@@ -1085,7 +1085,7 @@
     const vb = t.closest('.visual[data-visual]');
     if (vb) { guarda.gravar('atlas.visual', vb.dataset.visual); aplicaVisual(vb.dataset.visual); marcaVisual(); return; }
     if (t.closest('[data-versao]')) { // 5 toques seguidos mostram a seção Aparência
-      toquesVersao = (performance.now() - ultimoToqueVersao < 1200 ? toquesVersao : 0) + 1; ultimoToqueVersao = performance.now();
+      toquesVersao = (performance.now() - ultimoToqueVersao < 2500 ? toquesVersao : 0) + 1; ultimoToqueVersao = performance.now(); navigator.vibrate && navigator.vibrate(6);
       if (toquesVersao >= 5) { const cx = $('#visuais-caixa'); if (cx) { cx.hidden = false; cx.scrollIntoView({ block: 'center', behavior: 'smooth' }); } toquesVersao = 0; }
       return;
     }

@@ -5488,6 +5488,17 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
   display: none;
 }
 
+.versao-btn {
+  min-height: 44px;
+  color: inherit;
+  font-size: inherit;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  margin: -6px 0;
+  padding: 12px 22px;
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema="claro"]) {
     --bg: #090f0d;
