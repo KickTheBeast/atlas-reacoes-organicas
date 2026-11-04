@@ -2,7 +2,7 @@
 // Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
 (() => {
   'use strict';
-  const BUILD = '22d8d81ce6';
+  const BUILD = 'dd75b2838c';
   const $ = (s) => document.querySelector(s);
   const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
   const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
@@ -249,6 +249,13 @@
     notas: '<svg viewBox="0 0 24 24"><path d="M5 19l1-4L16.5 4.5a2 2 0 012.8 0l.2.2a2 2 0 010 2.8L9 18l-4 1z"/><path d="M14.5 6.5l3 3"/></svg>',
     guia: '<svg viewBox="0 0 24 24"><path d="M5 4.5h11a3 3 0 013 3V20H8a3 3 0 01-3-3V4.5z"/><path d="M9 9h6M9 12.5h4"/></svg>',
   };
+  /*@@vidro-ini*/
+  // Aparência "Vidro": escondida (toque 5 vezes na versão, no fim da tela inicial). Para remover do app, veja tools/REMOVER-VIDRO.md
+  const VISUAL_HTML = `<div class="visuais-caixa" id="visuais-caixa" hidden>
+        <div class="sec"><h3>Aparência</h3><span>cores e visual</span></div>
+        <div class="visuais" role="group" aria-label="Visual"><button class="visual v-original" data-visual="original"><i></i><b>Original</b><small>cartões sólidos</small></button><button class="visual v-vidro" data-visual="vidro"><i></i><b>Vidro</b><small>translúcido, estilo Apple</small></button></div>
+      </div>`;
+  /*@@vidro-fim*/
   function telaAulas() {
     const g = progressoGeral(), nAulas = D.aulas.filter((a) => a.id !== '00').length;
     const stat = (n, t) => `<div><b data-n="${n}">${n}</b><span>${t}</span></div>`;
@@ -274,11 +281,10 @@
         <div class="sec"><h3>Por aula</h3><span>${D.aulas.length} aulas</span></div>
         <div class="aulas-grade">${itens}</div>
         <a class="aula sobe" style="--i:${D.aulas.length + 6}" href="#/todas"><div class="num">∑</div><div class="tx"><b>Todas as reações</b><small>${plural(D.reacoes.length, 'reação', 'reações')}</small></div>${SETA_IR}</a>
-        <div class="sec"><h3>Aparência</h3><span>cores e visual</span></div>
-        <div class="visuais" role="group" aria-label="Visual"><button class="visual v-original" data-visual="original"><i></i><b>Original</b><small>cartões sólidos</small></button><button class="visual v-vidro" data-visual="vidro"><i></i><b>Vidro</b><small>translúcido, estilo Apple</small></button></div>
+        ${typeof VISUAL_HTML !== 'undefined' ? VISUAL_HTML : ''}
         <div class="tema" role="group" aria-label="Tema"><button data-tema="auto">Auto</button><button data-tema="claro">Claro</button><button data-tema="escuro">Escuro</button></div>
-        <div class="rodape"><button class="avatar" data-creditos aria-label="Créditos">${DINO_AVATAR}</button><br>Versão ${BUILD}<br><button data-verificar>Verificar atualização</button></div>`,
-      depois: () => { montaInstalar(); contaAte(tela); marcaTema(); marcaVisual(); },
+        <div class="rodape"><button class="avatar" data-creditos aria-label="Créditos">${DINO_AVATAR}</button><br><span data-versao>Versão ${BUILD}</span><br><button data-verificar>Verificar atualização</button></div>`,
+      depois: () => { montaInstalar(); contaAte(tela); marcaTema(); typeof marcaVisual === 'function' && marcaVisual(); },
     };
   }
 
@@ -1020,8 +1026,10 @@
     document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape' && creditosEl === el) { fecha(); document.removeEventListener('keydown', esc); } });
   }
 
+  /*@@vidro-ini*/
   const marcaVisual = () => { const v = guarda.ler('atlas.visual', 'original'); document.querySelectorAll('[data-visual]').forEach((b) => { if (b.classList.contains('visual')) b.classList.toggle('on', b.dataset.visual === v); }); };
   const aplicaVisual = (v) => { if (v === 'vidro') document.documentElement.dataset.visual = 'vidro'; else delete document.documentElement.dataset.visual; };
+  /*@@vidro-fim*/
   const marcaTema = () => { const t = guarda.ler('atlas.tema', 'auto'); document.querySelectorAll('.tema [data-tema]').forEach((b) => b.classList.toggle('on', b.dataset.tema === t)); };
   aplicaTema(guarda.ler('atlas.tema', 'auto'));
   matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => aplicaTema(guarda.ler('atlas.tema', 'auto')));
@@ -1035,6 +1043,9 @@
     else if (h === 'todas') { mostra(); }
   });
 
+  /*@@vidro-ini*/
+  let toquesVersao = 0, ultimoToqueVersao = 0;
+  /*@@vidro-fim*/
   // ---------- cliques ----------
   document.addEventListener('click', (e) => {
     const t = e.target;
@@ -1055,8 +1066,15 @@
     if (t.closest('[data-instalar]') && promptInstalar) { promptInstalar.prompt(); promptInstalar.userChoice.finally(() => { promptInstalar = null; $('#instalar').innerHTML = ''; }); return; }
     if (t.closest('[data-fechar-instalar]')) { guarda.gravar('atlas.instalar', true); $('#instalar').innerHTML = ''; return; }
     if (t.closest('[data-limpar-filtros]')) { filtrosSel = { a: '', c: '', nu: '', el: '' }; const h = rotaAtual.split('/')[1]; if (h === 'busca' && buscaAtual) { $('#filtros-av').innerHTML = filtrosHtml(); buscaAtual(); } else mostra(); return; }
+    /*@@vidro-ini*/
     const vb = t.closest('.visual[data-visual]');
     if (vb) { guarda.gravar('atlas.visual', vb.dataset.visual); aplicaVisual(vb.dataset.visual); marcaVisual(); return; }
+    if (t.closest('[data-versao]')) { // 5 toques seguidos mostram a seção Aparência
+      toquesVersao = (performance.now() - ultimoToqueVersao < 1200 ? toquesVersao : 0) + 1; ultimoToqueVersao = performance.now();
+      if (toquesVersao >= 5) { const cx = $('#visuais-caixa'); if (cx) { cx.hidden = false; cx.scrollIntoView({ block: 'center', behavior: 'smooth' }); } toquesVersao = 0; }
+      return;
+    }
+    /*@@vidro-fim*/
     const tb = t.closest('.tema [data-tema]');
     if (tb) { guarda.gravar('atlas.tema', tb.dataset.tema); aplicaTema(tb.dataset.tema); marcaTema(); return; }
     const rp = t.closest('[data-repetir]');
@@ -1073,6 +1091,7 @@
   zoom.addEventListener('click', fechaZoom);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fechaZoom(); });
 
+  /*@@vidro-ini*/
   // ---------- vidro: a luz acompanha o dedo e cada toque solta uma "gota" ----------
   (() => {
     const VIDRO = '.abas,.capa,.atalho,.aula-card,.modo,.aula,.item,.cartao,.ficha,.guia-link,.btn-grande,.chip,.busca-falsa,.reag,.cl-card';
@@ -1099,6 +1118,7 @@
     }, { passive: true });
   })();
 
+  /*@@vidro-fim*/
   // ---------- versão nova ----------
   // Mesmo comportamento do PILATESRUN MOVE: confere versao.json ao abrir, ao voltar
   // para o app e a cada poucos minutos. Nunca recarrega sozinho: só quando toca em Atualizar.

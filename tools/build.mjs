@@ -403,19 +403,22 @@ const dados = {
 };
 const dadosTxt = JSON.stringify(dados);
 const svgsTxt = JSON.stringify(svgs);
+const RECURSOS = JSON.parse(fs.readFileSync(path.join(FONTE, 'recursos.json'), 'utf8'));
+const VIDRO = RECURSOS.vidro !== false; // false = o tema Vidro some do app (menos CSS e JS)
 const escuro = fs.readFileSync(path.join(FONTE, 'app/escuro.css'), 'utf8');
-const vidroEscuro = fs.readFileSync(path.join(FONTE, 'app/tema-escuro.css'), 'utf8');
+const vidroEscuro = VIDRO ? fs.readFileSync(path.join(FONTE, 'app/tema-escuro.css'), 'utf8') : '';
 const temaEscuro = `@media (prefers-color-scheme:dark){:root:not([data-tema="claro"]){${escuro}}}\n:root[data-tema="escuro"]{${escuro}}\n` +
-  `@media (prefers-color-scheme:dark){:root[data-visual="vidro"]:not([data-tema="claro"]){${vidroEscuro}}}\n:root[data-visual="vidro"][data-tema="escuro"]{${vidroEscuro}}\n`;
-const cssBruto = fs.readFileSync(path.join(FONTE, 'app/style.css'), 'utf8') + escopaVidro(fs.readFileSync(path.join(FONTE, 'app/tema.css'), 'utf8')) + temaEscuro +
+  (VIDRO ? `@media (prefers-color-scheme:dark){:root[data-visual="vidro"]:not([data-tema="claro"]){${vidroEscuro}}}\n:root[data-visual="vidro"][data-tema="escuro"]{${vidroEscuro}}\n` : '');
+const cssBruto = fs.readFileSync(path.join(FONTE, 'app/style.css'), 'utf8') + (VIDRO ? escopaVidro(fs.readFileSync(path.join(FONTE, 'app/tema.css'), 'utf8')) + fs.readFileSync(path.join(FONTE, 'app/visuais.css'), 'utf8') : '') + temaEscuro +
   '\n/* estilos das estruturas (gerado) */\n' + [...estilos].map(([st, c]) => `.${c}{${st}}`).join('') + '\n';
 // Navegadores mais antigos (Samsung Internet, Chrome < 120) não entendem CSS aninhado: sem isso o modo escuro
 // perdia as regras e as cores saíam distorcidas. O lightningcss desdobra o aninhamento em CSS plano.
 const css = transform({ filename: 'style.css', code: Buffer.from(cssBruto), minify: false, targets: { chrome: 90 << 16, safari: 14 << 16, firefox: 90 << 16, samsung: undefined }, errorRecovery: true }).code.toString();
-const js = fs.readFileSync(path.join(FONTE, 'app/app.js'), 'utf8').replace('/*@@estudo*/', () => fs.readFileSync(path.join(FONTE, 'app/estudo.js'), 'utf8'));
+const semVidro = (t) => (VIDRO ? t : t.replace(/\s*\/\*@@vidro-ini\*\/[\s\S]*?\/\*@@vidro-fim\*\/\n?/g, '\n').replace(/<!--@@vidro-ini-->[\s\S]*?<!--@@vidro-fim-->\n?/g, ''));
+const js = semVidro(fs.readFileSync(path.join(FONTE, 'app/app.js'), 'utf8')).replace('/*@@estudo*/', () => fs.readFileSync(path.join(FONTE, 'app/estudo.js'), 'utf8'));
 const motionJs = fs.readFileSync(path.join(raiz, 'tools/node_modules/motion/dist/motion.js'), 'utf8');
 const swFonte = fs.readFileSync(path.join(FONTE, 'app/sw.js'), 'utf8');
-const htmlFonte = fs.readFileSync(path.join(FONTE, 'app/index.template.html'), 'utf8');
+const htmlFonte = semVidro(fs.readFileSync(path.join(FONTE, 'app/index.template.html'), 'utf8'));
 
 const build = crypto.createHash('sha1').update(dadosTxt).update(svgsTxt).update(css).update(js).update(motionJs).update(fs.readFileSync(path.join(FONTE, 'app/dino.png'))).update(fs.readFileSync(path.join(FONTE, 'app/icone.svg'))).update(fs.readFileSync(path.join(FONTE, 'app/escuro.css'))).update(fs.readFileSync(path.join(FONTE, 'app/estudo.js'))).update(fs.readFileSync(path.join(FONTE, 'app/dino-vetor.json'))).update(fs.readFileSync(path.join(raiz, 'tools/node_modules/gsap/dist/gsap.min.js'))).update(swFonte).update(htmlFonte)
   .digest('hex').slice(0, 10);

@@ -4478,47 +4478,6 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
   position: relative;
 }
 
-.visuais {
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 12px;
-  display: grid;
-}
-
-.visual {
-  text-align: left;
-  background: var(--card);
-  border: 2px solid var(--bd);
-  border-radius: 18px;
-  flex-direction: column;
-  gap: 2px;
-  padding: 10px 12px 12px;
-  transition: border-color .2s;
-  display: flex;
-}
-
-.visual i {
-  background: linear-gradient(135deg,var(--ac-soft),var(--card));
-  border: 1px solid var(--bd);
-  border-radius: 12px;
-  height: 54px;
-  margin-bottom: 8px;
-  display: block;
-}
-
-.visual.v-vidro i {
-  background: radial-gradient(circle at 25% 30%, #34d399b3, #0000 55%), radial-gradient(circle at 80% 80%, #5ec4ff8c, #0000 55%), #fff6;
-}
-
-.visual small {
-  color: var(--mut);
-  font-size: .76rem;
-}
-
-.visual.on {
-  border-color: var(--ac);
-}
-
 :root[data-visual="vidro"] {
   --bg: #f2f4f3;
   --card: #ffffff94;
@@ -4959,6 +4918,55 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
     backdrop-filter: none;
     background: var(--card);
   }
+}
+
+.visuais {
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+  display: grid;
+}
+
+.visual {
+  text-align: left;
+  background: var(--card);
+  border: 2px solid var(--bd);
+  border-radius: 18px;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px 12px;
+  transition: border-color .2s;
+  display: flex;
+}
+
+.visual i {
+  background: linear-gradient(135deg,var(--ac-soft),var(--card));
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  height: 54px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.visual.v-vidro i {
+  background: radial-gradient(circle at 25% 30%, #34d399b3, #0000 55%), radial-gradient(circle at 80% 80%, #5ec4ff8c, #0000 55%), #fff6;
+}
+
+.visual small {
+  color: var(--mut);
+  font-size: .76rem;
+}
+
+.visual.on {
+  border-color: var(--ac);
+}
+
+.visuais-caixa {
+  margin-top: 6px;
+}
+
+.visuais-caixa[hidden] {
+  display: none;
 }
 
 @media (prefers-color-scheme: dark) {
