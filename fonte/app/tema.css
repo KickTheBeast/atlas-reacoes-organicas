@@ -1,0 +1,85 @@
+/* ===== TEMA "VIDRO": interface limpa, material translúcido (Liquid Glass), tipografia do sistema, verde do sistema ===== */
+:root{
+  --bg:#f2f4f3;--card:rgba(255,255,255,.58);--ink:#0b1210;--mut:#5f6d68;--faint:#9aa6a1;--bd:rgba(255,255,255,.7);--bd2:rgba(60,80,72,.16);
+  --ac:#1faa59;--ac-ink:#fff;--ac-soft:rgba(48,209,88,.16);
+  --nu:#0a6cff;--nu-soft:rgba(10,108,255,.12);--el:#e0700a;--el-soft:rgba(255,149,0,.16);--mec:#8e44d6;--mec-soft:rgba(175,82,222,.14);
+  --r:26px;--sombra:0 10px 34px rgba(10,30,22,.08),0 1px 2px rgba(10,30,22,.05);
+  --vidro-fundo:linear-gradient(160deg,rgba(255,255,255,.78),rgba(255,255,255,.42));
+  --vidro-borda:rgba(255,255,255,.85);
+  --vidro-sombra:0 12px 40px rgba(10,30,22,.10),0 2px 6px rgba(10,30,22,.05),inset 0 1px 0 rgba(255,255,255,.95),inset 0 -1px 0 rgba(255,255,255,.35);
+  --desfoque:blur(26px) saturate(185%);
+  --verde:linear-gradient(180deg,#44dc76,#1faa59);
+}
+body{font-family:-apple-system,"SF Pro Display","SF Pro Text",system-ui,"Segoe UI",Roboto,sans-serif;font-feature-settings:"ss01";-webkit-font-smoothing:antialiased;background:var(--bg);letter-spacing:-.011em}
+/* orbes de cor atrás do vidro (é o que dá o que "refratar") */
+body::before,body::after{content:"";position:fixed;z-index:0;pointer-events:none;border-radius:50%;filter:blur(60px);will-change:transform}
+body::before{width:78vw;height:78vw;left:-26vw;top:-12vw;background:radial-gradient(circle at 40% 40%,rgba(52,211,153,.55),rgba(52,211,153,0) 68%);animation:orbe1 22s ease-in-out infinite alternate}
+body::after{width:70vw;height:70vw;right:-30vw;top:34vh;background:radial-gradient(circle at 50% 50%,rgba(94,196,255,.4),rgba(52,199,89,.18) 50%,rgba(0,0,0,0) 70%);animation:orbe2 28s ease-in-out infinite alternate}
+@keyframes orbe1{to{transform:translate(18vw,14vh) scale(1.15)}}
+@keyframes orbe2{to{transform:translate(-22vw,-16vh) scale(1.2)}}
+#app{position:relative;z-index:1}
+/* material de vidro */
+.abas,.capa,.atalho,.aula-card,.modo,.aula,.item,.cartao,.ficha,.guia-link,.busca-falsa,.reag,.cl-card,.mp-banco,.radial,.aviso{
+  background:radial-gradient(220px circle at var(--gx,50%) var(--gy,0%),rgba(255,255,255,.62),transparent 70%),var(--vidro-fundo);
+  border:1px solid var(--vidro-borda);box-shadow:var(--vidro-sombra);-webkit-backdrop-filter:var(--desfoque);backdrop-filter:var(--desfoque);
+  border-radius:var(--r);overflow:hidden;transition:transform .5s cubic-bezier(.2,1.4,.4,1),box-shadow .3s}
+.aula:active,.item:active,.atalho:active,.aula-card:active,.modo:active,.cartao:active,.ficha:active,.guia-link:active{transform:scale(.965);transition-duration:.12s}
+.gota{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.85),rgba(255,255,255,.1) 60%,transparent 72%);pointer-events:none;z-index:3;mix-blend-mode:soft-light}
+/* topo: vidro que aparece ao rolar */
+.topo{background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;border:0}
+.topo::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(242,244,243,.86),rgba(242,244,243,.55));-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);opacity:0;transition:opacity .25s;border-bottom:1px solid rgba(60,80,72,.08)}
+.topo.rolou::before{opacity:1}
+@supports (animation-timeline:scroll()){.topo::before{opacity:0;animation:topo-vidro linear both;animation-timeline:scroll(root);animation-range:0 70px}@keyframes topo-vidro{to{opacity:1}}}
+.topo h1{font-weight:700;letter-spacing:-.03em;font-size:1.12rem}
+.topo .icone-btn{width:40px;height:40px;border-radius:50%;background:var(--vidro-fundo);border:1px solid var(--vidro-borda);box-shadow:0 4px 14px rgba(10,30,22,.1),inset 0 1px 0 rgba(255,255,255,.9);-webkit-backdrop-filter:var(--desfoque);backdrop-filter:var(--desfoque)}
+/* dock: cápsula flutuante de vidro */
+.abas{border-radius:34px;padding:5px;height:64px}
+.pilula{background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,.6));border:1px solid rgba(255,255,255,.95);box-shadow:0 6px 18px rgba(10,30,22,.16),inset 0 1px 0 #fff;border-radius:29px;top:5px;bottom:5px}
+.abas a.on{color:var(--ac)}
+.abas a{font-weight:600}
+/* capa */
+.capa{border-radius:36px;color:var(--ink);background:radial-gradient(260px circle at var(--gx,80%) var(--gy,0%),rgba(255,255,255,.75),transparent 70%),linear-gradient(160deg,rgba(255,255,255,.7),rgba(255,255,255,.34))}
+.capa::after{display:none}
+.capa-mol{stroke:rgba(31,170,89,.4)}.capa-mol circle{fill:rgba(31,170,89,.5)}.capa-mol .cm-b{stroke:rgba(31,170,89,.25)}
+.capa-tag{background:var(--ac-soft);color:var(--ac)}
+.capa h2{font-size:2.3rem;font-weight:800;letter-spacing:-.045em;color:var(--ink)}
+.capa p{color:var(--mut);opacity:1}
+.capa-busca{background:rgba(120,130,125,.12);border:1px solid rgba(255,255,255,.7);color:var(--mut);box-shadow:inset 0 1px 2px rgba(10,30,22,.06)}
+.capa .stats b{color:var(--ink)}.capa .stats span{color:var(--mut);opacity:1}
+.capa .stats>div{padding:0}
+/* ícones: gradientes suaves em cápsula */
+.at-ic,.md-ic,.aula .num,.ac-num{border-radius:14px;background:var(--verde);color:#fff;box-shadow:0 4px 12px rgba(31,170,89,.3),inset 0 1px 0 rgba(255,255,255,.55)}
+.atalho.c-a .at-ic,.m-jogo .md-ic{background:linear-gradient(180deg,#c28bf0,#8e44d6);box-shadow:0 4px 12px rgba(142,68,214,.3),inset 0 1px 0 rgba(255,255,255,.5)}
+.atalho.c-b .at-ic,.m-simulado .md-ic{background:linear-gradient(180deg,#5aa2ff,#0a6cff);box-shadow:0 4px 12px rgba(10,108,255,.3),inset 0 1px 0 rgba(255,255,255,.5)}
+.atalho.c-d .at-ic,.m-salvos .md-ic{background:linear-gradient(180deg,#ffb454,#e0700a);box-shadow:0 4px 12px rgba(224,112,10,.3),inset 0 1px 0 rgba(255,255,255,.5)}
+.m-notas .md-ic{background:linear-gradient(180deg,#9aa6a1,#6b7873)}
+.m-cartoes .md-ic{background:var(--verde)}
+.jogo-ic{background:linear-gradient(180deg,#c28bf0,#8e44d6)!important;color:#fff!important}
+.ac-num{height:30px}
+/* controles estilo iOS */
+.chip,.sel-estudo,.trans-sel select,.campo input,.mp-chip{background:rgba(120,130,125,.12);border:1px solid rgba(255,255,255,.6);box-shadow:inset 0 1px 2px rgba(10,30,22,.05);border-radius:99px}
+.chip.on,.mp-chip.sel{background:var(--verde);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(31,170,89,.3),inset 0 1px 0 rgba(255,255,255,.4)}
+.modo-busca,.tema{background:rgba(120,130,125,.16);border:0;border-radius:14px;box-shadow:none}
+.modo-busca a.on,.tema button.on{background:#fff;color:var(--ink);box-shadow:0 3px 8px rgba(10,30,22,.12),0 1px 1px rgba(10,30,22,.06);border-radius:11px}
+.btn-grande,.btn-aviso,.cr-lojabtn{background:var(--verde);color:#fff;border:0;border-radius:99px;box-shadow:0 8px 22px rgba(31,170,89,.34),inset 0 1px 0 rgba(255,255,255,.5)}
+.btn{background:var(--vidro-fundo);border:1px solid var(--vidro-borda);border-radius:99px;box-shadow:0 4px 14px rgba(10,30,22,.08),inset 0 1px 0 #fff}
+.guia-link{color:#fff;background:linear-gradient(160deg,#3ad274,#17924a)}
+.guia-link .gl-ic{background:rgba(255,255,255,.25)}
+.hero{border-radius:32px}
+.tile{background:#fff;border:1px solid rgba(255,255,255,.9);border-radius:20px;box-shadow:0 6px 18px rgba(10,30,22,.1)}
+.mini-prog{background:rgba(120,130,125,.16)}.mini-prog i{background:var(--verde)}
+.rad-lin{stroke:#1faa59}
+.rad-rg span,.mp-slot{background:rgba(255,255,255,.85);border:1px solid #fff;box-shadow:0 3px 10px rgba(10,30,22,.12)}
+.aviso{color:var(--ink);background:var(--vidro-fundo)}
+/* transições de página (View Transitions API) */
+::view-transition-old(root),::view-transition-new(root){animation-duration:.42s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
+:root[data-nav="frente"]::view-transition-old(root){animation-name:vt-sai-esq}
+:root[data-nav="frente"]::view-transition-new(root){animation-name:vt-entra-dir}
+:root[data-nav="tras"]::view-transition-old(root){animation-name:vt-sai-dir}
+:root[data-nav="tras"]::view-transition-new(root){animation-name:vt-entra-esq}
+@keyframes vt-sai-esq{to{opacity:0;transform:translateX(-14%) scale(.97);filter:blur(10px)}}
+@keyframes vt-entra-dir{from{opacity:0;transform:translateX(16%) scale(1.02);filter:blur(10px)}}
+@keyframes vt-sai-dir{to{opacity:0;transform:translateX(14%) scale(.97);filter:blur(10px)}}
+@keyframes vt-entra-esq{from{opacity:0;transform:translateX(-16%) scale(1.02);filter:blur(10px)}}
+@media (prefers-reduced-motion:reduce){body::before,body::after{animation:none}}
+@media (prefers-reduced-transparency:reduce){.abas,.capa,.atalho,.aula-card,.modo,.aula,.item,.cartao{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--card)}}

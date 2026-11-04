@@ -2,7 +2,7 @@
 // Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
 (() => {
   'use strict';
-  const BUILD = '426570621f';
+  const BUILD = '3b5d56a827';
   const $ = (s) => document.querySelector(s);
   const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
   const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
@@ -597,12 +597,19 @@
     titulo.textContent = t.prof === 0 && TITULOS[t.aba] && hash.split('/').length < 3 ? (t.aba === 'aulas' ? 'Atlas Orgânico' : TITULOS[t.aba]) : t.titulo;
     voltar.hidden = t.prof === 0;
     document.title = (t.titulo === 'Atlas Orgânico' ? '' : t.titulo + ' · ') + 'Atlas de Reações Orgânicas';
-    tela.innerHTML = `<div class="tela ${usaMotion ? '' : dir}">${t.html}</div>`;
-    window.scrollTo(0, 0);
-    hidrata(tela);
-    t.depois && t.depois();
-    marcaAba();
-    animaTela(dir);
+    const aplica = (vt) => {
+      tela.innerHTML = `<div class="tela ${usaMotion ? '' : dir}">${t.html}</div>`;
+      window.scrollTo(0, 0);
+      hidrata(tela);
+      t.depois && t.depois();
+      marcaAba();
+      animaTela(dir, vt);
+    };
+    // Navegação com a View Transitions API: a tela antiga e a nova se fundem (e desfocam) em vez de trocar de repente
+    if (document.startViewTransition && !reduzido && dir !== '' && !document.hidden) {
+      document.documentElement.dataset.nav = dir;
+      document.startViewTransition(() => aplica(true));
+    } else aplica(false);
   }
 
   function marcaAba() {
@@ -652,11 +659,11 @@
   }
 
   // A tela inteira desliza (para a frente ou para trás) com mola
-  function animaTela(dir) {
+  function animaTela(dir, vt) {
     const el = tela.firstElementChild;
     if (!usaMotion || !el) return;
     const fim = () => { el.style.opacity = ''; el.style.transform = ''; };
-    M.animate(el, { opacity: [0, 1], x: [dir === 'frente' ? 40 : dir === 'tras' ? -40 : 0, 0], y: [dir ? 0 : 14, 0] }, { ...MOLA, stiffness: 320, damping: 30 }).then(fim, fim);
+    if (!vt) M.animate(el, { opacity: [0, 1], x: [dir === 'frente' ? 40 : dir === 'tras' ? -40 : 0, 0], y: [dir ? 0 : 14, 0] }, { ...MOLA, stiffness: 320, damping: 30 }).then(fim, fim);
     // Estruturas do esquema aparecem uma a uma, com um quique
     const tiles = el.querySelectorAll('.esquema .tile');
     if (tiles.length) M.animate(tiles, { opacity: [0, 1], scale: [0.55, 1] }, { type: 'spring', stiffness: 380, damping: 18, delay: M.stagger(0.09, { startDelay: 0.3 }) });
@@ -1059,6 +1066,30 @@
   function fechaZoom() { paraSetas(zoomConteudo); zoom.hidden = true; zoomConteudo.innerHTML = ''; }
   zoom.addEventListener('click', fechaZoom);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fechaZoom(); });
+
+  // ---------- vidro: a luz acompanha o dedo e cada toque solta uma "gota" ----------
+  (() => {
+    const VIDRO = '.abas,.capa,.atalho,.aula-card,.modo,.aula,.item,.cartao,.ficha,.guia-link,.btn-grande,.chip,.busca-falsa,.reag,.cl-card';
+    const luz = (e) => {
+      const el = e.target.closest && e.target.closest(VIDRO); if (!el) return;
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--gx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
+      el.style.setProperty('--gy', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
+    };
+    document.addEventListener('pointermove', luz, { passive: true });
+    document.addEventListener('pointerdown', (e) => {
+      luz(e);
+      const el = e.target.closest && e.target.closest(VIDRO); if (!el || reduzido) return;
+      const r = el.getBoundingClientRect();
+      const d = document.createElement('span'); d.className = 'gota';
+      const t = Math.max(r.width, r.height) * 1.6;
+      d.style.cssText = `left:${e.clientX - r.left - t / 2}px;top:${e.clientY - r.top - t / 2}px;width:${t}px;height:${t}px`;
+      if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+      el.appendChild(d);
+      const fim = () => d.remove();
+      if (usaMotion) M.animate(d, { scale: [0.1, 1], opacity: [0.55, 0] }, { duration: 0.7, ease: [0.16, 1, 0.3, 1] }).then(fim, fim); else setTimeout(fim, 400);
+    }, { passive: true });
+  })();
 
   // ---------- versão nova ----------
   // Mesmo comportamento do PILATESRUN MOVE: confere versao.json ao abrir, ao voltar

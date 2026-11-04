@@ -1,0 +1,32 @@
+--bg:#050807;--card:rgba(44,52,49,.5);--ink:#f2f7f5;--mut:#9fb0a9;--faint:#6d7f78;--bd:rgba(255,255,255,.1);--bd2:rgba(255,255,255,.14);
+--ac:#34e07a;--ac-ink:#02210f;--ac-soft:rgba(52,224,122,.16);
+--nu:#5aa2ff;--nu-soft:rgba(90,162,255,.16);--el:#ffa94d;--el-soft:rgba(255,169,77,.16);--mec:#c28bf0;--mec-soft:rgba(194,139,240,.16);
+--vidro-fundo:linear-gradient(160deg,rgba(255,255,255,.13),rgba(255,255,255,.04));
+--vidro-borda:rgba(255,255,255,.16);
+--vidro-sombra:0 14px 44px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.2),inset 0 -1px 0 rgba(255,255,255,.04);
+--sombra:0 10px 34px rgba(0,0,0,.45);
+color-scheme:dark;
+
+& body{background:var(--bg)}
+& body::before{background:radial-gradient(circle at 40% 40%,rgba(30,200,130,.42),rgba(30,200,130,0) 68%)}
+& body::after{background:radial-gradient(circle at 50% 50%,rgba(40,120,255,.3),rgba(30,200,110,.14) 50%,rgba(0,0,0,0) 70%)}
+& .abas,& .capa,& .atalho,& .aula-card,& .modo,& .aula,& .item,& .cartao,& .ficha,& .busca-falsa,& .reag,& .cl-card,& .mp-banco,& .radial,& .aviso{
+  background:radial-gradient(220px circle at var(--gx,50%) var(--gy,0%),rgba(255,255,255,.18),transparent 70%),var(--vidro-fundo);border-color:var(--vidro-borda);box-shadow:var(--vidro-sombra)}
+& .capa{color:var(--ink)}
+& .topo::before{background:linear-gradient(180deg,rgba(5,8,7,.85),rgba(5,8,7,.5));border-color:rgba(255,255,255,.08)}
+& .topo .icone-btn{border-color:var(--vidro-borda);box-shadow:0 4px 14px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.18)}
+& .pilula{background:linear-gradient(180deg,rgba(255,255,255,.26),rgba(255,255,255,.1));border-color:rgba(255,255,255,.3);box-shadow:0 6px 18px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.35)}
+& .chip,& .sel-estudo,& .trans-sel select,& .campo input,& .mp-chip{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12);box-shadow:none}
+& .chip.on,& .mp-chip.sel,& .btn-grande,& .btn-aviso{color:#02210f}
+& .modo-busca,& .tema{background:rgba(255,255,255,.1)}
+& .modo-busca a.on,& .tema button.on{background:rgba(255,255,255,.22);color:var(--ink);box-shadow:0 3px 8px rgba(0,0,0,.35)}
+& .btn{background:var(--vidro-fundo);border-color:var(--vidro-borda);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+& .tile{background:#fff;border-color:rgba(255,255,255,.9);box-shadow:0 8px 22px rgba(0,0,0,.5)}
+& .capa-busca{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.16);color:var(--mut)}
+& .capa-tag{color:var(--ac)}
+& .at-ic,& .md-ic,& .aula .num,& .ac-num{color:#02210f}
+& .atalho.c-a .at-ic,& .atalho.c-b .at-ic,& .atalho.c-d .at-ic,& .m-simulado .md-ic,& .m-jogo .md-ic,& .m-salvos .md-ic,& .m-notas .md-ic,& .jogo-ic{color:#fff}
+& .rad-rg span,& .mp-slot{background:rgba(40,48,45,.85);border-color:rgba(255,255,255,.18);color:var(--ink)}
+& .rad-lin{stroke:#34e07a}
+& .gota{mix-blend-mode:screen}
+& .aviso{color:var(--ink)}

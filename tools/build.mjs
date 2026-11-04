@@ -402,9 +402,9 @@ const dados = {
 };
 const dadosTxt = JSON.stringify(dados);
 const svgsTxt = JSON.stringify(svgs);
-const escuro = fs.readFileSync(path.join(FONTE, 'app/escuro.css'), 'utf8');
+const escuro = fs.readFileSync(path.join(FONTE, 'app/escuro.css'), 'utf8') + '\n' + fs.readFileSync(path.join(FONTE, 'app/tema-escuro.css'), 'utf8');
 const temaEscuro = `@media (prefers-color-scheme:dark){:root:not([data-tema="claro"]){${escuro}}}\n:root[data-tema="escuro"]{${escuro}}\n`;
-const cssBruto = fs.readFileSync(path.join(FONTE, 'app/style.css'), 'utf8') + temaEscuro +
+const cssBruto = fs.readFileSync(path.join(FONTE, 'app/style.css'), 'utf8') + fs.readFileSync(path.join(FONTE, 'app/tema.css'), 'utf8') + temaEscuro +
   '\n/* estilos das estruturas (gerado) */\n' + [...estilos].map(([st, c]) => `.${c}{${st}}`).join('') + '\n';
 // Navegadores mais antigos (Samsung Internet, Chrome < 120) não entendem CSS aninhado: sem isso o modo escuro
 // perdia as regras e as cores saíam distorcidas. O lightningcss desdobra o aninhamento em CSS plano.
