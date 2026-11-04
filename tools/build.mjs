@@ -16,6 +16,7 @@ import sharp from 'sharp';
 import { lerMolblock, posicoesAtomos, marcarSetas } from './setas.mjs';
 import { resolveCids } from './cid.mjs';
 import { transform } from 'lightningcss';
+import { escopaVidro } from './escopo-vidro.mjs';
 import { GRUPOS, gruposDe } from './grupos.mjs';
 
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -402,9 +403,11 @@ const dados = {
 };
 const dadosTxt = JSON.stringify(dados);
 const svgsTxt = JSON.stringify(svgs);
-const escuro = fs.readFileSync(path.join(FONTE, 'app/escuro.css'), 'utf8') + '\n' + fs.readFileSync(path.join(FONTE, 'app/tema-escuro.css'), 'utf8');
-const temaEscuro = `@media (prefers-color-scheme:dark){:root:not([data-tema="claro"]){${escuro}}}\n:root[data-tema="escuro"]{${escuro}}\n`;
-const cssBruto = fs.readFileSync(path.join(FONTE, 'app/style.css'), 'utf8') + fs.readFileSync(path.join(FONTE, 'app/tema.css'), 'utf8') + temaEscuro +
+const escuro = fs.readFileSync(path.join(FONTE, 'app/escuro.css'), 'utf8');
+const vidroEscuro = fs.readFileSync(path.join(FONTE, 'app/tema-escuro.css'), 'utf8');
+const temaEscuro = `@media (prefers-color-scheme:dark){:root:not([data-tema="claro"]){${escuro}}}\n:root[data-tema="escuro"]{${escuro}}\n` +
+  `@media (prefers-color-scheme:dark){:root[data-visual="vidro"]:not([data-tema="claro"]){${vidroEscuro}}}\n:root[data-visual="vidro"][data-tema="escuro"]{${vidroEscuro}}\n`;
+const cssBruto = fs.readFileSync(path.join(FONTE, 'app/style.css'), 'utf8') + escopaVidro(fs.readFileSync(path.join(FONTE, 'app/tema.css'), 'utf8')) + temaEscuro +
   '\n/* estilos das estruturas (gerado) */\n' + [...estilos].map(([st, c]) => `.${c}{${st}}`).join('') + '\n';
 // Navegadores mais antigos (Samsung Internet, Chrome < 120) não entendem CSS aninhado: sem isso o modo escuro
 // perdia as regras e as cores saíam distorcidas. O lightningcss desdobra o aninhamento em CSS plano.

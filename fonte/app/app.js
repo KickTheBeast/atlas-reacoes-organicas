@@ -257,10 +257,10 @@
     return {
       titulo: 'Atlas Orgânico', aba: 'aulas', prof: 0,
       html: `<section class="capa sobe">
-          <svg class="capa-mol" viewBox="0 0 200 160" aria-hidden="true"><g class="cm-a"><path d="M100 18l26 15v30l-26 15-26-15V33z"/><path d="M126 63l26 15v30l-26 15-26-15V78z" class="cm-b"/><path d="M74 63L48 78"/><path d="M48 78l-26 15"/></g><circle cx="22" cy="93" r="4"/><circle cx="48" cy="78" r="4"/></svg>
+          <svg class="hex" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 8 L86 29 L86 71 L50 92 L14 71 L14 29 Z"/></svg><svg class="hex" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 8 L86 29 L86 71 L50 92 L14 71 L14 29 Z"/></svg>
           <span class="capa-tag">Química Orgânica II · USP</span>
           <h2>Atlas de<br>reações</h2>
-          <p>Toda a matéria, do jeito que cai na prova.</p>
+          <p>Toda a matéria na palma da sua mão.</p>
           <button class="capa-busca" data-ir="#/busca"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>Buscar reação ou reagente…</button>
           <div class="stats">${stat(D.reacoes.length, 'reações')}${stat(nAulas, 'aulas')}${stat(g.dom, 'dominadas')}</div>
         </section>
@@ -274,9 +274,11 @@
         <div class="sec"><h3>Por aula</h3><span>${D.aulas.length} aulas</span></div>
         <div class="aulas-grade">${itens}</div>
         <a class="aula sobe" style="--i:${D.aulas.length + 6}" href="#/todas"><div class="num">∑</div><div class="tx"><b>Todas as reações</b><small>${plural(D.reacoes.length, 'reação', 'reações')}</small></div>${SETA_IR}</a>
+        <div class="sec"><h3>Aparência</h3><span>cores e visual</span></div>
+        <div class="visuais" role="group" aria-label="Visual"><button class="visual v-original" data-visual="original"><i></i><b>Original</b><small>cartões sólidos</small></button><button class="visual v-vidro" data-visual="vidro"><i></i><b>Vidro</b><small>translúcido, estilo Apple</small></button></div>
         <div class="tema" role="group" aria-label="Tema"><button data-tema="auto">Auto</button><button data-tema="claro">Claro</button><button data-tema="escuro">Escuro</button></div>
         <div class="rodape"><button class="avatar" data-creditos aria-label="Créditos">${DINO_AVATAR}</button><br>Versão ${BUILD}<br><button data-verificar>Verificar atualização</button></div>`,
-      depois: () => { montaInstalar(); contaAte(tela); marcaTema(); },
+      depois: () => { montaInstalar(); contaAte(tela); marcaTema(); marcaVisual(); },
     };
   }
 
@@ -606,7 +608,7 @@
       animaTela(dir, vt);
     };
     // Navegação com a View Transitions API: a tela antiga e a nova se fundem (e desfocam) em vez de trocar de repente
-    if (document.startViewTransition && !reduzido && dir !== '' && !document.hidden) {
+    if (document.startViewTransition && !reduzido && dir !== '' && !document.hidden && document.documentElement.dataset.visual === 'vidro') {
       document.documentElement.dataset.nav = dir;
       document.startViewTransition(() => aplica(true));
     } else aplica(false);
@@ -1018,6 +1020,8 @@
     document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape' && creditosEl === el) { fecha(); document.removeEventListener('keydown', esc); } });
   }
 
+  const marcaVisual = () => { const v = guarda.ler('atlas.visual', 'original'); document.querySelectorAll('[data-visual]').forEach((b) => { if (b.classList.contains('visual')) b.classList.toggle('on', b.dataset.visual === v); }); };
+  const aplicaVisual = (v) => { if (v === 'vidro') document.documentElement.dataset.visual = 'vidro'; else delete document.documentElement.dataset.visual; };
   const marcaTema = () => { const t = guarda.ler('atlas.tema', 'auto'); document.querySelectorAll('.tema [data-tema]').forEach((b) => b.classList.toggle('on', b.dataset.tema === t)); };
   aplicaTema(guarda.ler('atlas.tema', 'auto'));
   matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => aplicaTema(guarda.ler('atlas.tema', 'auto')));
@@ -1051,6 +1055,8 @@
     if (t.closest('[data-instalar]') && promptInstalar) { promptInstalar.prompt(); promptInstalar.userChoice.finally(() => { promptInstalar = null; $('#instalar').innerHTML = ''; }); return; }
     if (t.closest('[data-fechar-instalar]')) { guarda.gravar('atlas.instalar', true); $('#instalar').innerHTML = ''; return; }
     if (t.closest('[data-limpar-filtros]')) { filtrosSel = { a: '', c: '', nu: '', el: '' }; const h = rotaAtual.split('/')[1]; if (h === 'busca' && buscaAtual) { $('#filtros-av').innerHTML = filtrosHtml(); buscaAtual(); } else mostra(); return; }
+    const vb = t.closest('.visual[data-visual]');
+    if (vb) { guarda.gravar('atlas.visual', vb.dataset.visual); aplicaVisual(vb.dataset.visual); marcaVisual(); return; }
     const tb = t.closest('.tema [data-tema]');
     if (tb) { guarda.gravar('atlas.tema', tb.dataset.tema); aplicaTema(tb.dataset.tema); marcaTema(); return; }
     const rp = t.closest('[data-repetir]');
@@ -1071,6 +1077,7 @@
   (() => {
     const VIDRO = '.abas,.capa,.atalho,.aula-card,.modo,.aula,.item,.cartao,.ficha,.guia-link,.btn-grande,.chip,.busca-falsa,.reag,.cl-card';
     const luz = (e) => {
+      if (document.documentElement.dataset.visual !== 'vidro') return;
       const el = e.target.closest && e.target.closest(VIDRO); if (!el) return;
       const r = el.getBoundingClientRect();
       el.style.setProperty('--gx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
@@ -1078,6 +1085,7 @@
     };
     document.addEventListener('pointermove', luz, { passive: true });
     document.addEventListener('pointerdown', (e) => {
+      if (document.documentElement.dataset.visual !== 'vidro') return;
       luz(e);
       const el = e.target.closest && e.target.closest(VIDRO); if (!el || reduzido) return;
       const r = el.getBoundingClientRect();

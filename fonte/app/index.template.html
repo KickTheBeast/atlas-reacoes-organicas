@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Atlas Org.">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<script>try{var t=JSON.parse(localStorage.getItem("atlas.tema")||"null");if(t==="claro"||t==="escuro")document.documentElement.dataset.tema=t;var e=document.documentElement.dataset.tema||(matchMedia("(prefers-color-scheme: dark)").matches?"escuro":"claro");document.getElementById("tc").content=e==="escuro"?"#090f0d":"#f4f7f5"}catch(e){}</script>
+<script>try{if(JSON.parse(localStorage.getItem("atlas.visual")||"null")==="vidro")document.documentElement.dataset.visual="vidro"}catch(e){}try{var t=JSON.parse(localStorage.getItem("atlas.tema")||"null");if(t==="claro"||t==="escuro")document.documentElement.dataset.tema=t;var e=document.documentElement.dataset.tema||(matchMedia("(prefers-color-scheme: dark)").matches?"escuro":"claro");document.getElementById("tc").content=e==="escuro"?"#090f0d":"#f4f7f5"}catch(e){}</script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icone.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">

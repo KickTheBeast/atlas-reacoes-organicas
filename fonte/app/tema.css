@@ -40,7 +40,7 @@ body::after{width:70vw;height:70vw;right:-30vw;top:34vh;background:radial-gradie
 /* capa */
 .capa{border-radius:36px;color:var(--ink);background:radial-gradient(260px circle at var(--gx,80%) var(--gy,0%),rgba(255,255,255,.75),transparent 70%),linear-gradient(160deg,rgba(255,255,255,.7),rgba(255,255,255,.34))}
 .capa::after{display:none}
-.capa-mol{stroke:rgba(31,170,89,.4)}.capa-mol circle{fill:rgba(31,170,89,.5)}.capa-mol .cm-b{stroke:rgba(31,170,89,.25)}
+.capa .hex path{stroke:#1faa59}.capa .hex{opacity:.22}.capa .hex+.hex{opacity:.16}
 .capa-tag{background:var(--ac-soft);color:var(--ac)}
 .capa h2{font-size:2.3rem;font-weight:800;letter-spacing:-.045em;color:var(--ink)}
 .capa p{color:var(--mut);opacity:1}

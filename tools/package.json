@@ -11,6 +11,7 @@
     "gsap": "^3.15.0",
     "lightningcss": "^1.33.0",
     "motion": "^14.9.0",
+    "postcss": "^8.5.32",
     "sharp": "*"
   }
 }
