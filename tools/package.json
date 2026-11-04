@@ -1,1 +1,15 @@
-{"name":"atlas-tools","private":true,"type":"module","scripts":{"build":"node build.mjs"},"dependencies":{"@rdkit/rdkit":"*","gsap":"^3.15.0","motion":"^14.9.0","sharp":"*"}}
+{
+  "name": "atlas-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "validate-questions": "node validar-questoes.mjs"
+  },
+  "dependencies": {
+    "@rdkit/rdkit": "*",
+    "gsap": "^3.15.0",
+    "motion": "^14.9.0",
+    "sharp": "*"
+  }
+}

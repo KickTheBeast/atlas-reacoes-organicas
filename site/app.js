@@ -2,7 +2,7 @@
 // Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
 (() => {
   'use strict';
-  const BUILD = '3b66e94750';
+  const BUILD = '0f94452a65';
   const $ = (s) => document.querySelector(s);
   const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
   const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
@@ -264,7 +264,7 @@
       el: ['Eletrófilos', 'Escolha o eletrófilo (substrato ou reagente) e veja as reações.'],
     }[tipo];
     const nota = tipo === 'mec' ? '' : '<p class="sub-lista">Classificação automática a partir dos reagentes e das estruturas: confira no slide em caso de dúvida.</p>';
-    const guias = tipo === 'mec' ? `<div class="sec"><h3>Guias rápidos</h3><span>tabelas e esquemas</span></div>${D.guias.map((g, i) => `<a class="aula sobe" style="--i:${i + 2}" href="#/guia/${g.id}"><div class="num guia-num">${esc(g.curto)}</div><div class="tx"><b>${esc(g.t)}</b><small>${esc(g.sub)}</small></div>${SETA_IR}</a>`).join('')}<div class="sec"><h3>Reações por mecanismo</h3><span>${D.categorias.length} tipos</span></div>` : '';
+    const guias = tipo === 'mec' ? `<div class="sec"><h3>Mapas de reações</h3><span>diagramas e jogo</span></div>${D.mapas.map((m, i) => `<a class="aula sobe" style="--i:${i + 2}" href="#/mapa/${m.id}"><div class="num guia-num">${esc(m.curto)}</div><div class="tx"><b>${esc(m.t)}</b><small>${esc(m.sub)}${melhorMapa(m.id) != null ? ` · melhor jogo ${melhorMapa(m.id)}%` : ''}</small></div>${SETA_IR}</a>`).join('')}<div class="sec"><h3>Guias rápidos</h3><span>tabelas e esquemas</span></div>${D.guias.map((g, i) => `<a class="aula sobe" style="--i:${i + 2}" href="#/guia/${g.id}"><div class="num guia-num">${esc(g.curto)}</div><div class="tx"><b>${esc(g.t)}</b><small>${esc(g.sub)}</small></div>${SETA_IR}</a>`).join('')}<div class="sec"><h3>Reações por mecanismo</h3><span>${D.categorias.length} tipos</span></div>` : '';
     return {
       titulo: info[0], aba: tipo, prof: 0,
       html: `<h2 class="titulo-lista sobe">${info[0]}</h2><p class="sub-lista sobe" style="--i:1">${info[1]}</p>${nota}${guias}
@@ -428,10 +428,75 @@
     };
   }
 
+  // ---------- busca por transformação: grupo funcional de partida → grupo funcional de chegada ----------
+  const modoBusca = (on) => `<div class="modo-busca" role="tablist"><a href="#/busca" class="${on === 'texto' ? 'on' : ''}">Por texto</a><a href="#/transforma" class="${on === 'trans' ? 'on' : ''}">Por transformação</a></div>`;
+  const nomeGrupo = (id) => (D.grupos.find((g) => g.id === id) || {}).nome || id;
+  // o que "some" é a origem e o que "aparece" é o destino; se nada some (ex.: nitração do benzeno), vale o que já existia/ficou
+  const origens = (r) => { const a = r.gs.filter((x) => !r.gp.includes(x)); return a.length ? a : r.gs; };
+  const destinos = (r) => { const a = r.gp.filter((x) => !r.gs.includes(x)); return a.length ? a : r.gp; };
+  let trans = guarda.ler('atlas.trans', { de: 'haleto', para: 'alceno', rg: '' });
+  function telaTransforma() {
+    const opcoes = (sel, vazio) => `<option value="">${vazio}</option>` + [...D.grupos].sort((a, b) => a.nome.localeCompare(b.nome, 'pt')).map((g) => `<option value="${g.id}"${g.id === sel ? ' selected' : ''}>${esc(g.nome)}</option>`).join('');
+    return {
+      titulo: 'Buscar', aba: undefined, prof: 1,
+      html: `${modoBusca('trans')}
+        <p class="sub-lista sobe">Escolha o grupo funcional de partida e o de chegada: o atlas mostra os reagentes que fazem a transformação e as reações da matéria.</p>
+        <div class="trans-sel sobe" style="--i:1">
+          <label><span>Parto de</span><select id="t-de">${opcoes(trans.de, 'Qualquer grupo')}</select></label>
+          <button class="trans-troca" id="t-troca" aria-label="Trocar partida e chegada"><svg viewBox="0 0 24 24"><path d="M7 4v14M3.5 14.5 7 18l3.5-3.5M17 20V6M13.5 9.5 17 6l3.5 3.5"/></svg></button>
+          <label><span>Chego em</span><select id="t-para">${opcoes(trans.para, 'Qualquer grupo')}</select></label>
+        </div>
+        <div id="t-res"></div>`,
+      depois: () => {
+        const de = $('#t-de'), para = $('#t-para'), out = $('#t-res');
+        const filtra = () => D.reacoes.filter((r) => (!trans.de || origens(r).includes(trans.de)) && (!trans.para || destinos(r).includes(trans.para)) && (trans.de || trans.para));
+        const desenha = () => {
+          guarda.gravar('atlas.trans', trans);
+          if (!trans.de && !trans.para) {
+            const pares = {};
+            D.reacoes.forEach((r) => origens(r).forEach((a) => destinos(r).forEach((b) => { if (a !== b) pares[a + '|' + b] = (pares[a + '|' + b] || 0) + 1; })));
+            const top = Object.entries(pares).sort((a, b) => b[1] - a[1]).slice(0, 14);
+            out.innerHTML = `<div class="sec"><h3>Transformações comuns</h3></div><div class="filtros" style="flex-wrap:wrap;overflow:visible">${top.map(([k, n]) => { const [a, b] = k.split('|'); return `<button class="chip" data-par="${k}">${esc(nomeGrupo(a))} → ${esc(nomeGrupo(b))} <small>${n}</small></button>`; }).join('')}</div>`;
+            return;
+          }
+          const res = filtra();
+          // reagentes que servem para essa transformação (agrupados pelo texto do reagente)
+          const porRg = new Map();
+          res.forEach((r) => { const k = (r.rg || '').trim(); if (k) porRg.set(k, (porRg.get(k) || 0) + 1); });
+          const regs = [...porRg].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'pt'));
+          const lista = trans.rg ? res.filter((r) => (r.rg || '').trim() === trans.rg) : res;
+          let extra = '';
+          if (trans.de && !trans.para || !trans.de && trans.para) { // só um lado: mostra aonde dá para chegar / de onde vem
+            const cont = {};
+            res.forEach((r) => (trans.de ? destinos(r) : origens(r)).forEach((g) => { if (g !== (trans.de || trans.para)) cont[g] = (cont[g] || 0) + 1; }));
+            const alt = Object.entries(cont).sort((a, b) => b[1] - a[1]);
+            extra = `<div class="sec"><h3>${trans.de ? 'Dá para chegar em' : 'Vem de'}</h3><span>toque para escolher</span></div><div class="filtros" style="flex-wrap:wrap;overflow:visible">${alt.map(([g, n]) => `<button class="chip" data-alvo="${g}">${esc(nomeGrupo(g))} <small>${n}</small></button>`).join('')}</div>`;
+          }
+          if (!res.length) { out.innerHTML = vazio('Nenhuma reação do atlas faz essa transformação.<br>Tente outro par de grupos.'); return; }
+          ultimaLista = lista.map((r) => r.i);
+          out.innerHTML = `${extra}
+            <div class="sec"><h3>Reagentes</h3><span>${plural(regs.length, 'opção', 'opções')}</span></div>
+            <div class="reag-lista">${regs.map(([k, n]) => `<button class="reag${trans.rg === k ? ' on' : ''}" data-rg="${esc(k)}"><b>${esc(k)}</b><small>${plural(n, 'reação', 'reações')}</small></button>`).join('')}</div>
+            <div class="sec"><h3>Reações</h3><span>${plural(lista.length, 'reação', 'reações')}${trans.rg ? ' com este reagente' : ''}</span></div>${lista.slice(0, 80).map(itemHtml).join('')}${lista.length > 80 ? `<p class="vazio">Mostrando 80 de ${lista.length}.</p>` : ''}`;
+          hidrata(out);
+        };
+        de.addEventListener('change', () => { trans = { de: de.value, para: trans.para, rg: '' }; desenha(); });
+        para.addEventListener('change', () => { trans = { de: trans.de, para: para.value, rg: '' }; desenha(); });
+        $('#t-troca').addEventListener('click', () => { trans = { de: trans.para, para: trans.de, rg: '' }; de.value = trans.de; para.value = trans.para; desenha(); });
+        out.addEventListener('click', (e) => {
+          const rg = e.target.closest('[data-rg]'); if (rg) { trans.rg = trans.rg === rg.dataset.rg ? '' : rg.dataset.rg; desenha(); return; }
+          const al = e.target.closest('[data-alvo]'); if (al) { if (trans.de) trans.para = al.dataset.alvo; else trans.de = al.dataset.alvo; trans.rg = ''; de.value = trans.de; para.value = trans.para; desenha(); return; }
+          const pr = e.target.closest('[data-par]'); if (pr) { const [a, b] = pr.dataset.par.split('|'); trans = { de: a, para: b, rg: '' }; de.value = a; para.value = b; desenha(); }
+        });
+        desenha();
+      },
+    };
+  }
+
   function telaBusca() {
     return {
       titulo: 'Buscar', aba: undefined, prof: 1,
-      html: `<div class="campo"><input id="q" type="search" placeholder="Ex.: SN2, t-BuBr, Zaitsev, epóxido…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"></div><div id="filtros-av">${filtrosHtml()}</div><div id="resultados"></div>`,
+      html: `${modoBusca('texto')}<div class="campo"><input id="q" type="search" placeholder="Ex.: SN2, t-BuBr, Zaitsev, epóxido…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"></div><div id="filtros-av">${filtrosHtml()}</div><div id="resultados"></div>`,
       depois: () => {
         const q = $('#q'), out = $('#resultados');
         const sugest = ['SN2', 'SN1', 'E2', 'Zaitsev', 'Markovnikov', 'carbeno', 'bromônio', 'epóxido', 'rearranjo', 'Hammond'];
@@ -475,10 +540,11 @@
   let profAnterior = -1, abaAtual = 'aulas', rotaAtual = '';
   const reduzido = matchMedia('(prefers-reduced-motion: reduce)').matches;
   function resolve(hash) {
-    const [, a, b] = hash.split('?')[0].split('/');
+    const [, a, b, c] = hash.split('?')[0].split('/');
     if (!a || a === 'aulas') return telaAulas();
     if (a === 'mec' || a === 'nu' || a === 'el') return b ? telaLista(a, b) : telaIndice(a);
     if (a === 'guia') return telaGuia(b);
+    if (a === 'mapa') return telaMapa(b, c);
     if (a === 'aula') return telaLista('aula', b);
     if (a === 'todas') return telaLista('todas');
     if (a === 'salvos') return telaLista('salvos');
@@ -488,6 +554,7 @@
     if (a === 'notas') return telaNotas();
     if (a === 'r') return telaDetalhe(b);
     if (a === 'busca') return telaBusca();
+    if (a === 'transforma') return telaTransforma();
     return null;
   }
   const TITULOS = { aulas: 'Aulas', mec: 'Mecanismos', nu: 'Nucleófilos', el: 'Eletrófilos', salvos: 'Salvos', estudar: 'Estudar' };
@@ -1355,6 +1422,82 @@
     return { titulo: 'Minhas anotações', aba: 'estudar', prof: 1,
       html: `<h2 class="titulo-lista sobe">Minhas anotações</h2><p class="sub-lista sobe" style="--i:1">${plural(l.length, 'anotação', 'anotações')}</p>
         ${l.length ? l.map((r, i) => `<a class="item sobe" style="--i:${i + 2}" href="#/r/${r.i}"><div class="linha">Aula ${rotuloAula(r.a)}</div><b>${esc(r.n)}</b><p class="nota-previa">${esc(estudo[r.i].n.trim().slice(0, 160))}</p></a>`).join('') : vazio('Escreva anotações dentro de qualquer reação e elas aparecem aqui.')}` };
+  }
+
+  // ---------- Mapas de reações: diagrama + jogo "preencha os reagentes" ----------
+  const mapaPorId = (id) => D.mapas.find((m) => m.id === id);
+  const SETA_MP = '<svg class="mp-seta" viewBox="0 0 16 22" aria-hidden="true"><path d="M8 1v17M2.5 13 8 19l5.5-6"/></svg>';
+  const melhorMapa = (id) => (guarda.ler('atlas.mapas', {})[id] || {}).melhor;
+  function telaMapa(id, modo) {
+    const m = mapaPorId(id); if (!m) return null;
+    const jogo = modo === 'jogo';
+    let k = 0; const arestas = [];
+    const no = (n, raiz) => `<div class="mp-no${raiz ? ' raiz' : ''}">${tile(n.s, 0)}<div class="mp-tx"><b>${esc(n.n)}</b>${!jogo && n.nt ? `<small>${esc(n.nt)}</small>` : ''}</div></div>`;
+    const ramos = (lista) => `<div class="mp-filhos">${lista.map((n) => {
+      const i = k++; arestas[i] = n.rg;
+      return `<div class="mp-ramo"><div class="mp-rg">${SETA_MP}${jogo ? `<button class="mp-slot" data-slot="${i}"><span>?</span></button>` : `<span class="rg">${esc(n.rg)}</span>`}</div>${no(n)}${n.r ? ramos(n.r) : ''}</div>`;
+    }).join('')}</div>`;
+    const alterna = `<div class="modo-busca"><a href="#/mapa/${id}" class="${jogo ? '' : 'on'}">Mapa</a><a href="#/mapa/${id}/jogo" class="${jogo ? 'on' : ''}">Jogo</a></div>`;
+    const cab = `<h2 class="titulo-lista sobe">${esc(m.t)}</h2><p class="sub-lista sobe" style="--i:1">${esc(m.sub)}</p>${alterna}`;
+    if (!jogo) return { titulo: 'Mapa', aba: 'mec', prof: 1, html: `${cab}<div class="mapa">${no(m.c, true)}${ramos(m.r)}</div>`, depois: () => { mo(document.querySelectorAll('.mp-ramo'), { opacity: [0, 1], x: [-14, 0] }, { duration: 0.35, delay: M && M.stagger ? M.stagger(0.04) : 0 }); } };
+    return {
+      titulo: 'Jogo', aba: 'mec', prof: 1,
+      html: `${cab}<p class="sub-lista">Toque num reagente e depois no <b>?</b> da seta certa (ou o contrário). Toque num reagente colocado para tirá-lo.</p>
+        <div class="mp-banco" id="mp-banco"></div>
+        <div class="mapa jogo">${no(m.c, true)}${ramos(m.r)}</div>
+        <div class="mp-fim"><div id="mp-res" aria-live="polite"></div><div class="resumo-acoes"><button class="btn-grande pequeno" id="mp-verif"><b>Verificar</b></button><button class="btn" id="mp-reinicia">Recomeçar</button></div></div>`,
+      depois: () => iniciaJogoMapa(m, arestas),
+    };
+  }
+  function iniciaJogoMapa(m, arestas) {
+    const chips = embaralha(arestas.map((t, i) => ({ t, i })));
+    const slots = arestas.map(() => null); // slot -> índice em chips
+    let selChip = null, selSlot = null, verificado = false;
+    const banco = $('#mp-banco'), res = $('#mp-res');
+    const colocado = (c) => slots.includes(c);
+    const pinta = () => {
+      banco.innerHTML = chips.map((c, ci) => (colocado(ci) ? '' : `<button class="mp-chip${selChip === ci ? ' sel' : ''}" data-chip="${ci}">${esc(c.t)}</button>`)).join('') || '<span class="mp-vazio">Todos os reagentes foram colocados.</span>';
+      document.querySelectorAll('.mp-slot').forEach((el) => {
+        const k = +el.dataset.slot, c = slots[k];
+        el.className = 'mp-slot' + (c === null ? '' : ' cheio') + (selSlot === k ? ' sel' : '');
+        el.innerHTML = c === null ? '<span>?</span>' : `<span>${esc(chips[c].t)}</span>`;
+        if (verificado && c !== null) el.classList.add(chips[c].t === arestas[k] ? 'certo' : 'errado');
+      });
+    };
+    const poe = (ci, k) => { // coloca o reagente ci no espaço k (devolve o que estava lá)
+      slots.forEach((v, j) => { if (v === ci) slots[j] = null; });
+      slots[k] = ci; selChip = selSlot = null; verificado = false; res.textContent = '';
+      pinta();
+      const el = document.querySelector(`.mp-slot[data-slot="${k}"]`); if (el) mo(el, { scale: [0.85, 1] }, { type: 'spring', stiffness: 420, damping: 18 });
+      navigator.vibrate && navigator.vibrate(6);
+    };
+    banco.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-chip]'); if (!b) return;
+      const ci = +b.dataset.chip;
+      if (selSlot !== null) poe(ci, selSlot); else { selChip = selChip === ci ? null : ci; pinta(); }
+    });
+    document.querySelector('.mapa.jogo').addEventListener('click', (e) => {
+      const b = e.target.closest('.mp-slot'); if (!b) return;
+      const k = +b.dataset.slot;
+      if (selChip !== null) { poe(selChip, k); return; }
+      if (slots[k] !== null) { slots[k] = null; verificado = false; res.textContent = ''; pinta(); return; }
+      selSlot = selSlot === k ? null : k; pinta();
+    });
+    $('#mp-verif').addEventListener('click', () => {
+      const vazios = slots.filter((c) => c === null).length;
+      if (vazios === slots.length) { res.innerHTML = '<p class="mp-msg">Coloque alguns reagentes antes de verificar.</p>'; return; }
+      verificado = true; pinta();
+      const certos = slots.filter((c, k) => c !== null && chips[c].t === arestas[k]).length, n = arestas.length;
+      const pct = Math.round((100 * certos) / n);
+      const tudo = certos === n;
+      res.innerHTML = `<p class="mp-msg ${tudo ? 'ok' : ''}"><b>${certos} de ${n}</b> certos${vazios ? ` · ${plural(vazios, 'vazio', 'vazios')}` : ''}${tudo ? ' · mapa completo!' : ''}</p>`;
+      mo(document.querySelectorAll('.mp-slot.certo'), { scale: [1, 1.1, 1] }, { duration: 0.4, delay: M && M.stagger ? M.stagger(0.04) : 0 });
+      mo(document.querySelectorAll('.mp-slot.errado'), { x: [0, -6, 6, -4, 4, 0] }, { duration: 0.4 });
+      if (!vazios) { const a = guarda.ler('atlas.mapas', {}); a[m.id] = { melhor: Math.max(pct, (a[m.id] || {}).melhor || 0) }; guarda.gravar('atlas.mapas', a); }
+    });
+    $('#mp-reinicia').addEventListener('click', () => { mostra(); });
+    pinta();
+    mo(banco.querySelectorAll('.mp-chip'), { opacity: [0, 1], y: [10, 0], scale: [0.9, 1] }, { type: 'spring', stiffness: 320, damping: 22, delay: M && M.stagger ? M.stagger(0.03) : 0 });
   }
 
   // ---------- cliques do estudo ----------

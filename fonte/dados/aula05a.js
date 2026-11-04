@@ -148,7 +148,7 @@ window.REACTIONS.push(
     aula: 'Aula 5a', slides: '58–59',
     nome: 'Participação do grupo vizinho (S): 2-cloroetil fenil sulfeto + ROH',
     categories: ['sn1', 'mecanismos-gerais'],
-    reactants: ['c1ccccc1SCCCl'], reagents: 'ROH (R = CH₃ como exemplo)', conditions: 'solvólise',
+    reactants: ['c1ccccc1SCCCl'], reagents: 'CH₃OH (ROH)', conditions: 'solvólise',
     products: ['c1ccccc1SCCOC'],
     notas: 'Assistência anquimérica: o par de elétrons do enxofre (no carbono vizinho) desloca o Cl⁻ formando um <b>intermediário cíclico de 3 membros</b> (íon episulfônio); o nucleófilo então abre o anel. Duas consequências: velocidade <b>maior que a esperada</b> (PhSCH₂CH₂Cl reage com água 600× mais rápido que CH₃CH₂CH₂Cl) e <b>retenção de configuração</b> (duas inversões sucessivas). Grego anchi = vizinho, mer = parte. Usei ROH = metanol como exemplo; o slide usa HOR genérico.',
     mecanismo: [
@@ -160,7 +160,7 @@ window.REACTIONS.push(
     aula: 'Aula 5a', slides: '59',
     nome: 'Cloreto de etoximetila + ROH (SN1 sem participação de grupo vizinho)',
     categories: ['sn1'],
-    reactants: ['CCOCCl'], reagents: 'ROH (R = CH₃ como exemplo)', conditions: 'SN1',
+    reactants: ['CCOCCl'], reagents: 'CH₃OH (ROH)', conditions: 'SN1',
     products: ['CCOCOC'],
     notas: 'Nesta reação <b>não há participação do grupo vizinho</b>: o carbocátion é estabilizado por <b>ressonância</b> do par do oxigênio (cátion oxônio, intermediário π-ligado) e é atacado pelo ROH. Usei metanol como exemplo para R.',
     mecanismo: [

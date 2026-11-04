@@ -106,7 +106,7 @@ window.REACTIONS.push(
     aula: 'Aula 07', slides: '24',
     nome: 'Brometo vinílico + R₂NLi → alcino (E2; Z rápido, E lento)',
     categories: ['e2'],
-    reactants: ['CC(Br)=CC'], reagents: 'R₂NLi', conditions: 'E2',
+    reactants: ['CC(Br)=CC'], reagents: 'LDA (R₂NLi)', conditions: 'E2',
     products: ['CC#CC'],
     notas: 'A eliminação a partir do isômero <b>Z</b> do brometo vinílico (C–H e C–Br anti-periplanares) é <b>mais rápida</b> que a do isômero E (C–H e C–Br sin-periplanares). Na aula R¹ e R² são genéricos; usei 2-bromobut-2-eno como exemplo meu.',
     mecanismo: [],
@@ -115,7 +115,7 @@ window.REACTIONS.push(
     aula: 'Aula 07', slides: '25',
     nome: '1,2-Dibromopropano + 3 LDA → propinilideto de lítio',
     categories: ['e2'],
-    reactants: ['CC(Br)CBr'], reagents: 'R₂NLi (LDA) × 3', conditions: '−60 °C, 3 equivalentes',
+    reactants: ['CC(Br)CBr'], reagents: 'LDA (R₂NLi) × 3', conditions: '−60 °C, 3 equivalentes',
     products: ['[Li]C#CC'],
     notas: 'LDA = di-isopropilamideto de lítio. Três equivalentes: duas eliminações sucessivas e a desprotonação do alcino terminal, formando o alcinteto de lítio (usado em reações posteriores). A primeira E2 forma <b>estereosseletivamente o brometo vinílico E</b>; a segunda é uma eliminação <b>sin-periplanar</b>.',
     mecanismo: [

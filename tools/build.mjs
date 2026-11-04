@@ -15,6 +15,7 @@ import initRDKit from '@rdkit/rdkit';
 import sharp from 'sharp';
 import { lerMolblock, posicoesAtomos, marcarSetas } from './setas.mjs';
 import { resolveCids } from './cid.mjs';
+import { GRUPOS, gruposDe } from './grupos.mjs';
 
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FONTE = path.join(raiz, 'fonte');
@@ -32,6 +33,10 @@ const ctxG = { window: {} };
 vm.createContext(ctxG);
 vm.runInContext(fs.readFileSync(path.join(FONTE, 'guias/guias.js'), 'utf8'), ctxG, { filename: 'guias.js' });
 const GUIAS = ctxG.window.GUIAS;
+const ctxD = { window: {} };
+vm.createContext(ctxD);
+vm.runInContext(fs.readFileSync(path.join(FONTE, 'diagramas/diagramas.js'), 'utf8'), ctxD, { filename: 'diagramas.js' });
+const DIAGRAMAS = ctxD.window.DIAGRAMAS;
 
 const AULAS = {
   '00': 'Exemplos básicos (meus)',
@@ -316,12 +321,30 @@ const slideIni = (s) => parseInt(/\d+/.exec(s || '')?.[0] || '0', 10);
 const ordenadas = REACTIONS.map((r, i) => ({ r, i, aula: idAula(r.aula) })).sort((a, b) =>
   a.aula.localeCompare(b.aula) || slideIni(a.r.slides) - slideIni(b.r.slides) || a.i - b.i);
 
+// ---------- grupos funcionais (busca por transformação) ----------
+const infoMol = (smi) => {
+  const m = RDKit.get_mol(smi);
+  if (!m || !m.is_valid()) { m?.delete(); return null; }
+  const nC = JSON.parse(m.get_json()).molecules[0].atoms.filter((a) => (a.z ?? 6) === 6).length;
+  const g = gruposDe(m, tem);
+  m.delete();
+  return { nC, g };
+};
+function gruposDaReacao(r) {
+  const R = (r.reactants || []).map(infoMol).filter(Boolean), P = (r.products || []).map(infoMol).filter(Boolean);
+  if (!R.length || !P.length) return { gs: [], gp: [] };
+  const subs = R.reduce((a, b) => (b.nC > a.nC ? b : a), R[0]); // o substrato é o reagente com mais carbonos
+  const gp = new Set();
+  P.forEach((p, k) => { if (k === 0 || p.nC >= Math.max(3, 0.7 * subs.nC)) p.g.forEach((x) => gp.add(x)); }); // subprodutos pequenos não contam
+  return { gs: [...subs.g], gp: [...gp] };
+}
+
 const reacoes = ordenadas.map(({ r, aula }, n) => {
   const { nu, el } = classificar(r);
   const sv = (arr) => (arr || []).map(desenhar);
   const o = {
     i: n + 1, a: aula, s: r.slides || '', n: r.nome, c: r.categories || [], nu, el,
-    rg: r.reagents || '', cd: r.conditions || '', d3: r.d3 || undefined,
+    rg: r.reagents || '', cd: r.conditions || '', d3: r.d3 || undefined, ...gruposDaReacao(r),
     r: sv(r.reactants), p: sv(r.products), nt: r.notas || '',
     m: (r.mecanismo || []).map((m) => ({ t: m.titulo, x: m.texto, s: sv(m.smiles) })),
   };
@@ -348,6 +371,10 @@ const guias = GUIAS.map((g) => ({
     { k: 't', t: b.titulo, cols: b.cols, rows: b.rows.map((l) => l.map(celula)), nota: b.nota || '', ord: b.ordens || null }),
 }));
 
+// ---------- mapas de reações (diagramas e jogo) ----------
+const no = (x) => ({ s: desenhar(x.s), n: x.nome, rg: x.rg, nt: x.nota || undefined, r: x.ramos ? x.ramos.map(no) : undefined });
+const mapas = DIAGRAMAS.map((d) => ({ id: d.id, curto: d.curto, t: d.titulo, sub: d.sub, c: { s: desenhar(d.centro.s), n: d.centro.nome }, r: d.ramos.map(no) }));
+
 // ---------- build ----------
 fs.mkdirSync(SITE, { recursive: true });
 const dados = {
@@ -355,6 +382,8 @@ const dados = {
   categorias: CATEGORIES.filter((c) => cCat[c.id]).map((c) => ({ id: c.id, nome: c.nome, n: cCat[c.id] })),
   nucleofilos: lista(LISTA_NU, cNu),
   eletrofilos: lista(LISTA_EL, cEl),
+  grupos: GRUPOS.filter((g) => reacoes.some((x) => x.gs.includes(g.id) || x.gp.includes(g.id))).map((g) => ({ id: g.id, nome: g.nome })),
+  mapas,
   guias,
   reacoes,
 };

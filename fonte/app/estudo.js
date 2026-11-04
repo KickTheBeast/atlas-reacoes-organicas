@@ -351,6 +351,82 @@
         ${l.length ? l.map((r, i) => `<a class="item sobe" style="--i:${i + 2}" href="#/r/${r.i}"><div class="linha">Aula ${rotuloAula(r.a)}</div><b>${esc(r.n)}</b><p class="nota-previa">${esc(estudo[r.i].n.trim().slice(0, 160))}</p></a>`).join('') : vazio('Escreva anotações dentro de qualquer reação e elas aparecem aqui.')}` };
   }
 
+  // ---------- Mapas de reações: diagrama + jogo "preencha os reagentes" ----------
+  const mapaPorId = (id) => D.mapas.find((m) => m.id === id);
+  const SETA_MP = '<svg class="mp-seta" viewBox="0 0 16 22" aria-hidden="true"><path d="M8 1v17M2.5 13 8 19l5.5-6"/></svg>';
+  const melhorMapa = (id) => (guarda.ler('atlas.mapas', {})[id] || {}).melhor;
+  function telaMapa(id, modo) {
+    const m = mapaPorId(id); if (!m) return null;
+    const jogo = modo === 'jogo';
+    let k = 0; const arestas = [];
+    const no = (n, raiz) => `<div class="mp-no${raiz ? ' raiz' : ''}">${tile(n.s, 0)}<div class="mp-tx"><b>${esc(n.n)}</b>${!jogo && n.nt ? `<small>${esc(n.nt)}</small>` : ''}</div></div>`;
+    const ramos = (lista) => `<div class="mp-filhos">${lista.map((n) => {
+      const i = k++; arestas[i] = n.rg;
+      return `<div class="mp-ramo"><div class="mp-rg">${SETA_MP}${jogo ? `<button class="mp-slot" data-slot="${i}"><span>?</span></button>` : `<span class="rg">${esc(n.rg)}</span>`}</div>${no(n)}${n.r ? ramos(n.r) : ''}</div>`;
+    }).join('')}</div>`;
+    const alterna = `<div class="modo-busca"><a href="#/mapa/${id}" class="${jogo ? '' : 'on'}">Mapa</a><a href="#/mapa/${id}/jogo" class="${jogo ? 'on' : ''}">Jogo</a></div>`;
+    const cab = `<h2 class="titulo-lista sobe">${esc(m.t)}</h2><p class="sub-lista sobe" style="--i:1">${esc(m.sub)}</p>${alterna}`;
+    if (!jogo) return { titulo: 'Mapa', aba: 'mec', prof: 1, html: `${cab}<div class="mapa">${no(m.c, true)}${ramos(m.r)}</div>`, depois: () => { mo(document.querySelectorAll('.mp-ramo'), { opacity: [0, 1], x: [-14, 0] }, { duration: 0.35, delay: M && M.stagger ? M.stagger(0.04) : 0 }); } };
+    return {
+      titulo: 'Jogo', aba: 'mec', prof: 1,
+      html: `${cab}<p class="sub-lista">Toque num reagente e depois no <b>?</b> da seta certa (ou o contrário). Toque num reagente colocado para tirá-lo.</p>
+        <div class="mp-banco" id="mp-banco"></div>
+        <div class="mapa jogo">${no(m.c, true)}${ramos(m.r)}</div>
+        <div class="mp-fim"><div id="mp-res" aria-live="polite"></div><div class="resumo-acoes"><button class="btn-grande pequeno" id="mp-verif"><b>Verificar</b></button><button class="btn" id="mp-reinicia">Recomeçar</button></div></div>`,
+      depois: () => iniciaJogoMapa(m, arestas),
+    };
+  }
+  function iniciaJogoMapa(m, arestas) {
+    const chips = embaralha(arestas.map((t, i) => ({ t, i })));
+    const slots = arestas.map(() => null); // slot -> índice em chips
+    let selChip = null, selSlot = null, verificado = false;
+    const banco = $('#mp-banco'), res = $('#mp-res');
+    const colocado = (c) => slots.includes(c);
+    const pinta = () => {
+      banco.innerHTML = chips.map((c, ci) => (colocado(ci) ? '' : `<button class="mp-chip${selChip === ci ? ' sel' : ''}" data-chip="${ci}">${esc(c.t)}</button>`)).join('') || '<span class="mp-vazio">Todos os reagentes foram colocados.</span>';
+      document.querySelectorAll('.mp-slot').forEach((el) => {
+        const k = +el.dataset.slot, c = slots[k];
+        el.className = 'mp-slot' + (c === null ? '' : ' cheio') + (selSlot === k ? ' sel' : '');
+        el.innerHTML = c === null ? '<span>?</span>' : `<span>${esc(chips[c].t)}</span>`;
+        if (verificado && c !== null) el.classList.add(chips[c].t === arestas[k] ? 'certo' : 'errado');
+      });
+    };
+    const poe = (ci, k) => { // coloca o reagente ci no espaço k (devolve o que estava lá)
+      slots.forEach((v, j) => { if (v === ci) slots[j] = null; });
+      slots[k] = ci; selChip = selSlot = null; verificado = false; res.textContent = '';
+      pinta();
+      const el = document.querySelector(`.mp-slot[data-slot="${k}"]`); if (el) mo(el, { scale: [0.85, 1] }, { type: 'spring', stiffness: 420, damping: 18 });
+      navigator.vibrate && navigator.vibrate(6);
+    };
+    banco.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-chip]'); if (!b) return;
+      const ci = +b.dataset.chip;
+      if (selSlot !== null) poe(ci, selSlot); else { selChip = selChip === ci ? null : ci; pinta(); }
+    });
+    document.querySelector('.mapa.jogo').addEventListener('click', (e) => {
+      const b = e.target.closest('.mp-slot'); if (!b) return;
+      const k = +b.dataset.slot;
+      if (selChip !== null) { poe(selChip, k); return; }
+      if (slots[k] !== null) { slots[k] = null; verificado = false; res.textContent = ''; pinta(); return; }
+      selSlot = selSlot === k ? null : k; pinta();
+    });
+    $('#mp-verif').addEventListener('click', () => {
+      const vazios = slots.filter((c) => c === null).length;
+      if (vazios === slots.length) { res.innerHTML = '<p class="mp-msg">Coloque alguns reagentes antes de verificar.</p>'; return; }
+      verificado = true; pinta();
+      const certos = slots.filter((c, k) => c !== null && chips[c].t === arestas[k]).length, n = arestas.length;
+      const pct = Math.round((100 * certos) / n);
+      const tudo = certos === n;
+      res.innerHTML = `<p class="mp-msg ${tudo ? 'ok' : ''}"><b>${certos} de ${n}</b> certos${vazios ? ` · ${plural(vazios, 'vazio', 'vazios')}` : ''}${tudo ? ' · mapa completo!' : ''}</p>`;
+      mo(document.querySelectorAll('.mp-slot.certo'), { scale: [1, 1.1, 1] }, { duration: 0.4, delay: M && M.stagger ? M.stagger(0.04) : 0 });
+      mo(document.querySelectorAll('.mp-slot.errado'), { x: [0, -6, 6, -4, 4, 0] }, { duration: 0.4 });
+      if (!vazios) { const a = guarda.ler('atlas.mapas', {}); a[m.id] = { melhor: Math.max(pct, (a[m.id] || {}).melhor || 0) }; guarda.gravar('atlas.mapas', a); }
+    });
+    $('#mp-reinicia').addEventListener('click', () => { mostra(); });
+    pinta();
+    mo(banco.querySelectorAll('.mp-chip'), { opacity: [0, 1], y: [10, 0], scale: [0.9, 1] }, { type: 'spring', stiffness: 320, damping: 22, delay: M && M.stagger ? M.stagger(0.03) : 0 });
+  }
+
   // ---------- cliques do estudo ----------
   document.addEventListener('click', (e) => {
     const t = e.target;

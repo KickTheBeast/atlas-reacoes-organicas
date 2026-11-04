@@ -121,7 +121,7 @@ window.REACTIONS.push(
     aula: 'Aula 09', slides: '29',
     nome: 'Epoxidação de alceno com peroxiácido (adição syn)',
     categories: ['adicao-alcenos'],
-    reactants: ['CC1=CCCC1'], reagents: 'R–CO₃H', conditions: '',
+    reactants: ['CC1=CCCC1'], reagents: 'mCPBA (R–CO₃H)', conditions: '',
     products: ['CC12CCCC1O2'],
     notas: 'Slide-resumo: peroxiácido converte o alceno em <b>epóxido</b> por <b>adição syn</b> de oxigênio. Substrato: 1-metilciclopentano (1-metilciclopenteno).',
     mecanismo: [],

@@ -79,7 +79,7 @@ window.REACTIONS.push(
     aula: 'Aula 03', slides: '29',
     nome: 'HO⁻ não é grupo abandonador: o nucleófilo ataca o próton do álcool',
     categories: ['mecanismos-gerais'],
-    reactants: ['CCO'], reagents: 'Nu⁻', conditions: 'SN2 com deslocamento de HO⁻ nunca ocorre',
+    reactants: ['CCO'], reagents: 'HO⁻ (como Nu⁻)', conditions: 'SN2 com deslocamento de HO⁻ nunca ocorre',
     products: ['CC[O-]'],
     notas: 'Deslocamento SN2 de hidróxido <b>nunca acontece</b>: –OH é muito básico, não é bom grupo abandonador. Dados: energias de dissociação C–C 607, C–Cl 397, C–O 1076,5 kJ/mol (ligação C–O muito forte). Se o nucleófilo reage, ele ataca o próton (reação ácido-base), formando o alcóxido + H–Nu. Etanol é exemplo meu; o slide usa R–CH₂–OH genérico.',
     mecanismo: [],
@@ -144,7 +144,7 @@ window.REACTIONS.push(
     aula: 'Aula 03', slides: '66, 68',
     nome: 'Alquilação de amônia com haleto de alquila (polialquilação)',
     categories: ['sn2'],
-    reactants: ['CCBr', 'N'], reagents: 'NH₃ (excesso de RX leva à polialquilação)', conditions: 'SN2 sucessivas',
+    reactants: ['CCBr', 'N'], reagents: 'NH₃ (excesso de CH₃CH₂Br leva à polialquilação)', conditions: 'SN2 sucessivas',
     products: ['CCN', 'CCNCC', 'CCN(CC)CC', 'CC[N+](CC)(CC)CC'],
     notas: 'Aminas são bons nucleófilos, mas a reação NH₃ + R–X raramente dá um só produto: o produto (amina) é tão nucleofílico quanto o material de partida e compete pelo haleto. Série: NH₃ → RNH₂ → R₂NH → R₃N → R₄N⁺X⁻ (sal quaternário). Etapas intermediárias alternam SN2 e transferência de próton. Exemplo com etila é meu; os slides usam R–X genérico.',
     mecanismo: [

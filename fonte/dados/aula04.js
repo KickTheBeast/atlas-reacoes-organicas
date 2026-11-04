@@ -26,7 +26,7 @@ window.REACTIONS.push(
     aula: 'Aula 04', slides: '16',
     nome: 'Epóxido + amina secundária (R₂NH) → β-amino-álcool',
     categories: ['sn2'],
-    reactants: ['C1CO1', 'CNC'], reagents: 'R₂NH (aqui Me₂NH)', conditions: 'SN2; transferência rápida de próton',
+    reactants: ['C1CO1', 'CNC'], reagents: 'Me₂NH (R₂NH)', conditions: 'SN2; transferência rápida de próton',
     products: ['CN(C)CCO'],
     notas: 'A amina ataca o epóxido por SN2; o alcóxido/amônio formado sofre <b>transferência rápida de próton</b>, dando o amino-álcool neutro. O slide usa R₂NH genérico; usei óxido de etileno + dimetilamina como exemplo meu.',
     mecanismo: [
@@ -50,7 +50,7 @@ window.REACTIONS.push(
     aula: 'Aula 04', slides: '18',
     nome: 'Brometo de alila + RO⁻ (SN2 acelerada por conjugação)',
     categories: ['sn2'],
-    reactants: ['C=CCBr'], reagents: 'RO⁻ (aqui EtO⁻)', conditions: 'SN2',
+    reactants: ['C=CCBr'], reagents: 'EtO⁻ (RO⁻)', conditions: 'SN2',
     products: ['C=CCOCC'],
     notas: 'Sistemas π de C=C aumentam a velocidade SN2: haleto alílico reage cerca de <b>40×</b> mais rápido que o haleto alquílico simples (v1 = 40 × v). No estado de transição, o orbital p do carbono atacado (deficiente de elétrons) é <b>estabilizado por conjugação</b> com a ligação π alílica. O slide usa RO⁻ genérico; usei EtO⁻ como exemplo meu.',
     mecanismo: [
@@ -61,7 +61,7 @@ window.REACTIONS.push(
     aula: 'Aula 04', slides: '19',
     nome: 'Brometo de benzila + RO⁻ (SN2 acelerada por conjugação com o anel)',
     categories: ['sn2'],
-    reactants: ['BrCc1ccccc1'], reagents: 'RO⁻ (aqui EtO⁻)', conditions: 'SN2',
+    reactants: ['BrCc1ccccc1'], reagents: 'EtO⁻ (RO⁻)', conditions: 'SN2',
     products: ['CCOCc1ccccc1'],
     notas: 'Haleto benzílico reage cerca de <b>120×</b> mais rápido que o haleto alquílico simples (v2 = 120 × v): o TS é estabilizado pela conjugação com o anel benzênico. O slide usa RO⁻ genérico; usei EtO⁻ como exemplo meu.',
     mecanismo: [],
@@ -211,7 +211,7 @@ window.REACTIONS.push(
     aula: 'Aula 04', slides: '74',
     nome: 'Brometo de benzila + nucleófilo (SN1 via carbocátion benzílico)',
     categories: ['sn1'],
-    reactants: ['BrCc1ccccc1'], reagents: 'Nu (aqui H₂O)', conditions: 'SN1, solvente polar',
+    reactants: ['BrCc1ccccc1'], reagents: 'H₂O (Nu)', conditions: 'SN1, solvente polar',
     products: ['OCc1ccccc1'],
     notas: 'O carbocátion benzílico é deslocalizado pelo anel (formas de ressonância com carga nas posições orto e para), mas <b>o nucleófilo ataca apenas o grupo CH₂</b>, preservando a aromaticidade. O slide usa X e Nu genéricos; usei H₂O (solvólise) como exemplo meu.',
     mecanismo: [

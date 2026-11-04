@@ -99,20 +99,20 @@ window.REACTIONS.push(
   },
   {
     aula: 'Aula 01b', slides: '14',
-    nome: 'Éster + R′MgX → cetona (Reação 1 de Grignard)',
+    nome: 'Acetato de metila + EtMgBr → butan-2-ona (Reação 1 de Grignard)',
     categories: ['mecanismos-gerais'],
-    reactants: ['CC(=O)OC'], reagents: 'R′MgX (1,0 mmol)', conditions: '1,0 mmol de éster; – CH₃OMgX',
+    reactants: ['CC(=O)OC'], reagents: 'CH₃CH₂MgBr (EtMgBr; R′ = Et), 1,0 mmol', conditions: '1,0 mmol de éster; – CH₃OMgBr',
     products: ['CC(=O)CC'],
-    notas: 'A aula usa genéricos (RCO₂CH₃ + R′MgX → RCOR′ + CH₃OMgX). Acetato de metila + EtMgBr é um exemplo meu. Ponto do slide: como a cetona (3) também reage com R′MgX (reação 2), uma mistura 1:1 não para na cetona; o sistema é uma sequência de reações consecutivas.',
+    notas: 'A aula usa genéricos (RCO₂CH₃ + R′MgX → RCOR′ + CH₃OMgX); aqui R′ = etil. O grupo <b>etil do EtMgBr substitui o OCH₃</b> do éster: os 4 carbonos da butan-2-ona são 2 do acetil (acetato de metila) + 2 do etil (EtMgBr). <b>Na prática</b> a cetona formada é mais reativa que o éster e reage com mais Grignard, dando álcool terciário (reação 2); com 1 equivalente obtém-se uma mistura. A questão pede o produto da <b>primeira adição</b> (sequência de reações consecutivas).',
     mecanismo: [],
   },
   {
     aula: 'Aula 01b', slides: '14',
-    nome: 'Cetona + R′MgX → álcool terciário (Reação 2, após H₂O)',
+    nome: 'Butan-2-ona + EtMgBr → 3-metilpentan-3-ol (Reação 2, após H₂O)',
     categories: ['mecanismos-gerais'],
-    reactants: ['CC(=O)CC'], reagents: 'R′MgX; depois H₂O', conditions: 'forma alcóxido (OMgX); work-up com H₂O',
+    reactants: ['CC(=O)CC'], reagents: 'CH₃CH₂MgBr (EtMgBr; R′ = Et); depois H₂O', conditions: 'forma alcóxido (OMgBr); work-up com H₂O',
     products: ['CCC(C)(O)CC'],
-    notas: 'A aula usa genéricos: RCOR′ + R′MgX → R(R′)₂C–OMgX → (H₂O) → álcool terciário 4 + Mg(OH)X (e CH₃OH se as duas reações ocorrerem). Butan-2-ona + EtMgBr → 3-metilpentan-3-ol é um exemplo meu.',
+    notas: 'A aula usa genéricos: RCOR′ + R′MgX → R(R′)₂C–OMgX → (H₂O) → álcool terciário 4 + Mg(OH)X (e CH₃OH se as duas reações ocorrerem). Aqui R′ = etil: a butan-2-ona (4 C) recebe um segundo <b>etil do EtMgBr</b> (2 C) e vira, após H₂O, o álcool terciário 3-metilpentan-3-ol (6 C). A reação 2 é mais rápida que a 1, por isso com 1 equivalente de Grignard obtém-se mistura de éster, cetona e álcool.',
     mecanismo: [],
   }
 );
