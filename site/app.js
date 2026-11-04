@@ -2,7 +2,7 @@
 // Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
 (() => {
   'use strict';
-  const BUILD = 'e116f98a97';
+  const BUILD = '754e42909c';
   const $ = (s) => document.querySelector(s);
   const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
   const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
@@ -798,9 +798,9 @@
     <svg class="cr-papel" preserveAspectRatio="none" aria-hidden="true"><rect width="100%" height="100%" filter="url(#cr-papel)" opacity=".55"/></svg>`;
   // Easter egg: com exatamente 666 carinhos o Mutaninho fica vermelho e ganha chifrinhos; no 667º tudo volta ao normal.
   const DIABO = 666, VERMELHO = '#d62828';
-  // chifres de carneiro (espiral): contorno preto por baixo, miolo vinho por cima e anéis de crescimento
-  const espiral = (d, w) => `<path d="${d}" fill="none" stroke="#111" stroke-width="${w + 5}" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="#4d0b07" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
-  const CHIFRES = `<g class="chifres">${espiral('M506 80 C522 52 556 50 560 76 C562 94 544 100 538 88', 9)}<path d="M517 62 L525 70 M533 56 L538 66 M549 58 L550 68" stroke="#c9776c" stroke-width="2" stroke-linecap="round" opacity=".75"/>${espiral('M482 84 C458 44 410 46 408 82 C407 106 436 114 442 96 C446 86 434 80 428 88', 13)}<path d="M463 62 L474 70 M447 51 L453 63 M428 49 L429 62 M413 60 L424 66" stroke="#c9776c" stroke-width="2.4" stroke-linecap="round" opacity=".75"/></g>`;
+  // chifres grossos e nervurados que sobem e se curvam para fora (como a tiara da referência): carvão com nervuras vinho e ponta escura
+  const seg = (lista) => lista.map(([d, w]) => `<path d="${d}" fill="none" stroke="#111" stroke-width="${w + 5}" stroke-linecap="round" stroke-linejoin="round"/>`).join('') + lista.map(([d, w, c]) => `<path d="${d}" fill="none" stroke="${c || '#2c2427'}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`).join('');
+  const CHIFRES = `<g class="chifres">${seg([['M470 84 L452 40', 22], ['M452 40 Q446 20 426 14', 17], ['M426 14 Q410 9 392 20', 9, '#6d1410']])}<path d="M455 74 L474 66 M451 63 L470 55 M447 52 L465 44 M443 41 L459 34 M437 29 L451 25" stroke="#a3221c" stroke-width="3" stroke-linecap="round" fill="none"/>${seg([['M512 82 L530 40', 19], ['M530 40 Q535 22 552 15', 15], ['M552 15 Q566 10 582 20', 8, '#6d1410']])}<path d="M523 72 L509 66 M527 61 L512 55 M531 50 L517 43 M535 39 L521 33" stroke="#a3221c" stroke-width="2.6" stroke-linecap="round" fill="none"/></g>`;
   const MARCOS = { 666: '666. MUTANO ENDIABRADO.', 10: '10 CARINHOS. AGORA SOMOS AMIGOS.', 25: 'PROVA DE ORGÂNICA II? PODE VIR.', 50: 'MUTANO APROVA.', 100: 'LENDA DO CARINHO.' };
 
   function abreCreditos(ev, loja) {
