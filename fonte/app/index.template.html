@@ -5,13 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Atlas de Reações Orgânicas</title>
 <meta name="description" content="Atlas de reações de Química Orgânica II por aula, nucleófilo, eletrófilo e mecanismo.">
-<meta name="theme-color" content="#f4f7f5" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0d1714" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
+<meta name="theme-color" id="tc" content="#f4f7f5">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Atlas Org.">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<script>try{var t=JSON.parse(localStorage.getItem("atlas.tema")||"null");if(t==="claro"||t==="escuro")document.documentElement.dataset.tema=t}catch(e){}</script>
+<script>try{var t=JSON.parse(localStorage.getItem("atlas.tema")||"null");if(t==="claro"||t==="escuro")document.documentElement.dataset.tema=t;var e=document.documentElement.dataset.tema||(matchMedia("(prefers-color-scheme: dark)").matches?"escuro":"claro");document.getElementById("tc").content=e==="escuro"?"#090f0d":"#f4f7f5"}catch(e){}</script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icone.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">

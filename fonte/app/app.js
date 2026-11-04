@@ -238,18 +238,42 @@
   const vazio = (msg) => `<div class="vazio"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>${msg}</div>`;
 
   // ---------- telas ----------
+  // ícones (traço) usados na tela inicial e em Estudar
+  const IC = {
+    mapa: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.6"/><circle cx="12" cy="4.6" r="1.6"/><circle cx="19.2" cy="15.8" r="1.6"/><circle cx="4.8" cy="15.8" r="1.6"/><path d="M12 6.2v3.2M17.8 15l-3.3-1.8M6.2 15l3.3-1.8"/></svg>',
+    transforma: '<svg viewBox="0 0 24 24"><rect x="2.8" y="8" width="6.4" height="8" rx="2"/><rect x="14.8" y="8" width="6.4" height="8" rx="2"/><path d="M10.4 12h3.2M12.2 10.2L14 12l-1.8 1.8"/></svg>',
+    jogo: '<svg viewBox="0 0 24 24"><path d="M4 8h12M13 5l3 3-3 3"/><path d="M20 16H8M11 13l-3 3 3 3"/></svg>',
+    cartoes: '<svg viewBox="0 0 24 24"><rect x="3.5" y="7.5" width="14" height="12" rx="2.4"/><path d="M7 4.5h11.5A2.5 2.5 0 0121 7v9"/></svg>',
+    simulado: '<svg viewBox="0 0 24 24"><rect x="4.5" y="3.8" width="15" height="16.4" rx="2.4"/><path d="M8.6 9.2l1.5 1.5 2.7-3M8.6 15h7"/></svg>',
+    salvos: '<svg viewBox="0 0 24 24"><path d="M12 3.8l2.5 5.3 5.8.8-4.2 4 1 5.8-5.1-2.8-5.1 2.8 1-5.8-4.2-4 5.8-.8z"/></svg>',
+    notas: '<svg viewBox="0 0 24 24"><path d="M5 19l1-4L16.5 4.5a2 2 0 012.8 0l.2.2a2 2 0 010 2.8L9 18l-4 1z"/><path d="M14.5 6.5l3 3"/></svg>',
+    guia: '<svg viewBox="0 0 24 24"><path d="M5 4.5h11a3 3 0 013 3V20H8a3 3 0 01-3-3V4.5z"/><path d="M9 9h6M9 12.5h4"/></svg>',
+  };
   function telaAulas() {
-    const stats = `<div class="stats"><div><b data-n="${D.reacoes.length}">${D.reacoes.length}</b><span>reações</span></div><div><b data-n="${D.aulas.filter((a) => a.id !== '00').length}">${D.aulas.filter((a) => a.id !== '00').length}</b><span>aulas</span></div><div><b data-n="${progressoGeral().dom}">${progressoGeral().dom}</b><span>dominadas</span></div></div>`;
-    const hex = '<svg class="hex" viewBox="0 0 100 100"><path d="M50 8 L86 29 L86 71 L50 92 L14 71 L14 29 Z"/></svg><svg class="hex" viewBox="0 0 100 100"><path d="M50 8 L86 29 L86 71 L50 92 L14 71 L14 29 Z"/></svg>';
-    const itens = D.aulas.map((a, i) => `<a class="aula sobe" style="--i:${i + 2}" href="#/aula/${a.id}"><div class="num">${a.id === '00' ? 'Ex.' : rotuloAula(a.id)}</div><div class="tx"><b>${esc(a.nome)}</b><small>${plural(a.n, 'reação', 'reações')}${progressoAula(a.id).dom ? ` · ${progressoAula(a.id).dom} dominadas` : ''}</small><span class="mini-prog"><i style="width:${progressoAula(a.id).pct.toFixed(0)}%"></i></span></div>${SETA_IR}</a>`).join('');
+    const g = progressoGeral(), nAulas = D.aulas.filter((a) => a.id !== '00').length;
+    const stat = (n, t) => `<div><b data-n="${n}">${n}</b><span>${t}</span></div>`;
+    const atalho = (href, ic, t, sub, cor) => `<a class="atalho sobe c-${cor}" style="--i:${cor === 'a' ? 2 : cor === 'b' ? 3 : cor === 'c' ? 4 : 5}" href="${href}"><span class="at-ic">${IC[ic]}</span><b>${t}</b><small>${sub}</small></a>`;
+    const itens = D.aulas.map((a, i) => { const pr = progressoAula(a.id); return `<a class="aula-card sobe" style="--i:${i + 6}" href="#/aula/${a.id}"><span class="ac-num">${a.id === '00' ? 'Ex.' : rotuloAula(a.id)}</span><b>${esc(a.nome)}</b><small>${plural(a.n, 'reação', 'reações')}</small><span class="mini-prog"><i style="width:${pr.pct.toFixed(0)}%"></i></span></a>`; }).join('');
     return {
       titulo: 'Atlas Orgânico', aba: 'aulas', prof: 0,
-      html: `<section class="hero sobe">${hex}<h2>Reações de Química Orgânica II</h2><p>Toda a matéria, organizada para estudar.</p>${stats}</section>
+      html: `<section class="capa sobe">
+          <svg class="capa-mol" viewBox="0 0 200 160" aria-hidden="true"><g class="cm-a"><path d="M100 18l26 15v30l-26 15-26-15V33z"/><path d="M126 63l26 15v30l-26 15-26-15V78z" class="cm-b"/><path d="M74 63L48 78"/><path d="M48 78l-26 15"/></g><circle cx="22" cy="93" r="4"/><circle cx="48" cy="78" r="4"/></svg>
+          <span class="capa-tag">Química Orgânica II · USP</span>
+          <h2>Atlas de<br>reações</h2>
+          <p>Toda a matéria, do jeito que cai na prova.</p>
+          <button class="capa-busca" data-ir="#/busca"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>Buscar reação ou reagente…</button>
+          <div class="stats">${stat(D.reacoes.length, 'reações')}${stat(nAulas, 'aulas')}${stat(g.dom, 'dominadas')}</div>
+        </section>
         <div id="instalar"></div>
-        <button class="busca-falsa sobe" style="--i:1" data-ir="#/busca"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>Buscar reação ou reagente…</button>
-        <a class="guia-link sobe" style="--i:2" href="#/mec"><span class="gl-ic">vs</span><span class="gl-tx"><b>Guias rápidos de mecanismos</b><small>SN1, SN2, E1, E2, alcenos e mais</small></span>${SETA_IR}</a>
-        <div class="sec"><h3>Por aula</h3><span>${D.aulas.length} aulas</span></div>${itens}
-        <a class="aula sobe" style="--i:${D.aulas.length + 3}" href="#/todas"><div class="num">∑</div><div class="tx"><b>Todas as reações</b><small>${plural(D.reacoes.length, 'reação', 'reações')}</small></div>${SETA_IR}</a>
+        <div class="atalhos">
+          ${atalho('#/mec', 'mapa', 'Mecanismos', 'guias e mapas', 'a')}
+          ${atalho('#/transforma', 'transforma', 'Transformar', 'de grupo → grupo', 'b')}
+          ${atalho('#/estudar', 'cartoes', 'Estudar', 'cartões e jogos', 'c')}
+          ${atalho('#/salvos', 'salvos', 'Salvos', plural(salvos.size, 'reação', 'reações'), 'd')}
+        </div>
+        <div class="sec"><h3>Por aula</h3><span>${D.aulas.length} aulas</span></div>
+        <div class="aulas-grade">${itens}</div>
+        <a class="aula sobe" style="--i:${D.aulas.length + 6}" href="#/todas"><div class="num">∑</div><div class="tx"><b>Todas as reações</b><small>${plural(D.reacoes.length, 'reação', 'reações')}</small></div>${SETA_IR}</a>
         <div class="tema" role="group" aria-label="Tema"><button data-tema="auto">Auto</button><button data-tema="claro">Claro</button><button data-tema="escuro">Escuro</button></div>
         <div class="rodape"><button class="avatar" data-creditos aria-label="Créditos">${DINO_AVATAR}</button><br>Versão ${BUILD}<br><button data-verificar>Verificar atualização</button></div>`,
       depois: () => { montaInstalar(); contaAte(tela); marcaTema(); },

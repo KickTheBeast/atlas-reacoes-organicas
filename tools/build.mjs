@@ -15,6 +15,7 @@ import initRDKit from '@rdkit/rdkit';
 import sharp from 'sharp';
 import { lerMolblock, posicoesAtomos, marcarSetas } from './setas.mjs';
 import { resolveCids } from './cid.mjs';
+import { transform } from 'lightningcss';
 import { GRUPOS, gruposDe } from './grupos.mjs';
 
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -403,8 +404,11 @@ const dadosTxt = JSON.stringify(dados);
 const svgsTxt = JSON.stringify(svgs);
 const escuro = fs.readFileSync(path.join(FONTE, 'app/escuro.css'), 'utf8');
 const temaEscuro = `@media (prefers-color-scheme:dark){:root:not([data-tema="claro"]){${escuro}}}\n:root[data-tema="escuro"]{${escuro}}\n`;
-const css = fs.readFileSync(path.join(FONTE, 'app/style.css'), 'utf8') + temaEscuro +
+const cssBruto = fs.readFileSync(path.join(FONTE, 'app/style.css'), 'utf8') + temaEscuro +
   '\n/* estilos das estruturas (gerado) */\n' + [...estilos].map(([st, c]) => `.${c}{${st}}`).join('') + '\n';
+// Navegadores mais antigos (Samsung Internet, Chrome < 120) não entendem CSS aninhado: sem isso o modo escuro
+// perdia as regras e as cores saíam distorcidas. O lightningcss desdobra o aninhamento em CSS plano.
+const css = transform({ filename: 'style.css', code: Buffer.from(cssBruto), minify: false, targets: { chrome: 90 << 16, safari: 14 << 16, firefox: 90 << 16, samsung: undefined }, errorRecovery: true }).code.toString();
 const js = fs.readFileSync(path.join(FONTE, 'app/app.js'), 'utf8').replace('/*@@estudo*/', () => fs.readFileSync(path.join(FONTE, 'app/estudo.js'), 'utf8'));
 const motionJs = fs.readFileSync(path.join(raiz, 'tools/node_modules/motion/dist/motion.js'), 'utf8');
 const swFonte = fs.readFileSync(path.join(FONTE, 'app/sw.js'), 'utf8');

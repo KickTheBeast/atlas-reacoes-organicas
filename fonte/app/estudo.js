@@ -131,14 +131,15 @@
         ${escopo.tipo === 'aula' ? `<select class="sel-estudo" data-escopo-id="aula">${aulasOpt}</select>` : ''}
         ${escopo.tipo === 'mec' ? `<select class="sel-estudo" data-escopo-id="mec">${mecOpt}</select>` : ''}
         <div class="qtd sobe" style="--i:3"><span>Quantidade</span>${[10, 20, 50].map((n) => `<button class="chip${qtd === n ? ' on' : ''}" data-qtd="${n}">${n}</button>`).join('')}<button class="chip${qtd === 0 ? ' on' : ''}" data-qtd="0">Todas</button></div>
-        <div class="grande-grade">
-          <button class="btn-grande cartoes sobe" style="--i:4" data-iniciar="cartoes"><span class="bg-ic">⟳</span><span class="bg-tx"><b>Testar-me</b><small>${venc ? `${venc} para revisar` : 'cartões de revisão'}${novas ? ` · ${novas} novas` : ''}</small></span></button>
-          <button class="btn-grande simulado sobe" style="--i:5" data-iniciar="simulado"><span class="bg-ic">✎</span><span class="bg-tx"><b>Simulado</b><small>questões de múltipla escolha</small></span></button>
-          <button class="btn-grande simulado sobe" style="--i:6" data-ir="#/jogo"><span class="bg-ic">⇄</span><span class="bg-tx"><b>Jogo dos reagentes</b><small>preencha as setas dos mapas</small></span></button>
+        <div class="sec"><h3>Modos de estudo</h3></div>
+        <div class="modos">
+          <button class="modo sobe m-cartoes" style="--i:4" data-iniciar="cartoes"><span class="md-ic">${IC.cartoes}</span><b>Testar-me</b><small>${venc ? `${venc} para revisar` : 'cartões de revisão'}${novas ? ` · ${novas} novas` : ''}</small></button>
+          <button class="modo sobe m-simulado" style="--i:5" data-iniciar="simulado"><span class="md-ic">${IC.simulado}</span><b>Simulado</b><small>múltipla escolha</small></button>
+          <button class="modo sobe m-jogo" style="--i:6" data-ir="#/jogo"><span class="md-ic">${IC.jogo}</span><b>Reagentes</b><small>preencha as setas</small></button>
+          <button class="modo sobe m-mapas" style="--i:7" data-ir="#/mec"><span class="md-ic">${IC.mapa}</span><b>Mapas</b><small>diagramas de reações</small></button>
+          <button class="modo sobe m-salvos" style="--i:8" data-ir="#/salvos"><span class="md-ic">${IC.salvos}</span><b>Salvos</b><small>${plural(salvos.size, 'reação', 'reações')}</small></button>
+          <button class="modo sobe m-notas" style="--i:9" data-ir="#/notas"><span class="md-ic">${IC.notas}</span><b>Anotações</b><small>${plural(D.reacoes.filter((r) => comNota(r.i)).length, 'anotação', 'anotações')}</small></button>
         </div>
-        <div class="sec"><h3>Atalhos</h3></div>
-        <a class="aula sobe" style="--i:6" href="#/salvos"><div class="num">★</div><div class="tx"><b>Salvos</b><small>${plural(salvos.size, 'reação', 'reações')}</small></div>${SETA_IR}</a>
-        <a class="aula sobe" style="--i:7" href="#/notas"><div class="num">✎</div><div class="tx"><b>Minhas anotações</b><small>${plural(D.reacoes.filter((r) => comNota(r.i)).length, 'anotação', 'anotações')}</small></div>${SETA_IR}</a>
         <div class="sec"><h3>Progresso por aula</h3><span>dominadas</span></div><div class="prog">${barras}</div>`,
       depois: () => {
         anel($('#anel-geral'), g.pct);
@@ -435,7 +436,7 @@
     return {
       titulo: 'Jogo dos reagentes', aba: 'estudar', prof: 1,
       html: `<h2 class="titulo-lista sobe">Jogo dos reagentes</h2><p class="sub-lista sobe" style="--i:1">Escolha um mapa e coloque o reagente certo em cada seta.</p>
-        ${D.mapas.map((m, i) => `<a class="aula sobe" style="--i:${i + 2}" href="#/jogo/${m.id}"><div class="num guia-num">${esc(m.curto)}</div><div class="tx"><b>${esc(m.t)}</b><small>${esc(m.sub)}${melhorMapa(m.id) != null ? ` · melhor ${melhorMapa(m.id)}%` : ''}</small></div>${SETA_IR}</a>`).join('')}`,
+        ${D.mapas.map((m, i) => `<a class="aula sobe" style="--i:${i + 2}" href="#/jogo/${m.id}"><div class="num jogo-ic">${IC.jogo}</div><div class="tx"><b>${esc(m.t)}</b><small>${esc(m.sub)}${melhorMapa(m.id) != null ? ` · melhor ${melhorMapa(m.id)}%` : ''}</small></div>${SETA_IR}</a>`).join('')}`,
     };
   }
   function telaJogoMapa(id) {
