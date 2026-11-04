@@ -1,0 +1,26 @@
+--bg:#0b1411;--card:#142520;--ink:#e6f2ed;--mut:#93aba1;--faint:#667f75;--bd:rgba(255,255,255,.06);--bd2:#243a33;
+--ac:#44e0ae;--ac-ink:#04201a;--ac-soft:#12332b;
+--nu-soft:#14234a;--el-soft:#3b2412;--mec-soft:#271c40;
+--hi:rgba(255,255,255,.045);--lo:rgba(0,0,0,.62);
+--vidro:linear-gradient(145deg,rgba(255,255,255,.12),rgba(255,255,255,.03));
+color-scheme:dark;
+
+& body{background:var(--bg)}
+& body::before{background:linear-gradient(165deg,rgba(22,217,160,.28) 0%,rgba(10,122,96,.14) 46%,transparent 72%)}
+& .topo{background:linear-gradient(180deg,color-mix(in srgb,var(--bg) 88%,transparent),color-mix(in srgb,var(--bg) 50%,transparent))}
+& .abas{border-color:rgba(255,255,255,.12);box-shadow:10px 16px 34px rgba(0,0,0,.6),-4px -4px 12px rgba(255,255,255,.03),inset 0 1px 0 rgba(255,255,255,.14)}
+& .capa{box-shadow:10px 16px 34px rgba(0,0,0,.55),-4px -4px 12px rgba(255,255,255,.03),inset 0 1px 0 rgba(255,255,255,.2)}
+& .tile{background:#fff;box-shadow:5px 6px 14px rgba(0,0,0,.6),-3px -3px 9px rgba(255,255,255,.04)}
+& .btn-grande,& .btn-aviso{color:#04201a}
+& .chip.on,& .mp-chip.sel,& .tema button.on{color:#04201a}
+& .aula .num,& .ac-num,& .at-ic,& .md-ic{color:#04201a!important}
+& .atalho.c-a .at-ic,& .atalho.c-b .at-ic,& .atalho.c-d .at-ic,& .m-simulado .md-ic,& .m-jogo .md-ic,& .m-salvos .md-ic,& .jogo-ic{color:#fff!important}
+& .rad-lin{stroke:#44e0ae}
+& .cartao,& .item,& .aula,& .ficha,& .busca-falsa,& .atalho,& .aula-card,& .modo,& .reag,& .cl-card{background:var(--card);box-shadow:var(--sombra)}
+& .chip,& .sel-estudo,& .trans-sel select,& .campo input,& .mp-chip,& .modo-busca,& .tema{background:var(--card);box-shadow:var(--afunda)}
+& .chip.on,& .mp-chip.sel,& .tema button.on{background:var(--grad);box-shadow:0 6px 14px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.35)}
+& .abas{background:var(--vidro)}
+& .guia-link{background:var(--grad);box-shadow:10px 14px 26px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.3)}
+& .hero{background:linear-gradient(135deg,#12b384,#073a30 74%)}
+& .btn{background:var(--card);box-shadow:var(--sombra)}
+& .pilula{background:var(--grad)}

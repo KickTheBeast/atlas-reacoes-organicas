@@ -2041,10 +2041,6 @@ mark {
   transform: scale(.9);
 }
 
-.abas a.on {
-  color: #0c5f4e;
-}
-
 .abas a span {
   white-space: nowrap;
   line-height: 1;
@@ -4469,6 +4465,277 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
   }
 }
 
+:root {
+  --bg: #dfe8e4;
+  --card: #e8efec;
+  --ink: #12251f;
+  --mut: #566b63;
+  --faint: #8da097;
+  --bd: #ffffff8c;
+  --bd2: #c9d6d0;
+  --ac: #0f9a74;
+  --ac-ink: #fff;
+  --ac-soft: #d3eadf;
+  --nu-soft: #dbe6f6;
+  --el-soft: #f4e3d4;
+  --mec-soft: #e7dff4;
+  --r: 22px;
+  --hi: #fffffff2;
+  --lo: #8ca59b8c;
+  --sombra: 8px 8px 18px var(--lo),-8px -8px 18px var(--hi);
+  --afunda: inset 5px 5px 11px var(--lo),inset -5px -5px 11px var(--hi);
+  --grad: linear-gradient(135deg,#46e8b4 0%,#12b384 48%,#0a7a60 100%);
+  --vidro: linear-gradient(145deg,#ffffffb3,#ffffff47);
+}
+
+body {
+  background: var(--bg);
+}
+
+body:before {
+  content: "";
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(165deg, #16d9a057 0%, #0a7a6029 48%, #0000 74%);
+  border-radius: 60px;
+  width: 130vw;
+  height: 74vh;
+  position: fixed;
+  top: -14vh;
+  right: -38vw;
+  transform: rotate(-17deg);
+}
+
+#app {
+  z-index: 1;
+  position: relative;
+}
+
+.topo {
+  background: linear-gradient(180deg,color-mix(in srgb,var(--bg) 86%,transparent),color-mix(in srgb,var(--bg) 52%,transparent));
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  backdrop-filter: blur(18px) saturate(1.5);
+}
+
+.topo .icone-btn {
+  background: var(--card);
+  width: 42px;
+  height: 42px;
+  box-shadow: 5px 5px 11px var(--lo),-5px -5px 11px var(--hi);
+  border-radius: 14px;
+}
+
+.topo .icone-btn:active {
+  box-shadow: var(--afunda);
+}
+
+.topo h1 {
+  letter-spacing: -.02em;
+  font-weight: 800;
+}
+
+.abas {
+  background: var(--vidro);
+  box-shadow: 10px 14px 30px var(--lo),-6px -6px 16px var(--hi),inset 0 1px 0 #fffc;
+  -webkit-backdrop-filter: blur(26px) saturate(1.7);
+  backdrop-filter: blur(26px) saturate(1.7);
+  border: 1px solid #ffffffa6;
+  border-radius: 30px;
+}
+
+.pilula {
+  background: var(--grad);
+  box-shadow: 0 8px 18px #0a7a6073, inset 0 1px #ffffff73;
+}
+
+.abas a.on {
+  color: #fff;
+}
+
+.abas a.on svg, .abas a.on .glifo {
+  filter: drop-shadow(0 1px 2px #00000040);
+}
+
+.cartao, .item, .aula, .ficha, .busca-falsa, .atalho, .aula-card, .modo, .reag, .cl-card {
+  background: var(--card);
+  box-shadow: var(--sombra);
+  border-radius: var(--r);
+  border: 0;
+}
+
+.aula:active, .item:active, .atalho:active, .aula-card:active, .modo:active {
+  box-shadow: var(--afunda);
+  transform: none;
+}
+
+.aula .num, .ac-num {
+  background: var(--grad);
+  color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 6px 14px #0a7a6059, inset 0 1px #fff6;
+}
+
+.at-ic, .md-ic {
+  border-radius: 15px;
+  box-shadow: 0 7px 16px #0a7a6061, inset 0 1px #ffffff73;
+  background: var(--grad) !important;
+  color: #fff !important;
+}
+
+.atalho.c-b .at-ic, .m-simulado .md-ic {
+  box-shadow: 0 7px 16px #2c6bd661, inset 0 1px #ffffff73;
+  background: linear-gradient(135deg, #7aa8ff, #2c6bd6 60%, #1d4aa0) !important;
+}
+
+.atalho.c-a .at-ic, .m-jogo .md-ic {
+  box-shadow: 0 7px 16px #7a3fc961, inset 0 1px #ffffff73;
+  background: linear-gradient(135deg, #c3a1ff, #7a3fc9 60%, #58289a) !important;
+}
+
+.atalho.c-d .at-ic, .m-salvos .md-ic {
+  box-shadow: 0 7px 16px #d96a1c61, inset 0 1px #ffffff73;
+  background: linear-gradient(135deg, #ffbd8a, #d96a1c 60%, #a94c0c) !important;
+}
+
+.m-notas .md-ic {
+  background: linear-gradient(135deg, #aebdb6, #6b8077) !important;
+}
+
+.jogo-ic {
+  color: #fff !important;
+  background: linear-gradient(135deg, #c3a1ff, #7a3fc9) !important;
+}
+
+.capa {
+  box-shadow: 10px 16px 34px #0a5a4866,-6px -6px 16px var(--hi),inset 0 1px 0 #fff6;
+  background: radial-gradient(110% 80% at 90% -10%, #58f0c0 0%, #0000 52%), linear-gradient(150deg, #12b384 0%, #0a6b57 55%, #073a30 100%);
+  border-radius: 34px;
+}
+
+.capa-busca {
+  background: linear-gradient(145deg, #ffffff4d, #ffffff1a);
+  border: 1px solid #ffffff59;
+  box-shadow: inset 0 1px #ffffff59, 0 8px 18px #0000002e;
+}
+
+.capa .stats > div {
+  background: linear-gradient(145deg, #ffffff38, #ffffff0f);
+  border: 1px solid #fff3;
+  border-radius: 15px;
+  padding: 9px 13px;
+}
+
+.capa .stats {
+  gap: 10px;
+}
+
+.chip, .sel-estudo, .trans-sel select, .campo input, .mp-chip, .modo-busca {
+  background: var(--card);
+  box-shadow: var(--afunda);
+  border: 0;
+}
+
+.chip.on, .mp-chip.sel {
+  background: var(--grad);
+  color: #fff;
+  box-shadow: 0 6px 14px #0a7a6066, inset 0 1px #fff6;
+}
+
+.modo-busca {
+  border-radius: 18px;
+}
+
+.modo-busca a.on {
+  background: var(--card);
+  box-shadow: var(--sombra);
+  color: var(--ink);
+}
+
+.tema {
+  background: var(--card);
+  box-shadow: var(--afunda);
+  border: 0;
+}
+
+.tema button.on {
+  background: var(--grad);
+  color: #fff;
+  box-shadow: 0 5px 12px #0a7a6066;
+}
+
+.btn-grande, .btn-aviso, .cr-lojabtn {
+  background: var(--grad);
+  color: #fff;
+  border: 0;
+  box-shadow: 0 10px 22px #0a7a6066, inset 0 1px #ffffff6b;
+}
+
+.btn {
+  background: var(--card);
+  box-shadow: var(--sombra);
+  border: 0;
+}
+
+.btn:active {
+  box-shadow: var(--afunda);
+}
+
+.guia-link {
+  border-radius: var(--r);
+  background: var(--grad);
+  box-shadow: 10px 14px 26px #0a7a6052, inset 0 1px #fff6;
+}
+
+.tile {
+  box-shadow: 5px 5px 12px var(--lo),-4px -4px 10px var(--hi);
+  background: #fff;
+  border: 0;
+  border-radius: 16px;
+}
+
+.hero {
+  border-radius: 30px;
+}
+
+.mini-prog {
+  background: var(--card);
+  box-shadow: var(--afunda);
+}
+
+.mini-prog i {
+  background: var(--grad);
+}
+
+.radial {
+  box-shadow: var(--afunda);
+  background: var(--card);
+  border: 0;
+  border-radius: 26px;
+}
+
+.rad-rg span, .mp-slot {
+  background: var(--card);
+  box-shadow: 4px 4px 9px var(--lo),-3px -3px 8px var(--hi);
+  border: 0;
+}
+
+.mp-banco {
+  background: var(--vidro);
+  box-shadow: var(--sombra);
+  border: 0;
+  border-radius: 22px;
+}
+
+.rad-lin {
+  stroke: #0f9a74;
+}
+
+.aviso {
+  background: linear-gradient(145deg, #1d3a32, #0e211c);
+  border-radius: 22px;
+  box-shadow: 0 18px 36px #00000059;
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema="claro"]) {
     --bg: #090f0d;
@@ -4506,17 +4773,13 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
     color-scheme: dark;
   }
 
-  :root:not([data-tema="claro"]) body {
-    background: radial-gradient(120% 55% at 50% -8%,#10231c 0%,var(--bg) 62%) fixed;
-  }
+  
 
   :root:not([data-tema="claro"]) * {
     scrollbar-color: #2a3b35 transparent;
   }
 
-  :root:not([data-tema="claro"]) .topo {
-    background: color-mix(in srgb,var(--bg) 78%,transparent);
-  }
+  
 
   :root:not([data-tema="claro"]) .cartao, :root:not([data-tema="claro"]) .item, :root:not([data-tema="claro"]) .aula, :root:not([data-tema="claro"]) .ficha, :root:not([data-tema="claro"]) .busca-falsa {
     background: linear-gradient(180deg,color-mix(in srgb,#fff 2.6%,var(--card)),var(--card));
@@ -4541,10 +4804,7 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
     box-shadow: inset 0 1px #ffffff1a, 0 16px 40px #00000080;
   }
 
-  :root:not([data-tema="claro"]) .guia-link {
-    background: linear-gradient(135deg, #137761, #0a2c25);
-    box-shadow: inset 0 1px #ffffff17, 0 10px 26px #0006;
-  }
+  
 
   :root:not([data-tema="claro"]) .abas {
     background: #111b17a3;
@@ -4560,9 +4820,7 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
     color: var(--ac);
   }
 
-  :root:not([data-tema="claro"]) .pilula {
-    background: color-mix(in srgb,var(--ac) 16%,transparent);
-  }
+  
 
   :root:not([data-tema="claro"]) .tb .ok {
     color: #5fd68a;
@@ -4612,6 +4870,107 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
   :root:not([data-tema="claro"]) .atalho, :root:not([data-tema="claro"]) .aula-card, :root:not([data-tema="claro"]) .modo {
     background: linear-gradient(180deg,color-mix(in srgb,#fff 2.6%,var(--card)),var(--card));
   }
+
+  :root:not([data-tema="claro"]) {
+    --bg: #0b1411;
+    --card: #142520;
+    --ink: #e6f2ed;
+    --mut: #93aba1;
+    --faint: #667f75;
+    --bd: #ffffff0f;
+    --bd2: #243a33;
+    --ac: #44e0ae;
+    --ac-ink: #04201a;
+    --ac-soft: #12332b;
+    --nu-soft: #14234a;
+    --el-soft: #3b2412;
+    --mec-soft: #271c40;
+    --hi: #ffffff0b;
+    --lo: #0000009e;
+    --vidro: linear-gradient(145deg,#ffffff1f,#ffffff08);
+    --lightningcss-light: ;
+    --lightningcss-dark: initial;
+    color-scheme: dark;
+  }
+
+  :root:not([data-tema="claro"]) body {
+    background: var(--bg);
+  }
+
+  :root:not([data-tema="claro"]) body:before {
+    background: linear-gradient(165deg, #16d9a047 0%, #0a7a6024 46%, #0000 72%);
+  }
+
+  :root:not([data-tema="claro"]) .topo {
+    background: linear-gradient(180deg,color-mix(in srgb,var(--bg) 88%,transparent),color-mix(in srgb,var(--bg) 50%,transparent));
+  }
+
+  :root:not([data-tema="claro"]) .abas {
+    border-color: #ffffff1f;
+    box-shadow: 10px 16px 34px #0009, -4px -4px 12px #ffffff08, inset 0 1px #ffffff24;
+  }
+
+  :root:not([data-tema="claro"]) .capa {
+    box-shadow: 10px 16px 34px #0000008c, -4px -4px 12px #ffffff08, inset 0 1px #fff3;
+  }
+
+  :root:not([data-tema="claro"]) .tile {
+    background: #fff;
+    box-shadow: 5px 6px 14px #0009, -3px -3px 9px #ffffff0a;
+  }
+
+  :root:not([data-tema="claro"]) .btn-grande, :root:not([data-tema="claro"]) .btn-aviso, :root:not([data-tema="claro"]) .chip.on, :root:not([data-tema="claro"]) .mp-chip.sel, :root:not([data-tema="claro"]) .tema button.on {
+    color: #04201a;
+  }
+
+  :root:not([data-tema="claro"]) .aula .num, :root:not([data-tema="claro"]) .ac-num, :root:not([data-tema="claro"]) .at-ic, :root:not([data-tema="claro"]) .md-ic {
+    color: #04201a !important;
+  }
+
+  :root:not([data-tema="claro"]) .atalho.c-a .at-ic, :root:not([data-tema="claro"]) .atalho.c-b .at-ic, :root:not([data-tema="claro"]) .atalho.c-d .at-ic, :root:not([data-tema="claro"]) .m-simulado .md-ic, :root:not([data-tema="claro"]) .m-jogo .md-ic, :root:not([data-tema="claro"]) .m-salvos .md-ic, :root:not([data-tema="claro"]) .jogo-ic {
+    color: #fff !important;
+  }
+
+  :root:not([data-tema="claro"]) .rad-lin {
+    stroke: #44e0ae;
+  }
+
+  :root:not([data-tema="claro"]) .cartao, :root:not([data-tema="claro"]) .item, :root:not([data-tema="claro"]) .aula, :root:not([data-tema="claro"]) .ficha, :root:not([data-tema="claro"]) .busca-falsa, :root:not([data-tema="claro"]) .atalho, :root:not([data-tema="claro"]) .aula-card, :root:not([data-tema="claro"]) .modo, :root:not([data-tema="claro"]) .reag, :root:not([data-tema="claro"]) .cl-card {
+    background: var(--card);
+    box-shadow: var(--sombra);
+  }
+
+  :root:not([data-tema="claro"]) .chip, :root:not([data-tema="claro"]) .sel-estudo, :root:not([data-tema="claro"]) .trans-sel select, :root:not([data-tema="claro"]) .campo input, :root:not([data-tema="claro"]) .mp-chip, :root:not([data-tema="claro"]) .modo-busca, :root:not([data-tema="claro"]) .tema {
+    background: var(--card);
+    box-shadow: var(--afunda);
+  }
+
+  :root:not([data-tema="claro"]) .chip.on, :root:not([data-tema="claro"]) .mp-chip.sel, :root:not([data-tema="claro"]) .tema button.on {
+    background: var(--grad);
+    box-shadow: 0 6px 14px #00000080, inset 0 1px #ffffff59;
+  }
+
+  :root:not([data-tema="claro"]) .abas {
+    background: var(--vidro);
+  }
+
+  :root:not([data-tema="claro"]) .guia-link {
+    background: var(--grad);
+    box-shadow: 10px 14px 26px #00000080, inset 0 1px #ffffff4d;
+  }
+
+  :root:not([data-tema="claro"]) .hero {
+    background: linear-gradient(135deg, #12b384, #073a30 74%);
+  }
+
+  :root:not([data-tema="claro"]) .btn {
+    background: var(--card);
+    box-shadow: var(--sombra);
+  }
+
+  :root:not([data-tema="claro"]) .pilula {
+    background: var(--grad);
+  }
 }
 
 :root[data-tema="escuro"] {
@@ -4650,17 +5009,13 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
   color-scheme: dark;
 }
 
-:root[data-tema="escuro"] body {
-  background: radial-gradient(120% 55% at 50% -8%,#10231c 0%,var(--bg) 62%) fixed;
-}
+
 
 :root[data-tema="escuro"] * {
   scrollbar-color: #2a3b35 transparent;
 }
 
-:root[data-tema="escuro"] .topo {
-  background: color-mix(in srgb,var(--bg) 78%,transparent);
-}
+
 
 :root[data-tema="escuro"] .cartao, :root[data-tema="escuro"] .item, :root[data-tema="escuro"] .aula, :root[data-tema="escuro"] .ficha, :root[data-tema="escuro"] .busca-falsa {
   background: linear-gradient(180deg,color-mix(in srgb,#fff 2.6%,var(--card)),var(--card));
@@ -4685,10 +5040,7 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
   box-shadow: inset 0 1px #ffffff1a, 0 16px 40px #00000080;
 }
 
-:root[data-tema="escuro"] .guia-link {
-  background: linear-gradient(135deg, #137761, #0a2c25);
-  box-shadow: inset 0 1px #ffffff17, 0 10px 26px #0006;
-}
+
 
 :root[data-tema="escuro"] .abas {
   background: #111b17a3;
@@ -4704,9 +5056,7 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
   color: var(--ac);
 }
 
-:root[data-tema="escuro"] .pilula {
-  background: color-mix(in srgb,var(--ac) 16%,transparent);
-}
+
 
 :root[data-tema="escuro"] .tb .ok {
   color: #5fd68a;
@@ -4755,6 +5105,107 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
 
 :root[data-tema="escuro"] .atalho, :root[data-tema="escuro"] .aula-card, :root[data-tema="escuro"] .modo {
   background: linear-gradient(180deg,color-mix(in srgb,#fff 2.6%,var(--card)),var(--card));
+}
+
+:root[data-tema="escuro"] {
+  --bg: #0b1411;
+  --card: #142520;
+  --ink: #e6f2ed;
+  --mut: #93aba1;
+  --faint: #667f75;
+  --bd: #ffffff0f;
+  --bd2: #243a33;
+  --ac: #44e0ae;
+  --ac-ink: #04201a;
+  --ac-soft: #12332b;
+  --nu-soft: #14234a;
+  --el-soft: #3b2412;
+  --mec-soft: #271c40;
+  --hi: #ffffff0b;
+  --lo: #0000009e;
+  --vidro: linear-gradient(145deg,#ffffff1f,#ffffff08);
+  --lightningcss-light: ;
+  --lightningcss-dark: initial;
+  color-scheme: dark;
+}
+
+:root[data-tema="escuro"] body {
+  background: var(--bg);
+}
+
+:root[data-tema="escuro"] body:before {
+  background: linear-gradient(165deg, #16d9a047 0%, #0a7a6024 46%, #0000 72%);
+}
+
+:root[data-tema="escuro"] .topo {
+  background: linear-gradient(180deg,color-mix(in srgb,var(--bg) 88%,transparent),color-mix(in srgb,var(--bg) 50%,transparent));
+}
+
+:root[data-tema="escuro"] .abas {
+  border-color: #ffffff1f;
+  box-shadow: 10px 16px 34px #0009, -4px -4px 12px #ffffff08, inset 0 1px #ffffff24;
+}
+
+:root[data-tema="escuro"] .capa {
+  box-shadow: 10px 16px 34px #0000008c, -4px -4px 12px #ffffff08, inset 0 1px #fff3;
+}
+
+:root[data-tema="escuro"] .tile {
+  background: #fff;
+  box-shadow: 5px 6px 14px #0009, -3px -3px 9px #ffffff0a;
+}
+
+:root[data-tema="escuro"] .btn-grande, :root[data-tema="escuro"] .btn-aviso, :root[data-tema="escuro"] .chip.on, :root[data-tema="escuro"] .mp-chip.sel, :root[data-tema="escuro"] .tema button.on {
+  color: #04201a;
+}
+
+:root[data-tema="escuro"] .aula .num, :root[data-tema="escuro"] .ac-num, :root[data-tema="escuro"] .at-ic, :root[data-tema="escuro"] .md-ic {
+  color: #04201a !important;
+}
+
+:root[data-tema="escuro"] .atalho.c-a .at-ic, :root[data-tema="escuro"] .atalho.c-b .at-ic, :root[data-tema="escuro"] .atalho.c-d .at-ic, :root[data-tema="escuro"] .m-simulado .md-ic, :root[data-tema="escuro"] .m-jogo .md-ic, :root[data-tema="escuro"] .m-salvos .md-ic, :root[data-tema="escuro"] .jogo-ic {
+  color: #fff !important;
+}
+
+:root[data-tema="escuro"] .rad-lin {
+  stroke: #44e0ae;
+}
+
+:root[data-tema="escuro"] .cartao, :root[data-tema="escuro"] .item, :root[data-tema="escuro"] .aula, :root[data-tema="escuro"] .ficha, :root[data-tema="escuro"] .busca-falsa, :root[data-tema="escuro"] .atalho, :root[data-tema="escuro"] .aula-card, :root[data-tema="escuro"] .modo, :root[data-tema="escuro"] .reag, :root[data-tema="escuro"] .cl-card {
+  background: var(--card);
+  box-shadow: var(--sombra);
+}
+
+:root[data-tema="escuro"] .chip, :root[data-tema="escuro"] .sel-estudo, :root[data-tema="escuro"] .trans-sel select, :root[data-tema="escuro"] .campo input, :root[data-tema="escuro"] .mp-chip, :root[data-tema="escuro"] .modo-busca, :root[data-tema="escuro"] .tema {
+  background: var(--card);
+  box-shadow: var(--afunda);
+}
+
+:root[data-tema="escuro"] .chip.on, :root[data-tema="escuro"] .mp-chip.sel, :root[data-tema="escuro"] .tema button.on {
+  background: var(--grad);
+  box-shadow: 0 6px 14px #00000080, inset 0 1px #ffffff59;
+}
+
+:root[data-tema="escuro"] .abas {
+  background: var(--vidro);
+}
+
+:root[data-tema="escuro"] .guia-link {
+  background: var(--grad);
+  box-shadow: 10px 14px 26px #00000080, inset 0 1px #ffffff4d;
+}
+
+:root[data-tema="escuro"] .hero {
+  background: linear-gradient(135deg, #12b384, #073a30 74%);
+}
+
+:root[data-tema="escuro"] .btn {
+  background: var(--card);
+  box-shadow: var(--sombra);
+}
+
+:root[data-tema="escuro"] .pilula {
+  background: var(--grad);
 }
 
 .s0 {
