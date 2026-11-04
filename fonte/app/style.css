@@ -685,3 +685,6 @@ html.mo .item,html.mo .aula,html.mo .ficha,html.mo .guia-link,html.mo .nav-det a
 
 .capa .hex{z-index:0}
 .capa>*:not(.hex){position:relative;z-index:1}
+
+/* "Versão" parece texto, mas tem área de toque grande */
+.rodape .versao-btn{display:inline-block;margin:-4px 0;padding:12px 22px;min-height:44px;border:0;border-radius:0;background:none;font-size:inherit;font-weight:400;color:inherit;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}

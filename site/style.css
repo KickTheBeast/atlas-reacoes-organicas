@@ -4478,6 +4478,22 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
   position: relative;
 }
 
+.rodape .versao-btn {
+  min-height: 44px;
+  font-size: inherit;
+  color: inherit;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  margin: -4px 0;
+  padding: 12px 22px;
+  font-weight: 400;
+  display: inline-block;
+}
+
 :root[data-visual="vidro"] {
   --bg: #f2f4f3;
   --card: #ffffff94;
@@ -5486,17 +5502,6 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
 
 .visuais-caixa[hidden] {
   display: none;
-}
-
-.versao-btn {
-  min-height: 44px;
-  color: inherit;
-  font-size: inherit;
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-  margin: -6px 0;
-  padding: 12px 22px;
 }
 
 @media (prefers-color-scheme: dark) {
