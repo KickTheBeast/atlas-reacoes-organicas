@@ -2,7 +2,7 @@
 // Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
 (() => {
   'use strict';
-  const BUILD = 'a078d5bfc6';
+  const BUILD = 'ad3a3983ac';
   const $ = (s) => document.querySelector(s);
   const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
   const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
@@ -839,7 +839,7 @@
     if (!gsap || reduzido || !caixa || fechaVooAtual) { abreVoo(V, true); return; }
     const W = innerWidth, H = innerHeight, r = caixa.getBoundingClientRect();
     const st = document.createElement('div'); st.className = 'voo-cena';
-    const pw = Math.min(W * 0.86, 340), ph = pw * (329 / 560);
+    const pw = Math.min(W * 0.62, 250), ph = pw * (329 / 560);
     st.innerHTML = `<div class="vc-fundo"></div><div class="vc-aviao" style="width:${pw}px;height:${ph}px"><img class="vc-sem" src="aviao-vazio.png?v=${BUILD}" alt=""><img class="vc-com" src="aviao.png?v=${BUILD}" alt="" style="opacity:0"></div><div class="vc-dino" style="left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px">${dinoSvg(V, estadoDino(V))}</div>`;
     document.body.appendChild(st);
     caixa.style.visibility = 'hidden';
@@ -881,7 +881,7 @@
     const ajusta = () => { W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
     ajusta(); addEventListener('resize', ajusta);
     // sprite rasterizado uma única vez, já no tamanho final e na densidade da tela: bem mais nítido e leve do que redesenhar o SVG a cada quadro
-    const SW = 560, SH = 329, ESC = Math.min(190, innerWidth * 0.5) / 560;
+    const SW = 560, SH = 329, ESC = Math.min(135, innerWidth * 0.36) / 560;
     let sprite = null;
     const img = new Image();
     img.onload = () => { const c = document.createElement('canvas'); c.width = Math.round(SW * ESC * dpr); c.height = Math.round(SH * ESC * dpr); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); sprite = c; };
@@ -893,8 +893,8 @@
     const mostraRec = () => { rec.textContent = melhor ? 'recorde ' + melhor : ''; };
     // Constantes na escala do clássico (0,45 de gravidade, pulo de −7,5 e queda máxima de 10 a 60 quadros por segundo), passadas para segundos;
     // a inclinação do nariz acompanha a velocidade (−25° subindo, 70° caindo) com interpolação — a mesma ideia de vários clones livres (ex.: Serkanbyx/flappy-bird, MIT)
-    const G = 1620, PULO = -440, QUEDA_MAX = 600, TW = 66, ESPACO = 230;
-    const GAP = () => Math.max(168, Math.min(206, H * 0.26));
+    const G = 1620, PULO = -430, QUEDA_MAX = 600, TW = 48, ESPACO = 210;
+    const GAP = () => Math.max(128, Math.min(160, H * 0.2));
     const VEL = () => 150 + Math.min(70, pontos * 3.5); // acelera de leve com o placar
     const reinicia = () => { bird.x = W * 0.3; bird.y = H * 0.46; bird.vy = 0; ang = 0; tubos = []; dist = ESPACO * 0.45; pontos = 0; pt.textContent = '0'; mostraRec(); tremor = 0; flash = 0; };
     reinicia(); if (!intro) msg.textContent = 'TOQUE PARA VOAR';
@@ -920,8 +920,8 @@
     // colisão: dois círculos (corpo e nariz) contra retângulos dos tubos
     const circRet = (cx, cy, r, x, y, w, h) => Math.hypot(cx - Math.max(x, Math.min(cx, x + w)), cy - Math.max(y, Math.min(cy, y + h))) < r;
     const colide = () => {
-      if (bird.y - 34 < 0 || bird.y + 44 > H - 22) return true; // teto e chão
-      const pts = [[bird.x - 8, bird.y + 8, 22], [bird.x + 46, bird.y + 8, 15]], g = GAP();
+      if (bird.y - 24 < 0 || bird.y + 31 > H - 22) return true; // teto e chão
+      const pts = [[bird.x - 6, bird.y + 5, 15], [bird.x + 32, bird.y + 6, 10]], g = GAP();
       for (const t of tubos) for (const [cx, cy, rr] of pts) if (circRet(cx, cy, rr, t.x, -20, TW, t.g + 20) || circRet(cx, cy, rr, t.x, t.g + g, TW, H)) return true;
       return false;
     };
@@ -959,13 +959,13 @@
       for (let k = -1; k < Math.ceil(W / 900) + 2; k++) { c.beginPath(); c.moveTo(k * 900 - off, H - 22); colinas.forEach((h) => { c.quadraticCurveTo(k * 900 - off + h.x + 75, H - 22 - h.h * 1.7, k * 900 - off + h.x + 150, H - 22); }); c.fill(); c.stroke(); }
       nuvens.forEach((n) => { c.save(); c.globalAlpha = 0.6 + n.camada * 0.2; c.fillStyle = '#fff'; c.strokeStyle = '#111'; c.lineWidth = 2.2; c.translate(n.x, n.y); c.scale(n.s, n.s); c.beginPath(); c.arc(0, 0, 20, 0, 7); c.arc(24, -8, 26, 0, 7); c.arc(52, 2, 20, 0, 7); c.fill(); c.restore(); });
       tubos.forEach((t) => {
-        c.fillStyle = '#1f9e5a'; c.lineWidth = 4; c.strokeStyle = '#111';
+        c.fillStyle = '#1f9e5a'; c.lineWidth = 3; c.strokeStyle = '#111';
         const g = GAP(), b = t.g + g;
         c.fillRect(t.x, -6, TW, t.g + 6); c.strokeRect(t.x, -6, TW, t.g + 6);
-        c.fillRect(t.x - 6, t.g - 28, TW + 12, 28); c.strokeRect(t.x - 6, t.g - 28, TW + 12, 28);
+        c.fillRect(t.x - 4, t.g - 20, TW + 8, 20); c.strokeRect(t.x - 4, t.g - 20, TW + 8, 20);
         c.fillRect(t.x, b, TW, H - b); c.strokeRect(t.x, b, TW, H - b);
-        c.fillRect(t.x - 6, b, TW + 12, 28); c.strokeRect(t.x - 6, b, TW + 12, 28);
-        c.strokeStyle = 'rgba(255,255,255,.45)'; c.lineWidth = 3; c.beginPath(); c.moveTo(t.x + 14, 4); c.lineTo(t.x + 14, t.g - 34); c.moveTo(t.x + 14, b + 34); c.lineTo(t.x + 14, H - 28); c.stroke();
+        c.fillRect(t.x - 4, b, TW + 8, 20); c.strokeRect(t.x - 4, b, TW + 8, 20);
+        c.strokeStyle = 'rgba(255,255,255,.45)'; c.lineWidth = 3; c.beginPath(); c.moveTo(t.x + 10, 4); c.lineTo(t.x + 10, t.g - 26); c.moveTo(t.x + 10, b + 26); c.lineTo(t.x + 10, H - 28); c.stroke();
       });
       // chão que corre
       c.fillStyle = '#d9d1bb'; c.fillRect(-20, H - 22, W + 40, 40); c.strokeStyle = '#111'; c.lineWidth = 4; c.beginPath(); c.moveTo(-20, H - 22); c.lineTo(W + 20, H - 22); c.stroke();

@@ -4575,7 +4575,7 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
   pointer-events: none;
   color: #111;
   text-shadow: 3px 3px #1f9e5a;
-  font: 900 64px / 1 Impact, Haettenschweiler, Arial Narrow Bold, Arial, sans-serif;
+  font: 900 46px / 1 Impact, Haettenschweiler, Arial Narrow Bold, Arial, sans-serif;
   position: absolute;
 }
 
@@ -4584,7 +4584,7 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
   text-transform: uppercase;
   text-shadow: none;
   margin-top: 4px;
-  font-size: 15px;
+  font-size: 12px;
   display: block;
 }
 

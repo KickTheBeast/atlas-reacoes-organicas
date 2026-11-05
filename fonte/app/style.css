@@ -699,8 +699,8 @@ html.mo .item,html.mo .aula,html.mo .ficha,html.mo .guia-link,html.mo .nav-det a
 .voo canvas{display:block}
 .voo-x{position:absolute;right:max(10px,env(safe-area-inset-right));top:calc(10px + var(--top));width:56px;height:56px;display:grid;place-items:center;z-index:2}
 .voo-x svg{width:28px;height:28px;fill:none;stroke:#111;stroke-width:4.5;stroke-linecap:round}
-.voo-pt{position:absolute;left:0;right:0;top:calc(18px + var(--top));text-align:center;pointer-events:none;font:900 64px/1 Impact,'Haettenschweiler','Arial Narrow Bold',Arial,sans-serif;color:#111;text-shadow:3px 3px 0 #1f9e5a}
-.voo-pt small{display:block;font-size:15px;letter-spacing:.12em;text-transform:uppercase;text-shadow:none;margin-top:4px}
+.voo-pt{position:absolute;left:0;right:0;top:calc(18px + var(--top));text-align:center;pointer-events:none;font:900 46px/1 Impact,'Haettenschweiler','Arial Narrow Bold',Arial,sans-serif;color:#111;text-shadow:3px 3px 0 #1f9e5a}
+.voo-pt small{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;text-shadow:none;margin-top:4px}
 .voo-msg{position:absolute;left:0;right:0;top:56%;text-align:center;pointer-events:none;font:900 34px/1.1 Impact,'Haettenschweiler','Arial Narrow Bold',Arial,sans-serif;text-transform:uppercase;letter-spacing:.03em;color:#111}
 .voo-msg small{display:block;margin-top:8px;font-size:15px;font-weight:700;letter-spacing:.06em}
 
