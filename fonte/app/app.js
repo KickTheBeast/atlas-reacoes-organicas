@@ -851,7 +851,7 @@
     const fim = () => { caixa.style.visibility = ''; st.remove(); };
     const tl = gsap.timeline({ onComplete: fim });
     const inner = dn.querySelector('svg');
-    gsap.set(inner, { transformOrigin: '50% 100%' });
+    gsap.set(inner, { transformOrigin: '50% 80%' });
     // o pulo é uma parábola calculada quadro a quadro: x e escala avançam suavemente, y sobe e desce, e o corpo estica no ar e amassa ao pousar
     const pulo = { p: 0 };
     const salto = (m) => {
@@ -875,7 +875,9 @@
         p: 1, duration: 1.0, ease: 'none', // tempo linear: o y vira uma parábola de verdade (sobe desacelerando e cai acelerando)
         onUpdate: () => {
           const p = pulo.p, q = p * p * (3 - 2 * p);
-          gsap.set(dn, { x: J.tx * q - 130 * Math.sin(p * Math.PI) * (1 - 0.5 * p), y: J.ty * p - 4 * J.h * p * (1 - p), scale: 1 + (J.k - 1) * q, rotation: Math.sin(p * Math.PI) * (p < 0.5 ? -9 : 7) });
+          gsap.set(dn, { x: J.tx * q - 130 * Math.sin(p * Math.PI) * (1 - 0.5 * p), y: J.ty * p - 4 * J.h * p * (1 - p), scale: 1 + (J.k - 1) * q });
+          // inclinação contínua (sem sinal trocando no meio): inclina para trás no impulso, vai para a frente na queda e volta a zero ao pousar
+          gsap.set(inner, { rotation: -13 * Math.sin(2 * Math.PI * p) * (1 - 0.3 * p) + 17 * Math.sin(Math.PI * p) * p });
         },
       }, 1.5)
       .to(inner, { scaleY: 1, scaleX: 1, duration: 0.45, ease: 'sine.inOut' }, 1.7)
