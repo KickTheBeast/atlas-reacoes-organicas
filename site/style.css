@@ -4494,6 +4494,121 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
   display: inline-block;
 }
 
+.cr-botoes {
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+}
+
+.cr-voobtn {
+  color: #f6f3ec;
+  background: #1f9e5a;
+  border-radius: 3px;
+  place-items: center;
+  width: 46px;
+  height: 42px;
+  display: inline-grid;
+  transform: rotate(2deg);
+  box-shadow: 3px 3px #111;
+}
+
+.cr-voobtn[hidden] {
+  display: none;
+}
+
+.cr-voobtn:active {
+  transform: rotate(2deg) translate(2px, 2px);
+  box-shadow: 1px 1px #111;
+}
+
+.cr-voobtn svg {
+  fill: currentColor;
+  width: 22px;
+  height: 22px;
+  transform: rotate(90deg);
+}
+
+.voo {
+  z-index: 90;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  background: #f6f3ec;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+}
+
+.voo canvas {
+  display: block;
+}
+
+.voo-x {
+  right: max(10px,env(safe-area-inset-right));
+  top: calc(10px + var(--top));
+  z-index: 2;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  position: absolute;
+}
+
+.voo-x svg {
+  fill: none;
+  stroke: #111;
+  stroke-width: 4.5px;
+  stroke-linecap: round;
+  width: 28px;
+  height: 28px;
+}
+
+.voo-pt {
+  left: 0;
+  right: 0;
+  top: calc(18px + var(--top));
+  text-align: center;
+  pointer-events: none;
+  color: #111;
+  text-shadow: 3px 3px #1f9e5a;
+  font: 900 64px / 1 Impact, Haettenschweiler, Arial Narrow Bold, Arial, sans-serif;
+  position: absolute;
+}
+
+.voo-pt small {
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  text-shadow: none;
+  margin-top: 4px;
+  font-size: 15px;
+  display: block;
+}
+
+.voo-msg {
+  text-align: center;
+  pointer-events: none;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  color: #111;
+  font: 900 34px / 1.1 Impact, Haettenschweiler, Arial Narrow Bold, Arial, sans-serif;
+  position: absolute;
+  top: 56%;
+  left: 0;
+  right: 0;
+}
+
+.voo-msg small {
+  letter-spacing: .06em;
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  display: block;
+}
+
 :root[data-visual="vidro"] {
   --bg: #f2f4f3;
   --card: #ffffff94;

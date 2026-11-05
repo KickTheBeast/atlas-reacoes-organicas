@@ -2,7 +2,7 @@
 // Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
 (() => {
   'use strict';
-  const BUILD = 'efc99739a5';
+  const BUILD = 'bdf5e4faed';
   const $ = (s) => document.querySelector(s);
   const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
   const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
@@ -797,6 +797,8 @@
     <filter id="cr-papel" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="2"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 -.18"/></filter></defs></svg>
     <svg class="cr-papel" preserveAspectRatio="none" aria-hidden="true"><rect width="100%" height="100%" filter="url(#cr-papel)" opacity=".55"/></svg>`;
   // Easter egg: com exatamente 666 carinhos o Mutaninho fica vermelho e ganha chifrinhos; no 667º tudo volta ao normal.
+  const VOO = 1000;
+  const AVIAO_IC = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15.5v-1.6l-8-5V4.2a1.7 1.7 0 00-3.4 0v4.7l-8 5v1.6l8-2.2v3.8l-2 1.5V20l3.7-1 3.7 1v-1.2l-2-1.5v-3.8z"/></svg>';
   const DIABO = 666, VERMELHO = '#d62828';
   // chifres grossos e nervurados que sobem e se curvam para fora (como a tiara da referência): carvão com nervuras vinho e ponta escura
   const seg = (lista) => lista.map(([d, w]) => `<path d="${d}" fill="none" stroke="#111" stroke-width="${w + 5}" stroke-linecap="round" stroke-linejoin="round"/>`).join('') + lista.map(([d, w, c]) => `<path d="${d}" fill="none" stroke="${c || '#2c2427'}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`).join('');
@@ -816,6 +818,117 @@
   const BOLSA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>';
   const CADEADO = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
 
+
+  // ---------- avião + Flappy Bird (1000 carinhos) ----------
+  let fechaVooAtual = null;
+  function abreVoo(V, intro) {
+    if (fechaVooAtual) return;
+    const ov = document.createElement('div'); ov.className = 'voo';
+    ov.innerHTML = '<canvas></canvas><button class="voo-x" aria-label="Fechar o jogo"><svg viewBox="0 0 40 40"><path d="M8 9 L32 31 M31 8 L9 33"/></svg></button><div class="voo-pt"><b id="voo-pt">0</b><small id="voo-rec"></small></div><div class="voo-msg" id="voo-msg"></div>';
+    document.body.appendChild(ov);
+    const cv = ov.querySelector('canvas'), ctx = cv.getContext('2d');
+    let W = 0, H = 0, dpr = Math.min(devicePixelRatio || 1, 2);
+    const ajusta = () => { W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
+    ajusta(); addEventListener('resize', ajusta);
+    // sprite: o Mutaninho (vetor da imagem) sentado no avião, desenhado uma vez fora da tela
+    const SW = 190, SH = 170, sp = document.createElement('canvas'); sp.width = SW * 2; sp.height = SH * 2;
+    const sc = sp.getContext('2d'); sc.scale(2, 2);
+    const aviao = () => {
+      sc.save(); sc.translate(0, 44);
+      sc.lineJoin = 'round'; sc.lineCap = 'round'; sc.strokeStyle = '#111'; sc.lineWidth = 4;
+      sc.fillStyle = '#e8e2d2'; sc.beginPath(); sc.moveTo(30, 92); sc.quadraticCurveTo(26, 80, 52, 76); sc.lineTo(150, 74); sc.quadraticCurveTo(184, 78, 182, 92); sc.quadraticCurveTo(178, 106, 146, 108); sc.lineTo(60, 108); sc.quadraticCurveTo(34, 106, 30, 92); sc.closePath(); sc.fill(); sc.stroke();
+      sc.fillStyle = '#d62828'; sc.beginPath(); sc.moveTo(30, 92); sc.lineTo(14, 66); sc.lineTo(40, 74); sc.lineTo(56, 80); sc.closePath(); sc.fill(); sc.stroke(); // cauda
+      sc.fillStyle = '#e8e2d2'; sc.beginPath(); sc.moveTo(92, 96); sc.lineTo(70, 122); sc.lineTo(112, 122); sc.lineTo(124, 96); sc.closePath(); sc.fill(); sc.stroke(); // asa
+      sc.fillStyle = '#9fd3f2'; sc.beginPath(); sc.arc(132, 88, 8, 0, 7); sc.fill(); sc.stroke(); // janela
+      sc.fillStyle = '#111'; sc.beginPath(); sc.moveTo(182, 86); sc.lineTo(190, 80); sc.lineTo(190, 104); sc.lineTo(182, 98); sc.closePath(); sc.fill(); // hélice
+      sc.restore();
+    };
+    const dino = () => {
+      const k = 0.15; sc.save(); sc.translate(48, 26); sc.scale(k, k);
+      sc.fillStyle = V.cor; sc.strokeStyle = '#111'; sc.lineCap = 'round'; sc.lineJoin = 'round';
+      for (const nome of Object.keys(V.vermelho)) { const d = V.vermelho[nome]; if (d) sc.fill(new Path2D(d), 'evenodd'); }
+      for (const t of V.tracos) { sc.lineWidth = t.w * 1.2; sc.stroke(new Path2D(t.d)); }
+      sc.restore();
+    };
+    aviao(); dino();
+    // mundo
+    const REC = 'atlas.voo';
+    let melhor = guarda.ler(REC, 0), estado = 'intro', t0 = performance.now(), ultimo = t0, pontos = 0, tubos = [], prox = 1.2, tempoIntro = 0;
+    const bird = { x: 0, y: 0, vy: 0, r: 30 };
+    const msg = ov.querySelector('#voo-msg'), pt = ov.querySelector('#voo-pt'), rec = ov.querySelector('#voo-rec');
+    const mostraRec = () => { rec.textContent = melhor ? 'recorde ' + melhor : ''; };
+    const reinicia = () => { bird.x = W * 0.3; bird.y = H * 0.45; bird.vy = 0; tubos = []; prox = 0.9; pontos = 0; pt.textContent = '0'; mostraRec(); };
+    reinicia(); mostraRec();
+    const nuvens = Array.from({ length: 6 }, (_, i) => ({ x: Math.random() * W, y: 40 + Math.random() * H * 0.5, s: 0.6 + Math.random() * 0.9, v: 8 + Math.random() * 14 }));
+    const GAP = () => Math.max(170, Math.min(210, H * 0.27)), TW = 64, VEL = 150, G = 1500, PULO = -430;
+    const pula = () => {
+      if (estado === 'intro') return;
+      if (estado === 'espera') { estado = 'jogo'; msg.textContent = ''; }
+      if (estado === 'jogo') { bird.vy = PULO; navigator.vibrate && navigator.vibrate(5); }
+      else if (estado === 'fim' && performance.now() - fimT > 500) { reinicia(); estado = 'espera'; msg.innerHTML = 'TOQUE PARA VOAR'; }
+    };
+    let fimT = 0;
+    const morre = () => {
+      estado = 'fim'; fimT = performance.now();
+      const novo = pontos > melhor; if (novo) { melhor = pontos; guarda.gravar(REC, melhor); }
+      mostraRec(); navigator.vibrate && navigator.vibrate([20, 30, 60]);
+      msg.innerHTML = `${novo && pontos ? 'NOVO RECORDE!<br>' : ''}FIM DE VOO<small>${pontos} ${pontos === 1 ? 'ponto' : 'pontos'} · toque para tentar de novo</small>`;
+    };
+    ov.addEventListener('pointerdown', (e) => { if (e.target.closest('.voo-x')) return; e.preventDefault(); pula(); });
+    const tecla = (e) => { if (e.code === 'Space' || e.key === 'ArrowUp') { e.preventDefault(); pula(); } };
+    addEventListener('keydown', tecla);
+    let raf = 0, vivo = true;
+    const colide = () => {
+      if (bird.y - bird.r * 0.7 < 0 || bird.y + bird.r * 0.7 > H) return true;
+      for (const t of tubos) if (bird.x + bird.r * 0.8 > t.x && bird.x - bird.r * 0.8 < t.x + TW && (bird.y - bird.r * 0.6 < t.g || bird.y + bird.r * 0.6 > t.g + GAP())) return true;
+      return false;
+    };
+    const quadro = (agora) => {
+      if (!vivo) return;
+      const dt = Math.min(0.033, (agora - ultimo) / 1000); ultimo = agora;
+      // lógica
+      nuvens.forEach((n) => { n.x -= n.v * dt * (estado === 'jogo' ? 3 : 1); if (n.x < -120) { n.x = W + 60; n.y = 40 + Math.random() * H * 0.5; } });
+      if (estado === 'intro') { tempoIntro += dt; const u = Math.min(1, tempoIntro / 1.1), e = 1 - Math.pow(1 - u, 3); bird.x = -SW + (W * 0.3 + SW) * e; bird.y = H * 0.45 + Math.sin(u * 6) * 8; if (u >= 1) { estado = 'espera'; msg.textContent = 'TOQUE PARA VOAR'; } }
+      else if (estado === 'espera') { bird.y = H * 0.45 + Math.sin(agora / 260) * 10; }
+      else if (estado === 'jogo') {
+        bird.vy += G * dt; bird.y += bird.vy * dt;
+        prox -= dt; if (prox <= 0) { prox = 1.55; const gp = GAP(), min = 70, max = H - gp - 70; tubos.push({ x: W + 20, g: min + Math.random() * Math.max(10, max - min), ok: false }); }
+        tubos.forEach((t) => { t.x -= VEL * dt; if (!t.ok && t.x + TW < bird.x - bird.r) { t.ok = true; pontos++; pt.textContent = pontos; navigator.vibrate && navigator.vibrate(4); } });
+        tubos = tubos.filter((t) => t.x > -TW - 10);
+        if (colide()) morre();
+      } else if (estado === 'fim') { bird.vy += G * dt; bird.y = Math.min(H + 80, bird.y + bird.vy * dt); }
+      // desenho
+      const c = ctx; c.clearRect(0, 0, W, H);
+      const ceu = c.createLinearGradient(0, 0, 0, H); ceu.addColorStop(0, '#f6f3ec'); ceu.addColorStop(1, '#e6efe8'); c.fillStyle = ceu; c.fillRect(0, 0, W, H);
+      c.fillStyle = 'rgba(255,255,255,.9)'; c.strokeStyle = '#111'; c.lineWidth = 2.5;
+      nuvens.forEach((n) => { c.save(); c.translate(n.x, n.y); c.scale(n.s, n.s); c.beginPath(); c.arc(0, 0, 20, 0, 7); c.arc(24, -8, 26, 0, 7); c.arc(52, 2, 20, 0, 7); c.fill(); c.restore(); });
+      // tubos: "provetas" de tinta verde
+      tubos.forEach((t) => {
+        c.fillStyle = '#1f9e5a'; c.lineWidth = 4; c.strokeStyle = '#111';
+        c.fillRect(t.x, -6, TW, t.g + 6); c.strokeRect(t.x, -6, TW, t.g + 6);
+        c.fillRect(t.x - 6, t.g - 26, TW + 12, 26); c.strokeRect(t.x - 6, t.g - 26, TW + 12, 26);
+        const b = t.g + GAP(); c.fillRect(t.x, b, TW, H - b + 6); c.strokeRect(t.x, b, TW, H - b + 6);
+        c.fillRect(t.x - 6, b, TW + 12, 26); c.strokeRect(t.x - 6, b, TW + 12, 26);
+        c.strokeStyle = 'rgba(255,255,255,.45)'; c.lineWidth = 3; c.beginPath(); c.moveTo(t.x + 14, 4); c.lineTo(t.x + 14, t.g - 30); c.moveTo(t.x + 14, b + 32); c.lineTo(t.x + 14, H - 4); c.stroke();
+      });
+      // avião
+      c.save(); c.translate(bird.x, bird.y);
+      const ang = estado === 'jogo' || estado === 'fim' ? Math.max(-0.5, Math.min(0.9, bird.vy / 650)) : 0; c.rotate(ang);
+      const esc = 0.62; c.scale(esc, esc); c.drawImage(sp, -SW * 0.5, -SH * 0.8, SW, SH);
+      // hélice girando
+      c.restore();
+      c.save(); c.translate(bird.x + SW * esc * 0.5 - 4, bird.y + 2); c.rotate(ang); c.fillStyle = 'rgba(17,17,17,.35)'; c.beginPath(); c.ellipse(0, 0, 4, 26 * Math.abs(Math.sin(agora / 40)) + 4, 0, 0, 7); c.fill(); c.restore();
+      raf = requestAnimationFrame(quadro);
+    };
+    raf = requestAnimationFrame(quadro);
+    if (!intro) { estado = 'espera'; msg.textContent = 'TOQUE PARA VOAR'; bird.x = W * 0.3; }
+    const fechar = () => { vivo = false; cancelAnimationFrame(raf); removeEventListener('keydown', tecla); removeEventListener('resize', ajusta); ov.remove(); fechaVooAtual = null; };
+    fechaVooAtual = fechar;
+    ov.querySelector('.voo-x').addEventListener('click', (e) => { e.stopPropagation(); fechar(); });
+    gsap_fade(ov);
+  }
+  const gsap_fade = (el) => { if (window.gsap) window.gsap.fromTo(el, { opacity: 0 }, { opacity: 1, duration: 0.35 }); };
+
   function montaCreditos(V, origem, abrirLoja) {
     const gsap = window.gsap, SplitText = window.SplitText;
     let n = guarda.ler('atlas.carinhos', 0);
@@ -828,7 +941,7 @@
         <h2 class="cr-msg">Boa prova de<br>Química Orgânica II</h2>
         <div class="cr-contagem"><svg class="cr-tally" viewBox="0 0 240 60" aria-hidden="true"><g class="tally"></g></svg><span class="cr-n">×${n}</span></div>
         <p class="cr-marco" aria-live="polite"></p>
-        <button class="cr-lojabtn" data-loja>${BOLSA}<span>Loja</span></button>
+        <div class="cr-botoes"><button class="cr-lojabtn" data-loja>${BOLSA}<span>Loja</span></button><button class="cr-voobtn" data-voo aria-label="Voar de avião" ${n >= VOO ? '' : 'hidden'}>${AVIAO_IC}</button></div>
       </div>`;
     document.body.appendChild(el);
     creditosEl = el;
@@ -886,7 +999,7 @@
     gsap.set([contagem, ...iniciais], { opacity: 0 });
     gsap.set(iniciais, { drawSVG: '0%' });
     const accs = [...cabeca.querySelectorAll('.acc')]; gsap.set(accs, { opacity: 0 });
-    const btnLoja = q('.cr-lojabtn'); gsap.set(btnLoja, { autoAlpha: 0, y: 18 });
+    const btnLoja = q('.cr-botoes'); gsap.set(btnLoja, { autoAlpha: 0, y: 18 });
     const intro = gsap.timeline({ onComplete: () => { idle(); if (abrirLoja) abreLoja(); } });
     intro
       .fromTo(el, { clipPath: `circle(0px at ${origem[0]}px ${origem[1]}px)` }, { clipPath: `circle(${raio + 40}px at ${origem[0]}px ${origem[1]}px)`, duration: 0.85, ease: 'power3.inOut' })
@@ -956,6 +1069,11 @@
       gsap.to(numEstado, { v: n, duration: 0.45, ease: 'power2.out', onUpdate: mostraNum });
       gsap.fromTo(numEl, { scale: 1.45, rotation: gsap.utils.random(-6, 6) }, { scale: 1, rotation: 0, duration: 0.7, ease: 'elastic.out(1,0.4)' });
       if (n === DIABO) diabo(true); else if (n === DIABO + 1) diabo(false);
+      if (n === VOO) { // 1000: o Mutaninho sobe num avião e libera o jogo para sempre
+        const b = q('.cr-voobtn'); b.hidden = false;
+        const m = q('.cr-marco'); m.textContent = '1000! HORA DE DECOLAR.'; gsap.fromTo(m, { opacity: 0 }, { opacity: 1, duration: 0.2 });
+        setTimeout(() => abreVoo(V, true), 900);
+      }
       if (MARCOS[n]) {
         const m = q('.cr-marco'); m.textContent = MARCOS[n];
         gsap.fromTo(m, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4 });
@@ -963,7 +1081,7 @@
       }
     };
     el.addEventListener('pointerdown', (e) => {
-      if (!vivo || e.target.closest('.cr-fechar, .cr-lojabtn, .cr-loja')) return;
+      if (!vivo || e.target.closest('.cr-fechar, .cr-lojabtn, .cr-voobtn, .cr-loja, .voo')) return;
       const agora = performance.now();
       abaixa();
       if (agora - ultimoToque > 140) { ultimoToque = agora; conta(); }
@@ -995,6 +1113,7 @@
     }
     el.addEventListener('click', (e) => {
       if (e.target.closest('.cr-lojabtn')) { abreLoja(); return; }
+      if (e.target.closest('.cr-voobtn')) { abreVoo(V, false); return; }
       if (e.target.closest('.cl-x')) { fechaLoja(); return; }
       const v = e.target.closest('[data-vestir]');
       if (v) {
@@ -1017,13 +1136,13 @@
         .to(tracos, { drawSVG: '0%', duration: 0.3, ease: 'power2.in', stagger: { each: 0.011, from: 'end' } }, 0)
         .to([...splitMsg.chars, ...splitNome.chars], { yPercent: -115, opacity: 0, duration: 0.35, ease: 'power2.in', stagger: { each: 0.012, from: 'end' } }, 0)
         .to(zz, { drawSVG: '0%', duration: 0.3, ease: 'power2.in' }, 0)
-        .to([...cabeca.querySelectorAll('.acc'), q('.cr-lojabtn'), q('.cr-loja')].filter(Boolean), { opacity: 0, duration: 0.25 }, 0)
+        .to([...cabeca.querySelectorAll('.acc'), q('.cr-botoes'), q('.cr-loja')].filter(Boolean), { opacity: 0, duration: 0.25 }, 0)
         .to([peq, contagem, q('.cr-marco')], { opacity: 0, duration: 0.25 }, 0)
         .to(vermelhos, { scale: 0.88, opacity: 0, duration: 0.35, ease: 'power2.in', stagger: 0.04 }, 0.15)
         .to(el, { clipPath: `circle(0px at ${origem[0]}px ${origem[1]}px)`, duration: 0.6, ease: 'power3.inOut' }, 0.4);
     };
     el.querySelector('.cr-fechar').addEventListener('click', (e) => { e.stopPropagation(); fecha(); });
-    document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape' && creditosEl === el) { if (loja) { fechaLoja(); return; } fecha(); document.removeEventListener('keydown', esc); } });
+    document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape' && creditosEl === el) { if (fechaVooAtual) { fechaVooAtual(); return; } if (loja) { fechaLoja(); return; } fecha(); document.removeEventListener('keydown', esc); } });
   }
 
   // Sem GSAP (offline sem cache, ou "reduzir movimento"): a imagem original, sem animação.

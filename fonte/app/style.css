@@ -688,3 +688,18 @@ html.mo .item,html.mo .aula,html.mo .ficha,html.mo .guia-link,html.mo .nav-det a
 
 /* "Versão" parece texto, mas tem área de toque grande */
 .rodape .versao-btn{display:inline-block;margin:-4px 0;padding:12px 22px;min-height:44px;border:0;border-radius:0;background:none;font-size:inherit;font-weight:400;color:inherit;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+
+/* botões da tela do Mutaninho + jogo do avião */
+.cr-botoes{display:flex;align-items:center;justify-content:center;gap:10px}
+.cr-voobtn{display:inline-grid;place-items:center;width:46px;height:42px;background:#1f9e5a;color:#f6f3ec;border-radius:3px;transform:rotate(2deg);box-shadow:3px 3px 0 #111}
+.cr-voobtn[hidden]{display:none}
+.cr-voobtn:active{transform:rotate(2deg) translate(2px,2px);box-shadow:1px 1px 0 #111}
+.cr-voobtn svg{width:22px;height:22px;fill:currentColor;transform:rotate(90deg)}
+.voo{position:fixed;inset:0;z-index:90;background:#f6f3ec;touch-action:none;-webkit-user-select:none;user-select:none;overflow:hidden}
+.voo canvas{display:block}
+.voo-x{position:absolute;right:max(10px,env(safe-area-inset-right));top:calc(10px + var(--top));width:56px;height:56px;display:grid;place-items:center;z-index:2}
+.voo-x svg{width:28px;height:28px;fill:none;stroke:#111;stroke-width:4.5;stroke-linecap:round}
+.voo-pt{position:absolute;left:0;right:0;top:calc(18px + var(--top));text-align:center;pointer-events:none;font:900 64px/1 Impact,'Haettenschweiler','Arial Narrow Bold',Arial,sans-serif;color:#111;text-shadow:3px 3px 0 #1f9e5a}
+.voo-pt small{display:block;font-size:15px;letter-spacing:.12em;text-transform:uppercase;text-shadow:none;margin-top:4px}
+.voo-msg{position:absolute;left:0;right:0;top:56%;text-align:center;pointer-events:none;font:900 34px/1.1 Impact,'Haettenschweiler','Arial Narrow Bold',Arial,sans-serif;text-transform:uppercase;letter-spacing:.03em;color:#111}
+.voo-msg small{display:block;margin-top:8px;font-size:15px;font-weight:700;letter-spacing:.06em}
