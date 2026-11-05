@@ -2,7 +2,7 @@
 // Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
 (() => {
   'use strict';
-  const BUILD = 'bdf5e4faed';
+  const BUILD = '8ba0590dcc';
   const $ = (s) => document.querySelector(s);
   const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
   const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
@@ -760,6 +760,14 @@
       <path d="M472 150 L463 176 L474 196 L486 176 L477 150 Z" fill="#d93a2f" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
       <path d="M465 146 L482 146 L479 154 L468 154 Z" fill="#d93a2f" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
       <path d="M470 166 L479 163 M468 176 L482 172" stroke="#111" stroke-width="2.2" stroke-linecap="round" opacity=".5"/></g>`,
+  }, {
+    id: 'aviador', slot: 'cabeca', secreto: true, nome: 'Chapéu de aviador', como: 'Voe com o Mutaninho', vb: '432 36 110 80',
+    arte: `<path d="M451 90 Q448 56 486 50 Q526 50 523 90 Z" fill="#8a5426" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M451 88 Q440 100 446 118 Q458 112 462 96 Z" fill="#6f4120" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M452 76 Q487 66 522 74" stroke="#111" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <circle cx="469" cy="68" r="10" fill="#9fd3f2" stroke="#111" stroke-width="3.2"/><circle cx="500" cy="66" r="10" fill="#9fd3f2" stroke="#111" stroke-width="3.2"/>
+      <path d="M464 64 L469 61 M495 62 L500 59" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M470 54 Q486 50 502 54" stroke="#b97a3d" stroke-width="2.4" fill="none" stroke-linecap="round"/>`,
   }];
   const lerAcess = () => { const a = guarda.ler('atlas.acessorios', null); return a && Array.isArray(a.tem) ? a : { tem: [], uso: [] }; };
   function ganhaAcessorio(id) {
@@ -771,7 +779,7 @@
     return ac;
   }
   // sorteia um acessório que ainda não é seu
-  const sorteiaAcessorio = () => { const a = lerAcess(), falta = ACESSORIOS.filter((x) => !a.tem.includes(x.id)); return falta.length ? ganhaAcessorio(falta[Math.floor(Math.random() * falta.length)].id) : null; };
+  const sorteiaAcessorio = () => { const a = lerAcess(), falta = ACESSORIOS.filter((x) => !x.secreto && !a.tem.includes(x.id)); return falta.length ? ganhaAcessorio(falta[Math.floor(Math.random() * falta.length)].id) : null; };
   const arteAcess = (uso) => uso.map((id) => { const a = ACESSORIOS.find((x) => x.id === id); return a ? `<g class="acc" data-acc="${id}">${a.arte}</g>` : ''; }).join('');
 
   function dinoSvg(V, op = {}) {
@@ -820,6 +828,64 @@
 
 
   // ---------- avião + Flappy Bird (1000 carinhos) ----------
+  // O avião é um SVG só (vermelho, com cabine de vidro). Com `dentro` o Mutaninho aparece na cabine; a mesma peça serve para a cena de entrada e para o jogo.
+  const aviaoSvg = (V, op = {}) => {
+    const cor = op.diabo ? VERMELHO : V.cor;
+    const dino = op.dentro ? dinoSvg(V, { uso: op.uso || [], diabo: op.diabo, vb: '395 40 200 170' }).replace('<svg class="dv"', '<svg x="94" y="20" width="88" height="76"').replace(/ style="--vermelho:[^"]*"/, '') : '';
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 150"><style>.v-red{fill:${cor};stroke:none}.v-traco{fill:none;stroke:#111}@keyframes h{50%{transform:scaleY(.18)}}.helice{transform-box:fill-box;transform-origin:center;animation:h .09s linear infinite}</style>
+      <g stroke="#111" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M34 72 L10 26 L44 38 L66 62 Z" fill="#d62828"/>
+        <path d="M14 82 L42 72 L58 86 L30 94 Z" fill="#a81c1c"/>
+        <path d="M100 96 L76 136 L132 136 L156 96 Z" fill="#a81c1c"/>
+      </g>${dino}
+      <g stroke="#111" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M36 82 Q34 64 72 60 L172 58 Q236 60 254 86 Q236 110 170 110 L70 110 Q38 106 36 82 Z" fill="#d62828"/></g>
+      <path d="M62 90 L226 90" stroke="#fff" stroke-width="3.4" opacity=".55" stroke-linecap="round"/>
+      <path d="M52 76 Q80 68 120 66" stroke="#ff7a6a" stroke-width="3" fill="none" opacity=".7" stroke-linecap="round"/>
+      <path d="M92 62 Q94 20 134 20 Q176 20 182 62 Z" fill="rgba(180,222,248,.42)" stroke="#111" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M104 50 Q110 32 132 28" stroke="#fff" stroke-width="3.4" opacity=".8" fill="none" stroke-linecap="round"/>
+      <circle cx="152" cy="92" r="5" fill="#111"/>
+      <g class="helice"><rect x="254" y="50" width="9" height="72" rx="4.5" fill="#111"/></g>
+      <rect id="cab" x="96" y="22" width="84" height="76" fill="none"/></svg>`;
+  };
+  const estadoDino = (V) => ({ uso: lerAcess().uso, diabo: guarda.ler('atlas.carinhos', 0) === DIABO });
+
+  // Cena de entrada: o fundo some, o avião pousa ao lado e o Mutaninho pula para dentro da cabine
+  function cenaAviao(V) {
+    const gsap = window.gsap, caixa = document.querySelector('.dv-caixa');
+    if (!gsap || reduzido || !caixa || fechaVooAtual) { abreVoo(V, true); return; }
+    const W = innerWidth, H = innerHeight, r = caixa.getBoundingClientRect();
+    const st = document.createElement('div'); st.className = 'voo-cena';
+    const pw = Math.min(W * 0.86, 340), ph = pw * (150 / 270);
+    st.innerHTML = `<div class="vc-fundo"></div><div class="vc-aviao" style="width:${pw}px;height:${ph}px"><div class="vc-sem">${aviaoSvg(V, { dentro: false })}</div><div class="vc-com" style="opacity:0">${aviaoSvg(V, { dentro: true, ...estadoDino(V) })}</div></div><div class="vc-dino" style="left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px">${dinoSvg(V, estadoDino(V))}</div>`;
+    document.body.appendChild(st);
+    caixa.style.visibility = 'hidden';
+    const fundo = st.querySelector('.vc-fundo'), av = st.querySelector('.vc-aviao'), dn = st.querySelector('.vc-dino'), com = st.querySelector('.vc-com'), sem = st.querySelector('.vc-sem');
+    const ay = Math.min(H - ph - 90, r.bottom + 20);
+    const ax = (W - pw) / 2;
+    gsap.set(av, { x: W + 40, y: ay + 10, rotation: 4 });
+    gsap.set(dn, { transformOrigin: '0 0' });
+    const fim = () => { caixa.style.visibility = ''; st.remove(); };
+    const tl = gsap.timeline({ onComplete: fim });
+    tl.fromTo(fundo, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.inOut' })
+      .to(av, { x: ax, y: ay, rotation: 0, duration: 0.9, ease: 'power3.out' }, 0.35)
+      .to(dn, { scaleY: 0.92, scaleX: 1.04, duration: 0.18, yoyo: true, repeat: 1, ease: 'power1.inOut' }, 1.2);
+    // pulo: posição final calculada pela cabine do avião
+    tl.add(() => {
+      const m = av.querySelector('#cab').getBoundingClientRect();
+      const upu = m.width / 200, u0 = r.width / 600; // pixels por unidade do desenho: no avião e na imagem original
+      const k = upu / u0, tx = m.left - 395 * upu - r.left, ty = m.top - 40 * upu - r.top;
+      gsap.to(dn, { x: tx, duration: 0.8, ease: 'power1.inOut' });
+      gsap.to(dn, { scale: k, duration: 0.8, ease: 'power2.inOut' });
+      gsap.timeline().to(dn, { y: Math.min(0, ty) - 130, duration: 0.4, ease: 'power2.out' }).to(dn, { y: ty, duration: 0.4, ease: 'power2.in' });
+    }, 1.55)
+    .add(() => { gsap.set(com, { opacity: 1 }); gsap.set(sem, { opacity: 0 }); gsap.set(dn, { opacity: 0 }); navigator.vibrate && navigator.vibrate(18); }, 2.4)
+    .to(av, { y: '+=10', scaleY: 0.96, duration: 0.14, yoyo: true, repeat: 1 }, 2.4)
+    .to(av, { rotation: -10, y: ay - 40, duration: 0.45, ease: 'power2.out' }, 2.75)
+    .add(() => abreVoo(V, true), 3.0)
+    .to(av, { x: W + 120, y: ay - 190, rotation: -14, duration: 0.75, ease: 'power2.in' }, 3.1)
+    .to(st, { opacity: 0, duration: 0.3 }, 3.6);
+  }
+
   let fechaVooAtual = null;
   function abreVoo(V, intro) {
     if (fechaVooAtual) return;
@@ -827,47 +893,31 @@
     ov.innerHTML = '<canvas></canvas><button class="voo-x" aria-label="Fechar o jogo"><svg viewBox="0 0 40 40"><path d="M8 9 L32 31 M31 8 L9 33"/></svg></button><div class="voo-pt"><b id="voo-pt">0</b><small id="voo-rec"></small></div><div class="voo-msg" id="voo-msg"></div>';
     document.body.appendChild(ov);
     const cv = ov.querySelector('canvas'), ctx = cv.getContext('2d');
-    let W = 0, H = 0, dpr = Math.min(devicePixelRatio || 1, 2);
+    let W = 0, H = 0; const dpr = Math.min(devicePixelRatio || 1, 2);
     const ajusta = () => { W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
     ajusta(); addEventListener('resize', ajusta);
-    // sprite: o Mutaninho (vetor da imagem) sentado no avião, desenhado uma vez fora da tela
-    const SW = 190, SH = 170, sp = document.createElement('canvas'); sp.width = SW * 2; sp.height = SH * 2;
-    const sc = sp.getContext('2d'); sc.scale(2, 2);
-    const aviao = () => {
-      sc.save(); sc.translate(0, 44);
-      sc.lineJoin = 'round'; sc.lineCap = 'round'; sc.strokeStyle = '#111'; sc.lineWidth = 4;
-      sc.fillStyle = '#e8e2d2'; sc.beginPath(); sc.moveTo(30, 92); sc.quadraticCurveTo(26, 80, 52, 76); sc.lineTo(150, 74); sc.quadraticCurveTo(184, 78, 182, 92); sc.quadraticCurveTo(178, 106, 146, 108); sc.lineTo(60, 108); sc.quadraticCurveTo(34, 106, 30, 92); sc.closePath(); sc.fill(); sc.stroke();
-      sc.fillStyle = '#d62828'; sc.beginPath(); sc.moveTo(30, 92); sc.lineTo(14, 66); sc.lineTo(40, 74); sc.lineTo(56, 80); sc.closePath(); sc.fill(); sc.stroke(); // cauda
-      sc.fillStyle = '#e8e2d2'; sc.beginPath(); sc.moveTo(92, 96); sc.lineTo(70, 122); sc.lineTo(112, 122); sc.lineTo(124, 96); sc.closePath(); sc.fill(); sc.stroke(); // asa
-      sc.fillStyle = '#9fd3f2'; sc.beginPath(); sc.arc(132, 88, 8, 0, 7); sc.fill(); sc.stroke(); // janela
-      sc.fillStyle = '#111'; sc.beginPath(); sc.moveTo(182, 86); sc.lineTo(190, 80); sc.lineTo(190, 104); sc.lineTo(182, 98); sc.closePath(); sc.fill(); // hélice
-      sc.restore();
-    };
-    const dino = () => {
-      const k = 0.15; sc.save(); sc.translate(48, 26); sc.scale(k, k);
-      sc.fillStyle = V.cor; sc.strokeStyle = '#111'; sc.lineCap = 'round'; sc.lineJoin = 'round';
-      for (const nome of Object.keys(V.vermelho)) { const d = V.vermelho[nome]; if (d) sc.fill(new Path2D(d), 'evenodd'); }
-      for (const t of V.tracos) { sc.lineWidth = t.w * 1.2; sc.stroke(new Path2D(t.d)); }
-      sc.restore();
-    };
-    aviao(); dino();
-    // mundo
+    const img = new Image(); let pronta = false;
+    img.onload = () => { pronta = true; };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(aviaoSvg(V, { dentro: true, ...estadoDino(V) }));
+    const SW = 270, SH = 150, ESC = 0.78;
     const REC = 'atlas.voo';
-    let melhor = guarda.ler(REC, 0), estado = 'intro', t0 = performance.now(), ultimo = t0, pontos = 0, tubos = [], prox = 1.2, tempoIntro = 0;
-    const bird = { x: 0, y: 0, vy: 0, r: 30 };
+    let melhor = guarda.ler(REC, 0), estado = intro ? 'intro' : 'espera', ultimo = performance.now(), pontos = 0, tubos = [], dist = 0, tempoIntro = 0, fimT = 0, ang = 0;
+    const bird = { x: 0, y: 0, vy: 0, r: 26 }, fumacas = [];
     const msg = ov.querySelector('#voo-msg'), pt = ov.querySelector('#voo-pt'), rec = ov.querySelector('#voo-rec');
     const mostraRec = () => { rec.textContent = melhor ? 'recorde ' + melhor : ''; };
-    const reinicia = () => { bird.x = W * 0.3; bird.y = H * 0.45; bird.vy = 0; tubos = []; prox = 0.9; pontos = 0; pt.textContent = '0'; mostraRec(); };
-    reinicia(); mostraRec();
-    const nuvens = Array.from({ length: 6 }, (_, i) => ({ x: Math.random() * W, y: 40 + Math.random() * H * 0.5, s: 0.6 + Math.random() * 0.9, v: 8 + Math.random() * 14 }));
-    const GAP = () => Math.max(170, Math.min(210, H * 0.27)), TW = 64, VEL = 150, G = 1500, PULO = -430;
+    const GAP = () => Math.max(176, Math.min(214, H * 0.28)), TW = 64, VEL = 160, ESPACO = 250;
+    const G = 1250, PULO = -400, QUEDA_MAX = 560; // gravidade mais suave e velocidade de queda limitada: o voo parece um planeio, não um pulo seco
+    const reinicia = () => { bird.x = W * 0.3; bird.y = H * 0.46; bird.vy = 0; ang = 0; tubos = []; dist = ESPACO * 0.35; pontos = 0; pt.textContent = '0'; mostraRec(); };
+    reinicia(); if (!intro) msg.textContent = 'TOQUE PARA VOAR';
+    const nuvens = Array.from({ length: 7 }, () => ({ x: Math.random() * W, y: 40 + Math.random() * H * 0.55, s: 0.6 + Math.random() * 0.9, v: 8 + Math.random() * 14 }));
     const pula = () => {
       if (estado === 'intro') return;
       if (estado === 'espera') { estado = 'jogo'; msg.textContent = ''; }
-      if (estado === 'jogo') { bird.vy = PULO; navigator.vibrate && navigator.vibrate(5); }
-      else if (estado === 'fim' && performance.now() - fimT > 500) { reinicia(); estado = 'espera'; msg.innerHTML = 'TOQUE PARA VOAR'; }
+      if (estado === 'jogo') {
+        bird.vy = PULO; navigator.vibrate && navigator.vibrate(5);
+        for (let i = 0; i < 3; i++) fumacas.push({ x: bird.x - 62, y: bird.y + 8 + Math.random() * 8, r: 5 + Math.random() * 4, vida: 1, vx: -50 - Math.random() * 30, vy: 10 + Math.random() * 30 });
+      } else if (estado === 'fim' && performance.now() - fimT > 500) { reinicia(); estado = 'espera'; msg.textContent = 'TOQUE PARA VOAR'; }
     };
-    let fimT = 0;
     const morre = () => {
       estado = 'fim'; fimT = performance.now();
       const novo = pontos > melhor; if (novo) { melhor = pontos; guarda.gravar(REC, melhor); }
@@ -878,60 +928,69 @@
     const tecla = (e) => { if (e.code === 'Space' || e.key === 'ArrowUp') { e.preventDefault(); pula(); } };
     addEventListener('keydown', tecla);
     let raf = 0, vivo = true;
+    // colisão com dois círculos (corpo e nariz) e uma folga de 4 px, para não punir por rente
     const colide = () => {
-      if (bird.y - bird.r * 0.7 < 0 || bird.y + bird.r * 0.7 > H) return true;
-      for (const t of tubos) if (bird.x + bird.r * 0.8 > t.x && bird.x - bird.r * 0.8 < t.x + TW && (bird.y - bird.r * 0.6 < t.g || bird.y + bird.r * 0.6 > t.g + GAP())) return true;
+      if (bird.y - 16 < 0 || bird.y + 18 > H) return true;
+      const pts = [[bird.x - 14, bird.y, 20], [bird.x + 26, bird.y + 2, 14]];
+      for (const t of tubos) for (const [cx, cy, rr] of pts) {
+        const nx = Math.max(t.x, Math.min(cx, t.x + TW)), g = GAP();
+        if (Math.hypot(cx - nx, cy - Math.min(cy, t.g)) < rr - 4 && cy < t.g + rr) return true;
+        if (Math.hypot(cx - nx, cy - Math.max(cy, t.g + g)) < rr - 4 && cy > t.g + g - rr) return true;
+      }
       return false;
+    };
+    const passo = (dt, agora) => {
+      nuvens.forEach((n) => { n.x -= n.v * dt * (estado === 'jogo' ? 3 : 1); if (n.x < -120) { n.x = W + 60; n.y = 40 + Math.random() * H * 0.55; } });
+      if (estado === 'intro') { tempoIntro += dt; const u = Math.min(1, tempoIntro / 1.1), e = 1 - Math.pow(1 - u, 3); bird.x = -SW * ESC + (W * 0.3 + SW * ESC) * e; bird.y = H * 0.46 + Math.sin(u * 6) * 8; if (u >= 1) { estado = 'espera'; msg.textContent = 'TOQUE PARA VOAR'; } }
+      else if (estado === 'espera') { bird.y = H * 0.46 + Math.sin(agora / 300) * 9; ang += (Math.sin(agora / 300) * 0.05 - ang) * 0.1; }
+      else if (estado === 'jogo') {
+        bird.vy = Math.min(QUEDA_MAX, bird.vy + G * dt); bird.y += bird.vy * dt;
+        const alvo = Math.max(-0.45, Math.min(0.75, bird.vy / 620)); ang += (alvo - ang) * Math.min(1, dt * 9); // inclinação suavizada
+        dist += VEL * dt;
+        if (dist >= ESPACO) { dist -= ESPACO; const gp = GAP(), min = 80, max = H - gp - 80; tubos.push({ x: W + 20, g: min + Math.random() * Math.max(10, max - min), ok: false }); }
+        tubos.forEach((t) => { t.x -= VEL * dt; if (!t.ok && t.x + TW < bird.x - bird.r) { t.ok = true; pontos++; pt.textContent = pontos; navigator.vibrate && navigator.vibrate(4); } });
+        tubos = tubos.filter((t) => t.x > -TW - 10);
+        if (colide()) morre();
+      } else if (estado === 'fim') { bird.vy = Math.min(900, bird.vy + G * dt); bird.y = Math.min(H + 120, bird.y + bird.vy * dt); ang += (1.1 - ang) * Math.min(1, dt * 5); }
+      fumacas.forEach((f) => { f.x += f.vx * dt; f.y += f.vy * dt; f.vida -= dt * 1.8; f.r += dt * 14; });
+      while (fumacas.length && fumacas[0].vida <= 0) fumacas.shift();
+    };
+    const desenha = (agora) => {
+      const c = ctx; c.clearRect(0, 0, W, H);
+      const ceu = c.createLinearGradient(0, 0, 0, H); ceu.addColorStop(0, '#f6f3ec'); ceu.addColorStop(1, '#e3efe8'); c.fillStyle = ceu; c.fillRect(0, 0, W, H);
+      c.fillStyle = 'rgba(255,255,255,.9)'; c.strokeStyle = '#111'; c.lineWidth = 2.5;
+      nuvens.forEach((n) => { c.save(); c.translate(n.x, n.y); c.scale(n.s, n.s); c.beginPath(); c.arc(0, 0, 20, 0, 7); c.arc(24, -8, 26, 0, 7); c.arc(52, 2, 20, 0, 7); c.fill(); c.restore(); });
+      tubos.forEach((t) => {
+        c.fillStyle = '#1f9e5a'; c.lineWidth = 4; c.strokeStyle = '#111';
+        const g = GAP(), b = t.g + g;
+        c.fillRect(t.x, -6, TW, t.g + 6); c.strokeRect(t.x, -6, TW, t.g + 6);
+        c.fillRect(t.x - 6, t.g - 26, TW + 12, 26); c.strokeRect(t.x - 6, t.g - 26, TW + 12, 26);
+        c.fillRect(t.x, b, TW, H - b + 6); c.strokeRect(t.x, b, TW, H - b + 6);
+        c.fillRect(t.x - 6, b, TW + 12, 26); c.strokeRect(t.x - 6, b, TW + 12, 26);
+        c.strokeStyle = 'rgba(255,255,255,.45)'; c.lineWidth = 3; c.beginPath(); c.moveTo(t.x + 14, 4); c.lineTo(t.x + 14, t.g - 30); c.moveTo(t.x + 14, b + 32); c.lineTo(t.x + 14, H - 4); c.stroke();
+      });
+      fumacas.forEach((f) => { c.fillStyle = `rgba(255,255,255,${Math.max(0, f.vida) * 0.85})`; c.strokeStyle = `rgba(17,17,17,${Math.max(0, f.vida) * 0.5})`; c.lineWidth = 2; c.beginPath(); c.arc(f.x, f.y, f.r, 0, 7); c.fill(); c.stroke(); });
+      if (pronta) {
+        c.save(); c.translate(bird.x, bird.y); c.rotate(ang); c.scale(ESC, ESC); c.drawImage(img, -SW * 0.5, -SH * 0.52, SW, SH); c.restore();
+      }
     };
     const quadro = (agora) => {
       if (!vivo) return;
       const dt = Math.min(0.033, (agora - ultimo) / 1000); ultimo = agora;
-      // lógica
-      nuvens.forEach((n) => { n.x -= n.v * dt * (estado === 'jogo' ? 3 : 1); if (n.x < -120) { n.x = W + 60; n.y = 40 + Math.random() * H * 0.5; } });
-      if (estado === 'intro') { tempoIntro += dt; const u = Math.min(1, tempoIntro / 1.1), e = 1 - Math.pow(1 - u, 3); bird.x = -SW + (W * 0.3 + SW) * e; bird.y = H * 0.45 + Math.sin(u * 6) * 8; if (u >= 1) { estado = 'espera'; msg.textContent = 'TOQUE PARA VOAR'; } }
-      else if (estado === 'espera') { bird.y = H * 0.45 + Math.sin(agora / 260) * 10; }
-      else if (estado === 'jogo') {
-        bird.vy += G * dt; bird.y += bird.vy * dt;
-        prox -= dt; if (prox <= 0) { prox = 1.55; const gp = GAP(), min = 70, max = H - gp - 70; tubos.push({ x: W + 20, g: min + Math.random() * Math.max(10, max - min), ok: false }); }
-        tubos.forEach((t) => { t.x -= VEL * dt; if (!t.ok && t.x + TW < bird.x - bird.r) { t.ok = true; pontos++; pt.textContent = pontos; navigator.vibrate && navigator.vibrate(4); } });
-        tubos = tubos.filter((t) => t.x > -TW - 10);
-        if (colide()) morre();
-      } else if (estado === 'fim') { bird.vy += G * dt; bird.y = Math.min(H + 80, bird.y + bird.vy * dt); }
-      // desenho
-      const c = ctx; c.clearRect(0, 0, W, H);
-      const ceu = c.createLinearGradient(0, 0, 0, H); ceu.addColorStop(0, '#f6f3ec'); ceu.addColorStop(1, '#e6efe8'); c.fillStyle = ceu; c.fillRect(0, 0, W, H);
-      c.fillStyle = 'rgba(255,255,255,.9)'; c.strokeStyle = '#111'; c.lineWidth = 2.5;
-      nuvens.forEach((n) => { c.save(); c.translate(n.x, n.y); c.scale(n.s, n.s); c.beginPath(); c.arc(0, 0, 20, 0, 7); c.arc(24, -8, 26, 0, 7); c.arc(52, 2, 20, 0, 7); c.fill(); c.restore(); });
-      // tubos: "provetas" de tinta verde
-      tubos.forEach((t) => {
-        c.fillStyle = '#1f9e5a'; c.lineWidth = 4; c.strokeStyle = '#111';
-        c.fillRect(t.x, -6, TW, t.g + 6); c.strokeRect(t.x, -6, TW, t.g + 6);
-        c.fillRect(t.x - 6, t.g - 26, TW + 12, 26); c.strokeRect(t.x - 6, t.g - 26, TW + 12, 26);
-        const b = t.g + GAP(); c.fillRect(t.x, b, TW, H - b + 6); c.strokeRect(t.x, b, TW, H - b + 6);
-        c.fillRect(t.x - 6, b, TW + 12, 26); c.strokeRect(t.x - 6, b, TW + 12, 26);
-        c.strokeStyle = 'rgba(255,255,255,.45)'; c.lineWidth = 3; c.beginPath(); c.moveTo(t.x + 14, 4); c.lineTo(t.x + 14, t.g - 30); c.moveTo(t.x + 14, b + 32); c.lineTo(t.x + 14, H - 4); c.stroke();
-      });
-      // avião
-      c.save(); c.translate(bird.x, bird.y);
-      const ang = estado === 'jogo' || estado === 'fim' ? Math.max(-0.5, Math.min(0.9, bird.vy / 650)) : 0; c.rotate(ang);
-      const esc = 0.62; c.scale(esc, esc); c.drawImage(sp, -SW * 0.5, -SH * 0.8, SW, SH);
-      // hélice girando
-      c.restore();
-      c.save(); c.translate(bird.x + SW * esc * 0.5 - 4, bird.y + 2); c.rotate(ang); c.fillStyle = 'rgba(17,17,17,.35)'; c.beginPath(); c.ellipse(0, 0, 4, 26 * Math.abs(Math.sin(agora / 40)) + 4, 0, 0, 7); c.fill(); c.restore();
+      passo(dt, agora); desenha(agora);
       raf = requestAnimationFrame(quadro);
     };
     raf = requestAnimationFrame(quadro);
-    if (!intro) { estado = 'espera'; msg.textContent = 'TOQUE PARA VOAR'; bird.x = W * 0.3; }
     const fechar = () => { vivo = false; cancelAnimationFrame(raf); removeEventListener('keydown', tecla); removeEventListener('resize', ajusta); ov.remove(); fechaVooAtual = null; };
     fechaVooAtual = fechar;
     ov.querySelector('.voo-x').addEventListener('click', (e) => { e.stopPropagation(); fechar(); });
-    gsap_fade(ov);
+    if (window.gsap) window.gsap.fromTo(ov, { opacity: 0 }, { opacity: 1, duration: 0.3 });
   }
-  const gsap_fade = (el) => { if (window.gsap) window.gsap.fromTo(el, { opacity: 0 }, { opacity: 1, duration: 0.35 }); };
 
   function montaCreditos(V, origem, abrirLoja) {
     const gsap = window.gsap, SplitText = window.SplitText;
     let n = guarda.ler('atlas.carinhos', 0);
+    if (n >= VOO) ganhaAcessorio('aviador');
     const el = document.createElement('div');
     el.className = 'creditos';
     el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Créditos');
@@ -1072,7 +1131,8 @@
       if (n === VOO) { // 1000: o Mutaninho sobe num avião e libera o jogo para sempre
         const b = q('.cr-voobtn'); b.hidden = false;
         const m = q('.cr-marco'); m.textContent = '1000! HORA DE DECOLAR.'; gsap.fromTo(m, { opacity: 0 }, { opacity: 1, duration: 0.2 });
-        setTimeout(() => abreVoo(V, true), 900);
+        ganhaAcessorio('aviador');
+        setTimeout(() => cenaAviao(V), 700);
       }
       if (MARCOS[n]) {
         const m = q('.cr-marco'); m.textContent = MARCOS[n];
@@ -1106,7 +1166,7 @@
       loja = document.createElement('div'); loja.className = 'cr-loja'; loja.setAttribute('role', 'dialog'); loja.setAttribute('aria-label', 'Loja do Mutaninho');
       loja.innerHTML = `<div class="cl-topo"><h3>Loja</h3><button class="cl-x" aria-label="Fechar a loja"><svg viewBox="0 0 40 40"><path d="M8 9 L32 31 M31 8 L9 33"/></svg></button></div>
         <p class="cl-sub">Acessórios do Mutaninho</p>
-        <div class="cl-grade">${ACESSORIOS.map(cartaoLoja).join('')}<div class="cl-card breve"><div class="cl-prev"><span class="cl-int">?</span></div><b>Mais em breve</b><small>Novos acessórios por vir</small></div></div>`;
+        <div class="cl-grade">${ACESSORIOS.filter((a) => !a.secreto || lerAcess().tem.includes(a.id)).map(cartaoLoja).join('')}<div class="cl-card breve"><div class="cl-prev"><span class="cl-int">?</span></div><b>Mais em breve</b><small>Novos acessórios por vir</small></div></div>`;
       el.appendChild(loja);
       gsap.fromTo(loja, { yPercent: 105 }, { yPercent: 0, duration: 0.55, ease: 'power3.out' });
       gsap.from(loja.querySelectorAll('.cl-card'), { y: 30, opacity: 0, rotation: () => gsap.utils.random(-4, 4), duration: 0.5, ease: 'back.out(1.6)', stagger: 0.08, delay: 0.25 });
