@@ -2,7 +2,7 @@
 // Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
 (() => {
   'use strict';
-  const BUILD = '59e1dc2e26';
+  const BUILD = '6b02d85b1a';
   const $ = (s) => document.querySelector(s);
   const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
   const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
@@ -833,7 +833,11 @@
   // O avião é um SVG só (vermelho, com cabine de vidro). Com `dentro` o Mutaninho aparece na cabine; a mesma peça serve para a cena de entrada e para o jogo.
   const aviaoSvg = (V, op = {}) => {
     const cor = op.diabo ? VERMELHO : V.cor;
-    const dino = op.dentro ? dinoSvg(V, { uso: op.uso || [], diabo: op.diabo, vb: '395 40 200 170' }).replace('<svg class="dv"', '<svg x="94" y="20" width="88" height="76"').replace(/ style="--vermelho:[^"]*"/, '') : '';
+    const dino0 = op.dentro ? dinoSvg(V, { uso: op.uso || [], diabo: op.diabo, vb: '395 40 200 170' }).replace('<svg class="dv"', '<svg x="94" y="20" width="88" height="76"').replace(/ style="--vermelho:[^"]*"/, '') : '';
+    const dente = '<path d="M542 116 Q539 134 549 137 Q561 134 558 116 Z" fill="#fffdf6" stroke="#3b1111" stroke-width="2.2" stroke-linejoin="round"/><path d="M547 121 Q546 129 549 130" stroke="#e5ddc8" stroke-width="1.6" fill="none" stroke-linecap="round"/>';
+    const dino = op.dentro ? dino0.replace(/<\/svg>\s*$/, dente + '</svg>') : '';
+    // rabinho: sai de trás da cabine, passa por cima da deriva e termina em ponta com espinhos
+    const rabo = op.dentro ? `<g stroke="#3b1111" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M114 74 Q86 70 56 54 Q32 42 14 22 Q12 17 20 17 Q48 22 72 34 Q100 44 124 54 Z" fill="${cor}"/><path d="M66 34 L64 25 L74 31 M46 27 L43 18 L53 24 M30 21 L26 12 L37 18" fill="${cor}" stroke-width="1.5"/><path d="M70 50 Q92 56 110 62" stroke="#0f5c30" stroke-width="1.6" fill="none" opacity=".45"/></g>` : '';
     const helice = op.helice === false ? '' : '<g class="helice"><rect x="243" y="46" width="8" height="76" rx="4" fill="#3a3733"/><rect x="243" y="46" width="8" height="12" rx="4" fill="#d9a62e"/><rect x="243" y="110" width="8" height="12" rx="4" fill="#d9a62e"/></g><circle cx="247" cy="84" r="4.6" fill="#e9dfc6" stroke="#4a3a2a" stroke-width="1.4"/>';
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 14 270 136"><style>.v-red{fill:${cor};stroke:none}.v-traco{fill:none;stroke:#111}@keyframes h{50%{transform:scaleY(.18)}}.helice{transform-box:fill-box;transform-origin:center;animation:h .09s linear infinite}</style>
       <defs>
@@ -848,7 +852,7 @@
         <g clip-path="url(#fin)" stroke="none"><path d="M10 50 L60 50 L60 56 L10 56 Z M10 62 L60 62 L60 68 L10 68 Z" fill="#c0262d"/></g>
         <path d="M10 86 L46 78 L62 87 L26 95 Z" fill="url(#gW)"/>
         <path d="M62 111 Q130 103 214 107 L206 120 Q130 123 52 122 Z" fill="url(#gW)"/>
-      </g>${dino}
+      </g>${rabo}${dino}
       <g stroke="#3b1111" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round">
         <path d="M36 86 Q40 68 82 63 L170 59 Q198 57 208 72 L210 100 Q192 108 160 108 L70 108 Q42 104 36 86 Z" fill="url(#gR)"/>
         <path d="M60 78 Q96 68 150 66" stroke="#f08a7e" stroke-width="2.4" fill="none" opacity=".6"/>
