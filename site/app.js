@@ -2,7 +2,7 @@
 // Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
 (() => {
   'use strict';
-  const BUILD = '800ab060be';
+  const BUILD = 'e61630f748';
   const $ = (s) => document.querySelector(s);
   const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
   const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
@@ -840,10 +840,10 @@
     const W = innerWidth, H = innerHeight, r = caixa.getBoundingClientRect();
     const st = document.createElement('div'); st.className = 'voo-cena';
     const pw = Math.min(W * 0.62, 250), ph = pw * (329 / 560);
-    st.innerHTML = `<div class="vc-fundo"></div><div class="vc-aviao" style="width:${pw}px;height:${ph}px"><img class="vc-sem" src="aviao-vazio.png?v=${BUILD}" alt=""><img class="vc-com" src="aviao.png?v=${BUILD}" alt="" style="opacity:0"></div><div class="vc-dino" style="left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px">${dinoSvg(V, estadoDino(V))}</div>`;
+    st.innerHTML = `<div class="vc-fundo"></div><div class="vc-aviao" style="width:${pw}px;height:${ph}px"><img class="vc-sem" src="aviao-vazio.png?v=${BUILD}" alt=""><img class="vc-com" src="aviao.png?v=${BUILD}" alt="" style="opacity:0"></div><div class="vc-clip"><div class="vc-dino" style="left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px">${dinoSvg(V, estadoDino(V))}</div></div>`;
     document.body.appendChild(st);
     caixa.style.visibility = 'hidden';
-    const fundo = st.querySelector('.vc-fundo'), av = st.querySelector('.vc-aviao'), dn = st.querySelector('.vc-dino'), com = st.querySelector('.vc-com'), sem = st.querySelector('.vc-sem');
+    const clip = st.querySelector('.vc-clip'), fundo = st.querySelector('.vc-fundo'), av = st.querySelector('.vc-aviao'), dn = st.querySelector('.vc-dino'), com = st.querySelector('.vc-com'), sem = st.querySelector('.vc-sem');
     const ay = Math.min(H - ph - 90, r.bottom + 20);
     const ax = (W - pw) / 2;
     gsap.set(av, { x: W + 40, y: ay + 10, rotation: 4 });
@@ -859,12 +859,14 @@
       const k = (85 * f) / (140 * u0); // a cabeça do piloto no PNG tem ~85 unidades; a do Mutaninho, ~140
       const tx = m.left + 300 * f - 500 * u0 * k - r.left, ty = m.top + 102 * f - 110 * u0 * k - r.top; // centro da cabeça do piloto no PNG ↔ centro da cabeça do Mutaninho
       const h = 0.5 * Math.abs(ty) + 110; // altura da parábola: o pulo sobe antes de descer na cabine (ty é só a distância até lá)
-      return { k, tx, ty, h };
+      // a borda da cabine: o que passar dela é escondido, então o corpo "afunda" na fuselagem em vez de ficar por cima dela
+      const rim = m.top + 152 * f;
+      return { k, tx, ty, h, rim };
     };
     let J = null;
     tl.fromTo(fundo, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.inOut' })
       .to(av, { x: ax, y: ay, rotation: 0, duration: 0.9, ease: 'power3.out' }, 0.35)
-      .add(() => { J = salto(av.getBoundingClientRect()); }, 1.26)
+      .add(() => { J = salto(av.getBoundingClientRect()); clip.style.clipPath = `inset(0 0 ${Math.max(0, H - J.rim)}px 0)`; }, 1.26)
       // agacha antes de saltar
       .to(inner, { scaleY: 0.84, scaleX: 1.1, duration: 0.24, ease: 'power2.out' }, 1.25)
       // decola: estica no impulso e vai subindo e atravessando
@@ -873,13 +875,13 @@
         p: 1, duration: 1.0, ease: 'none', // tempo linear: o y vira uma parábola de verdade (sobe desacelerando e cai acelerando)
         onUpdate: () => {
           const p = pulo.p, q = p * p * (3 - 2 * p);
-          gsap.set(dn, { x: J.tx * q + Math.sin(p * Math.PI) * -34, y: J.ty * p - 4 * J.h * p * (1 - p), scale: 1 + (J.k - 1) * q, rotation: Math.sin(p * Math.PI) * (p < 0.5 ? -9 : 7) });
+          gsap.set(dn, { x: J.tx * q - 130 * Math.sin(p * Math.PI) * (1 - 0.5 * p), y: J.ty * p - 4 * J.h * p * (1 - p), scale: 1 + (J.k - 1) * q, rotation: Math.sin(p * Math.PI) * (p < 0.5 ? -9 : 7) });
         },
       }, 1.5)
       .to(inner, { scaleY: 1, scaleX: 1, duration: 0.45, ease: 'sine.inOut' }, 1.7)
       // pousa na cabine: amassa um pouco, o avião cede e a imagem do piloto assume o lugar
       .to(inner, { scaleY: 0.82, scaleX: 1.12, duration: 0.09, ease: 'power2.in' }, 2.43)
-      .add(() => { gsap.set(com, { opacity: 1 }); gsap.set(sem, { opacity: 0 }); gsap.to(dn, { opacity: 0, duration: 0.12 }); navigator.vibrate && navigator.vibrate(18); }, 2.47)
+      .add(() => { gsap.to(com, { opacity: 1, duration: 0.2 }); gsap.set(sem, { opacity: 0, delay: 0.25 }); gsap.to(dn, { opacity: 0, duration: 0.25 }); navigator.vibrate && navigator.vibrate(18); }, 2.47)
       .to(av, { y: ay + 12, rotation: 2.5, duration: 0.1, ease: 'power2.out' }, 2.45)
       .to(av, { y: ay, rotation: 0, duration: 0.55, ease: 'elastic.out(1,0.35)' }, 2.55)
       // o avião encosta o nariz para cima e arranca

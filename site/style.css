@@ -4664,6 +4664,19 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
   right: 0;
 }
 
+.vc-clip {
+  z-index: 2;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.vc-clip .vc-dino {
+  z-index: auto;
+}
+
 :root[data-visual="vidro"] {
   --bg: #f2f4f3;
   --card: #ffffff94;
