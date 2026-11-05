@@ -762,9 +762,7 @@
       <path d="M470 166 L479 163 M468 176 L482 172" stroke="#111" stroke-width="2.2" stroke-linecap="round" opacity=".5"/></g>`,
   }, {
     id: 'aviador', slot: 'cabeca', secreto: true, nome: 'Chapéu de aviador', como: 'Voe com o Mutaninho', vb: '380 40 170 120',
-    arte: `<path d="M436 120 Q404 108 388 122 L400 128 L386 138 L402 141 L390 153 Q420 142 442 132 Z" fill="#c0262d" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
-      <path d="M436 118 Q474 130 522 112 L524 124 Q476 142 434 132 Z" fill="#c0262d" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
-      <path d="M447 96 Q438 66 476 54 Q518 47 532 80 L528 94 Q500 86 447 96 Z" fill="#8a5428" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+    arte: `<path d="M447 96 Q438 66 476 54 Q518 47 532 80 L528 94 Q500 86 447 96 Z" fill="#8a5428" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
       <path d="M476 55 Q486 74 484 90 M498 52 Q508 66 510 84" stroke="#4f2c12" stroke-width="2.4" fill="none" stroke-linecap="round"/>
       <path d="M447 94 Q434 112 445 134 Q460 137 470 120 Q472 104 463 91 Z" fill="#7b4723" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
       <path d="M458 108 L465 128" stroke="#3a1f0c" stroke-width="3" stroke-linecap="round"/>
@@ -837,19 +835,34 @@
     const cor = op.diabo ? VERMELHO : V.cor;
     const dino = op.dentro ? dinoSvg(V, { uso: op.uso || [], diabo: op.diabo, vb: '395 40 200 170' }).replace('<svg class="dv"', '<svg x="94" y="20" width="88" height="76"').replace(/ style="--vermelho:[^"]*"/, '') : '';
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 150"><style>.v-red{fill:${cor};stroke:none}.v-traco{fill:none;stroke:#111}@keyframes h{50%{transform:scaleY(.18)}}.helice{transform-box:fill-box;transform-origin:center;animation:h .09s linear infinite}</style>
-      <g stroke="#111" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
-        <path d="M34 72 L10 26 L44 38 L66 62 Z" fill="#d62828"/>
-        <path d="M14 82 L42 72 L58 86 L30 94 Z" fill="#a81c1c"/>
-        <path d="M100 96 L76 136 L132 136 L156 96 Z" fill="#a81c1c"/>
+      <defs><clipPath id="fin"><path d="M14 76 L20 40 Q40 42 56 72 Z"/></clipPath></defs>
+      <g stroke="#111" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M150 104 L162 134 M176 104 L166 134" fill="none" stroke-width="4"/>
+        <path d="M14 76 L20 40 Q40 42 56 72 Z" fill="#efe6cf"/>
+        <g clip-path="url(#fin)" stroke="none"><path d="M10 50 L60 50 L60 56 L10 56 Z M10 62 L60 62 L60 68 L10 68 Z" fill="#c0262d"/></g>
+        <path d="M14 76 L20 40 Q40 42 56 72 Z" fill="none"/>
+        <path d="M10 86 L46 78 L62 87 L26 95 Z" fill="#a81c1c"/>
+        <path d="M96 24 L104 62 M184 20 L178 60 M118 24 L124 62 M164 22 L160 60" fill="none" stroke-width="3.2"/>
+        <path d="M100 110 L108 106 M184 110 L178 106" fill="none" stroke-width="3.2"/>
+        <path d="M62 112 Q130 104 208 108 L202 119 Q130 122 54 121 Z" fill="#a81c1c"/>
       </g>${dino}
-      <g stroke="#111" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M36 82 Q34 64 72 60 L172 58 Q236 60 254 86 Q236 110 170 110 L70 110 Q38 106 36 82 Z" fill="#d62828"/></g>
-      <path d="M62 90 L226 90" stroke="#fff" stroke-width="3.4" opacity=".55" stroke-linecap="round"/>
-      <path d="M52 76 Q80 68 120 66" stroke="#ff7a6a" stroke-width="3" fill="none" opacity=".7" stroke-linecap="round"/>
-      <path d="M92 62 Q94 20 134 20 Q176 20 182 62 Z" fill="rgba(180,222,248,.42)" stroke="#111" stroke-width="4" stroke-linejoin="round"/>
-      <path d="M104 50 Q110 32 132 28" stroke="#fff" stroke-width="3.4" opacity=".8" fill="none" stroke-linecap="round"/>
-      <circle cx="152" cy="92" r="5" fill="#111"/>
-      <g class="helice"><rect x="254" y="50" width="9" height="72" rx="4.5" fill="#111"/></g>
-      <rect id="cab" x="96" y="22" width="84" height="76" fill="none"/></svg>`;
+      <g stroke="#111" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M36 86 Q40 68 82 63 L170 59 Q198 57 208 72 L210 100 Q192 108 160 108 L70 108 Q42 104 36 86 Z" fill="#c9262b"/>
+        <path d="M60 78 Q96 68 150 66" stroke="#ef7468" stroke-width="3" fill="none" opacity=".7"/>
+        <path d="M200 62 Q240 60 244 84 Q240 108 200 108 Q214 84 200 62 Z" fill="#efe6cf"/>
+        <ellipse cx="236" cy="84" rx="9" ry="19" fill="#161616"/>
+        <path d="M236 68 L236 100 M229 74 L243 94 M229 94 L243 74" stroke="#4a4a4a" stroke-width="1.6" fill="none"/>
+        <circle cx="128" cy="86" r="14" fill="#efe6cf"/>
+        <path d="M128 76 L131 83 L139 84 L133 89 L135 97 L128 93 L121 97 L123 89 L117 84 L125 83 Z" fill="#161616" stroke="none"/>
+        <path d="M108 63 Q134 54 162 61" fill="none" stroke="#efe6cf" stroke-width="5"/>
+        <path d="M96 24 Q150 10 216 16 L210 28 Q150 24 90 34 Z" fill="#c9262b"/>
+        <path d="M110 24 Q150 18 196 20" fill="none" stroke="#ef7468" stroke-width="2.4" opacity=".75"/>
+        <circle cx="162" cy="134" r="11" fill="#161616"/><circle cx="162" cy="134" r="4.4" fill="#efe6cf" stroke="none"/>
+        <path d="M162 134 L174 134" stroke-width="3.4" fill="none"/>
+      </g>
+      <g class="helice"><rect x="243" y="38" width="9" height="92" rx="4.5" fill="#161616"/><rect x="243" y="38" width="9" height="14" rx="4.5" fill="#e0a82e"/><rect x="243" y="116" width="9" height="14" rx="4.5" fill="#e0a82e"/></g>
+      <circle cx="247" cy="84" r="5" fill="#efe6cf" stroke="#111" stroke-width="2.4"/>
+      <rect id="cab" x="94" y="20" width="88" height="76" fill="none"/></svg>`;
   };
   const estadoDino = (V) => ({ uso: lerAcess().uso, diabo: guarda.ler('atlas.carinhos', 0) === DIABO });
 
@@ -925,14 +938,12 @@
       if (estado === 'espera') { estado = 'jogo'; msg.textContent = ''; }
       if (estado === 'jogo') {
         bird.vy = PULO; ang = Math.min(ang, -0.2); navigator.vibrate && navigator.vibrate(5);
-        for (let i = 0; i < 3; i++) fumacas.push({ x: bird.x - 62 * ESC / 0.6, y: bird.y + 6 + Math.random() * 8, r: 4 + Math.random() * 4, vida: 1, vx: -60 - Math.random() * 40, vy: 8 + Math.random() * 24 });
-      } else if (estado === 'fim' && performance.now() - fimT > 600) { reinicia(); estado = 'espera'; msg.textContent = 'TOQUE PARA VOAR'; }
+        } else if (estado === 'fim' && performance.now() - fimT > 600) { reinicia(); estado = 'espera'; msg.textContent = 'TOQUE PARA VOAR'; }
     };
     const morre = () => {
       estado = 'fim'; fimT = performance.now(); tremor = 1; flash = 1;
       const novo = pontos > melhor; if (novo) { melhor = pontos; guarda.gravar(REC, melhor); }
       mostraRec(); navigator.vibrate && navigator.vibrate([20, 30, 60]);
-      for (let i = 0; i < 10; i++) fumacas.push({ x: bird.x, y: bird.y, r: 5 + Math.random() * 6, vida: 1, vx: (Math.random() - 0.5) * 260, vy: (Math.random() - 0.7) * 220 });
       msg.innerHTML = `${novo && pontos ? 'NOVO RECORDE!<br>' : ''}FIM DE VOO<small>${pontos} ${pontos === 1 ? 'ponto' : 'pontos'} · toque para tentar de novo</small>`;
     };
     ov.addEventListener('pointerdown', (e) => { if (e.target.closest('.voo-x')) return; e.preventDefault(); pula(); });
@@ -969,7 +980,6 @@
       fumacas.forEach((f) => { f.x += f.vx * dt; f.y += f.vy * dt; f.vida -= dt * 1.7; f.r += dt * 16; });
       while (fumacas.length && fumacas[0].vida <= 0) fumacas.shift();
       tremor = Math.max(0, tremor - dt * 3); flash = Math.max(0, flash - dt * 3.5); popPt = Math.max(0, popPt - dt * 5);
-      pt.style.transform = popPt ? `scale(${1 + popPt * 0.28})` : '';
     };
     const desenha = (agora) => {
       const c = ctx; c.save();
@@ -993,12 +1003,11 @@
       // chão que corre
       c.fillStyle = '#d9d1bb'; c.fillRect(-20, H - 22, W + 40, 40); c.strokeStyle = '#111'; c.lineWidth = 4; c.beginPath(); c.moveTo(-20, H - 22); c.lineTo(W + 20, H - 22); c.stroke();
       c.lineWidth = 3; c.strokeStyle = 'rgba(17,17,17,.4)'; c.beginPath(); const co = deriva % 26; for (let x = -26 - co; x < W + 26; x += 26) { c.moveTo(x, H - 22); c.lineTo(x - 12, H); } c.stroke();
-      fumacas.forEach((f) => { c.fillStyle = `rgba(255,255,255,${Math.max(0, f.vida) * 0.85})`; c.strokeStyle = `rgba(17,17,17,${Math.max(0, f.vida) * 0.5})`; c.lineWidth = 2; c.beginPath(); c.arc(f.x, f.y, f.r, 0, 7); c.fill(); c.stroke(); });
       if (sprite) {
         const w = SW * ESC, h = SH * ESC;
         c.save(); c.translate(bird.x, bird.y); c.rotate(ang); c.drawImage(sprite, -w * 0.5, -h * 0.52, w, h); c.restore();
         // hélice em movimento: um borrão que pulsa no nariz
-        c.save(); c.translate(bird.x, bird.y); c.rotate(ang); c.fillStyle = 'rgba(17,17,17,.22)'; c.beginPath(); c.ellipse(w * 0.5 - 4 * ESC, (-0.52 * h) + h * 0.7, 3 * ESC + 1, (26 + 10 * Math.abs(Math.sin(agora / 30))) * ESC, 0, 0, 7); c.fill(); c.restore();
+        c.save(); c.translate(bird.x, bird.y); c.rotate(ang); c.fillStyle = 'rgba(17,17,17,.22)'; c.beginPath(); c.ellipse(112 * ESC, 6 * ESC, 3 * ESC + 1, (36 + 8 * Math.abs(Math.sin(agora / 30))) * ESC, 0, 0, 7); c.fill(); c.restore();
       }
       c.restore();
       if (flash) { ctx.fillStyle = `rgba(214,40,40,${flash * 0.35})`; ctx.fillRect(0, 0, W, H); }
