@@ -424,7 +424,7 @@ const motionJs = fs.readFileSync(path.join(raiz, 'tools/node_modules/motion/dist
 const swFonte = fs.readFileSync(path.join(FONTE, 'app/sw.js'), 'utf8');
 const htmlFonte = semVidro(fs.readFileSync(path.join(FONTE, 'app/index.template.html'), 'utf8'));
 
-const build = crypto.createHash('sha1').update(dadosTxt).update(svgsTxt).update(css).update(js).update(motionJs).update(fs.readFileSync(path.join(FONTE, 'app/dino.png'))).update(fs.readFileSync(path.join(FONTE, 'app/icone.svg'))).update(fs.readFileSync(path.join(FONTE, 'app/escuro.css'))).update(fs.readFileSync(path.join(FONTE, 'app/estudo.js'))).update(fs.readFileSync(path.join(FONTE, 'app/dino-vetor.json'))).update(fs.readFileSync(path.join(raiz, 'tools/node_modules/gsap/dist/gsap.min.js'))).update(swFonte).update(htmlFonte)
+const build = crypto.createHash('sha1').update(dadosTxt).update(svgsTxt).update(css).update(js).update(motionJs).update(fs.readFileSync(path.join(FONTE, 'app/dino.png'))).update(fs.readFileSync(path.join(FONTE, 'app/aviao.png'))).update(fs.readFileSync(path.join(FONTE, 'app/aviao-vazio.png'))).update(fs.readFileSync(path.join(FONTE, 'app/icone.svg'))).update(fs.readFileSync(path.join(FONTE, 'app/escuro.css'))).update(fs.readFileSync(path.join(FONTE, 'app/estudo.js'))).update(fs.readFileSync(path.join(FONTE, 'app/dino-vetor.json'))).update(fs.readFileSync(path.join(raiz, 'tools/node_modules/gsap/dist/gsap.min.js'))).update(swFonte).update(htmlFonte)
   .digest('hex').slice(0, 10);
 
 const V = `?v=${build}`;
@@ -442,6 +442,8 @@ write('versao.json', JSON.stringify({ build }) + '\n');
 fs.copyFileSync(path.join(FONTE, 'app/manifest.webmanifest'), path.join(SITE, 'manifest.webmanifest'));
 fs.copyFileSync(path.join(FONTE, 'app/icone.svg'), path.join(SITE, 'icone.svg'));
 fs.copyFileSync(path.join(FONTE, 'app/dino.png'), path.join(SITE, 'dino.png'));
+fs.copyFileSync(path.join(FONTE, 'app/aviao.png'), path.join(SITE, 'aviao.png'));
+fs.copyFileSync(path.join(FONTE, 'app/aviao-vazio.png'), path.join(SITE, 'aviao-vazio.png'));
 fs.copyFileSync(path.join(FONTE, 'app/dino-vetor.json'), path.join(SITE, 'dino-vetor.json'));
 for (const f of ['gsap.min.js', 'DrawSVGPlugin.min.js', 'SplitText.min.js']) fs.copyFileSync(path.join(raiz, 'tools/node_modules/gsap/dist', f), path.join(SITE, f));
 for (const [nome, t] of [['icone-192.png', 192], ['icone-512.png', 512], ['apple-touch-icon.png', 180]]) {

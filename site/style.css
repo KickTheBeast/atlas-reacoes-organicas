@@ -4653,6 +4653,17 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
   z-index: 2;
 }
 
+.vc-aviao img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
 :root[data-visual="vidro"] {
   --bg: #f2f4f3;
   --card: #ffffff94;

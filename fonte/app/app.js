@@ -830,41 +830,7 @@
 
 
   // ---------- avião + Flappy Bird (1000 carinhos) ----------
-  // O avião é um SVG só (vermelho, com cabine de vidro). Com `dentro` o Mutaninho aparece na cabine; a mesma peça serve para a cena de entrada e para o jogo.
-  const aviaoSvg = (V, op = {}) => {
-    const cor = op.diabo ? VERMELHO : V.cor;
-    const dino0 = op.dentro ? dinoSvg(V, { uso: op.uso || [], diabo: op.diabo, vb: '395 40 200 170' }).replace('<svg class="dv"', '<svg x="78" y="1" width="120" height="102"').replace(/ style="--vermelho:[^"]*"/, '') : '';
-    // duas presinhas brancas saindo da boca
-    const dentes = '<path d="M528 119 Q525 133 531 135 Q539 132 537 119 Z" fill="#fffdf6" stroke="#111" stroke-width="2" stroke-linejoin="round"/><path d="M547 117 Q544 132 550 135 Q559 132 557 117 Z" fill="#fffdf6" stroke="#111" stroke-width="2" stroke-linejoin="round"/>';
-    const dino = op.dentro ? dino0.replace(/<\/svg>\s*$/, dentes + '</svg>') : '';
-    const helice = op.helice === false ? '' : '<g class="helice"><path d="M243 52 Q250 50 253 56 L251 86 L245 86 Z" fill="#e0b96a" stroke="#111" stroke-width="2"/><path d="M245 86 L251 86 L253 118 Q250 124 243 120 Z" fill="#161616"/></g>';
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -12 270 168"><style>.v-red{fill:${cor};stroke:none}.v-traco{fill:none;stroke:#111}@keyframes h{50%{transform:scaleY(.18)}}.helice{transform-box:fill-box;transform-origin:center;animation:h .09s linear infinite}</style>
-      <defs><linearGradient id="gR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8362f"/><stop offset="1" stop-color="#ab1f1d"/></linearGradient></defs>
-      <g stroke="#111" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
-        <path d="M168 110 L188 140 M192 110 L192 140" fill="none" stroke-width="4"/>
-        <path d="M22 100 L22 104" stroke-width="5" fill="none"/><circle cx="22" cy="106" r="3.4" fill="#161616"/>
-        <path d="M30 70 L26 34 Q42 34 60 66 Z" fill="url(#gR)"/><path d="M33 62 L31 42 M38 62 L36 48 M44 62 L42 52" stroke="#7a1212" stroke-width="1.4" fill="none"/>
-        <path d="M2 92 Q26 83 60 88 L60 95 Q26 99 2 96 Z" fill="url(#gR)"/>
-      </g>${dino}
-      <g stroke="#111" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
-        <path d="M12 82 Q30 66 76 62 L150 58 Q184 54 206 62 L208 104 Q190 114 150 114 L72 110 Q30 104 12 90 Z" fill="url(#gR)"/>
-        <path d="M30 86 L90 82 M44 98 L120 104 M110 70 L170 66" stroke="#7a1212" stroke-width="1.5" fill="none" opacity=".55"/>
-        <path d="M96 66 Q130 54 170 60" fill="none" stroke="#161616" stroke-width="3.4"/>
-        <path d="M168 58 L178 48 L186 58 Z" fill="#2b2b2b" stroke-width="2"/>
-        <circle cx="120" cy="90" r="18" fill="#efe6cf"/>
-        <path d="M120 78 L123.5 86 L132 86.6 L125.4 92 L127.6 100 L120 95.4 L112.4 100 L114.6 92 L108 86.6 L116.5 86 Z" fill="#1d1d2b" stroke="none"/>
-        <path d="M200 60 Q242 58 248 86 Q242 114 200 114 Q214 88 200 60 Z" fill="#efe6cf"/>
-        <ellipse cx="238" cy="86" rx="9" ry="22" fill="#161616" stroke="none"/>
-        <path d="M238 66 L238 106 M231 72 L245 100 M231 100 L245 72" stroke="#6b665c" stroke-width="1.2" fill="none"/>
-        <path d="M92 110 Q150 103 214 107 Q219 114 210 118 Q150 122 88 118 Q82 113 92 110 Z" fill="url(#gR)"/>
-        <circle cx="192" cy="142" r="13" fill="#161616"/><circle cx="192" cy="142" r="7" fill="#efe6cf" stroke-width="1.6"/><circle cx="192" cy="142" r="2.6" fill="#161616" stroke="none"/>
-        <path d="M66 -2 Q150 -12 234 -6 Q240 2 230 6 Q150 12 60 8 Q54 2 66 -2 Z" fill="url(#gR)"/>
-        <path d="M80 2 Q150 -4 222 -2" fill="none" stroke="#7a1212" stroke-width="1.4" opacity=".6"/>
-        <path d="M90 8 L104 60 M112 8 L126 58 M204 4 L190 62 M184 6 L150 58" fill="none" stroke-width="4.2"/>
-      </g>${helice}
-      <circle cx="249" cy="86" r="5" fill="#efe6cf" stroke="#111" stroke-width="2"/>
-      <rect id="cab" x="78" y="1" width="120" height="102" fill="none"/></svg>`;
-  };
+  // O avião é uma ilustração PNG recortada (tools/aviao-png.py): aviao.png com o Mutaninho piloto e aviao-vazio.png com a cabine vazia (para a cena de entrada).
   const estadoDino = (V) => ({ uso: lerAcess().uso, diabo: guarda.ler('atlas.carinhos', 0) === DIABO });
 
   // Cena de entrada: o fundo some, o avião pousa ao lado e o Mutaninho pula para dentro da cabine
@@ -873,8 +839,8 @@
     if (!gsap || reduzido || !caixa || fechaVooAtual) { abreVoo(V, true); return; }
     const W = innerWidth, H = innerHeight, r = caixa.getBoundingClientRect();
     const st = document.createElement('div'); st.className = 'voo-cena';
-    const pw = Math.min(W * 0.78, 300), ph = pw * (168 / 270);
-    st.innerHTML = `<div class="vc-fundo"></div><div class="vc-aviao" style="width:${pw}px;height:${ph}px"><div class="vc-sem">${aviaoSvg(V, { dentro: false })}</div><div class="vc-com" style="opacity:0">${aviaoSvg(V, { dentro: true, ...estadoDino(V) })}</div></div><div class="vc-dino" style="left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px">${dinoSvg(V, estadoDino(V))}</div>`;
+    const pw = Math.min(W * 0.86, 340), ph = pw * (329 / 560);
+    st.innerHTML = `<div class="vc-fundo"></div><div class="vc-aviao" style="width:${pw}px;height:${ph}px"><img class="vc-sem" src="aviao-vazio.png?v=${BUILD}" alt=""><img class="vc-com" src="aviao.png?v=${BUILD}" alt="" style="opacity:0"></div><div class="vc-dino" style="left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px">${dinoSvg(V, estadoDino(V))}</div>`;
     document.body.appendChild(st);
     caixa.style.visibility = 'hidden';
     const fundo = st.querySelector('.vc-fundo'), av = st.querySelector('.vc-aviao'), dn = st.querySelector('.vc-dino'), com = st.querySelector('.vc-com'), sem = st.querySelector('.vc-sem');
@@ -889,14 +855,14 @@
       .to(dn, { scaleY: 0.92, scaleX: 1.04, duration: 0.18, yoyo: true, repeat: 1, ease: 'power1.inOut' }, 1.2);
     // pulo: posição final calculada pela cabine do avião
     tl.add(() => {
-      const m = av.querySelector('#cab').getBoundingClientRect();
-      const upu = m.width / 200, u0 = r.width / 600; // pixels por unidade do desenho: no avião e na imagem original
-      const k = upu / u0, tx = m.left - 395 * upu - r.left, ty = m.top - 40 * upu - r.top;
+      const m = av.getBoundingClientRect(), f = m.width / 560, u0 = r.width / 600; // f: pixels por unidade do PNG; u0: o mesmo no desenho do Mutaninho
+      const k = (85 * f) / (140 * u0); // a cabeça do piloto no PNG tem ~85 unidades; a do Mutaninho, ~140
+      const tx = m.left + 300 * f - 500 * u0 * k - r.left, ty = m.top + 102 * f - 110 * u0 * k - r.top; // centro da cabeça do piloto no PNG ↔ centro da cabeça do Mutaninho
       gsap.to(dn, { x: tx, duration: 0.8, ease: 'power1.inOut' });
       gsap.to(dn, { scale: k, duration: 0.8, ease: 'power2.inOut' });
       gsap.timeline().to(dn, { y: Math.min(0, ty) - 130, duration: 0.4, ease: 'power2.out' }).to(dn, { y: ty, duration: 0.4, ease: 'power2.in' });
     }, 1.55)
-    .add(() => { gsap.set(com, { opacity: 1 }); gsap.set(sem, { opacity: 0 }); gsap.set(dn, { opacity: 0 }); navigator.vibrate && navigator.vibrate(18); }, 2.4)
+    .add(() => { gsap.set(com, { opacity: 1 }); gsap.set(sem, { opacity: 0 }); gsap.to(dn, { opacity: 0, duration: 0.15 }); navigator.vibrate && navigator.vibrate(18); }, 2.4)
     .to(av, { y: '+=10', scaleY: 0.96, duration: 0.14, yoyo: true, repeat: 1 }, 2.4)
     .to(av, { rotation: -10, y: ay - 40, duration: 0.45, ease: 'power2.out' }, 2.75)
     .add(() => abreVoo(V, true), 3.0)
@@ -915,11 +881,11 @@
     const ajusta = () => { W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
     ajusta(); addEventListener('resize', ajusta);
     // sprite rasterizado uma única vez, já no tamanho final e na densidade da tela: bem mais nítido e leve do que redesenhar o SVG a cada quadro
-    const SW = 270, SH = 168, ESC = Math.min(0.56, innerWidth / 620);
+    const SW = 560, SH = 329, ESC = Math.min(190, innerWidth * 0.5) / 560;
     let sprite = null;
     const img = new Image();
     img.onload = () => { const c = document.createElement('canvas'); c.width = Math.round(SW * ESC * dpr); c.height = Math.round(SH * ESC * dpr); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); sprite = c; };
-    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(aviaoSvg(V, { dentro: true, helice: false, ...estadoDino(V) }));
+    img.src = 'aviao.png?v=' + BUILD;
     const REC = 'atlas.voo';
     let melhor = guarda.ler(REC, 0), estado = intro ? 'intro' : 'espera', ultimo = performance.now(), pontos = 0, tubos = [], dist = 0, tempoIntro = 0, fimT = 0, ang = 0, tremor = 0, flash = 0, deriva = 0, popPt = 0;
     const bird = { x: 0, y: 0, vy: 0 }, fumacas = [];
@@ -954,8 +920,8 @@
     // colisão: dois círculos (corpo e nariz) contra retângulos dos tubos
     const circRet = (cx, cy, r, x, y, w, h) => Math.hypot(cx - Math.max(x, Math.min(cx, x + w)), cy - Math.max(y, Math.min(cy, y + h))) < r;
     const colide = () => {
-      if (bird.y - 18 < 0 || bird.y + 22 > H - 22) return true; // teto e chão
-      const pts = [[bird.x - 12, bird.y, 17], [bird.x + 28, bird.y + 3, 11]], g = GAP();
+      if (bird.y - 34 < 0 || bird.y + 44 > H - 22) return true; // teto e chão
+      const pts = [[bird.x - 8, bird.y + 8, 22], [bird.x + 46, bird.y + 8, 15]], g = GAP();
       for (const t of tubos) for (const [cx, cy, rr] of pts) if (circRet(cx, cy, rr, t.x, -20, TW, t.g + 20) || circRet(cx, cy, rr, t.x, t.g + g, TW, H)) return true;
       return false;
     };
@@ -1008,11 +974,11 @@
         const w = SW * ESC, h = SH * ESC;
         c.save(); c.translate(bird.x, bird.y); c.rotate(ang); c.drawImage(sprite, -w * 0.5, -h * 0.52, w, h); c.restore();
         // hélice: disco translúcido + duas pás que giram (a largura de cada pá varia com o ângulo, como em perspectiva)
-        c.save(); c.translate(bird.x, bird.y); c.rotate(ang); c.translate(113 * ESC, 10.6 * ESC);
-        c.fillStyle = 'rgba(70,64,56,.14)'; c.beginPath(); c.ellipse(0, 0, 4.5 * ESC, 38 * ESC, 0, 0, 7); c.fill();
+        c.save(); c.translate(bird.x, bird.y); c.rotate(ang); c.translate(259 * ESC, 0.9 * ESC);
+        c.fillStyle = 'rgba(70,64,56,.14)'; c.beginPath(); c.ellipse(0, 0, 6 * ESC, 92 * ESC, 0, 0, 7); c.fill();
         const th = agora / 55, k = Math.abs(Math.cos(th)); c.fillStyle = '#3a3733';
-        for (const sg of [1, -1]) { c.beginPath(); c.ellipse(0, sg * 19 * ESC * k, 2.6 * ESC, 19 * ESC * Math.max(0.12, k), 0, 0, 7); c.fill(); c.fillStyle = '#d9a62e'; c.beginPath(); c.arc(0, sg * 36 * ESC * k, 2.6 * ESC, 0, 7); c.fill(); c.fillStyle = '#3a3733'; }
-        c.fillStyle = '#e9dfc6'; c.strokeStyle = '#4a3a2a'; c.lineWidth = 1.2; c.beginPath(); c.arc(0, 0, 4 * ESC, 0, 7); c.fill(); c.stroke();
+        for (const sg of [1, -1]) { c.beginPath(); c.ellipse(0, sg * 45 * ESC * k, 7 * ESC, 45 * ESC * Math.max(0.12, k), 0, 0, 7); c.fill(); c.fillStyle = '#d9a62e'; c.beginPath(); c.arc(0, sg * 84 * ESC * k, 5 * ESC, 0, 7); c.fill(); c.fillStyle = '#3a3733'; }
+        c.fillStyle = '#e9dfc6'; c.strokeStyle = '#4a3a2a'; c.lineWidth = 1.2; c.beginPath(); c.arc(0, 0, 11 * ESC, 0, 7); c.fill(); c.stroke();
         c.restore();
       }
       c.restore();

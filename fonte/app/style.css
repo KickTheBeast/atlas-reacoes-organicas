@@ -710,3 +710,5 @@ html.mo .item,html.mo .aula,html.mo .ficha,html.mo .guia-link,html.mo .nav-det a
 .vc-aviao>div{position:absolute;inset:0}
 .vc-aviao svg,.vc-dino svg{display:block;width:100%;height:100%;overflow:visible}
 .vc-dino{z-index:2}
+
+.vc-aviao img{position:absolute;inset:0;width:100%;height:100%;display:block}
