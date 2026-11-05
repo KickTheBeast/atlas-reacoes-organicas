@@ -2,7 +2,7 @@
 // Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
 (() => {
   'use strict';
-  const BUILD = '6b02d85b1a';
+  const BUILD = '512e407d28';
   const $ = (s) => document.querySelector(s);
   const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
   const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
@@ -833,39 +833,37 @@
   // O avião é um SVG só (vermelho, com cabine de vidro). Com `dentro` o Mutaninho aparece na cabine; a mesma peça serve para a cena de entrada e para o jogo.
   const aviaoSvg = (V, op = {}) => {
     const cor = op.diabo ? VERMELHO : V.cor;
-    const dino0 = op.dentro ? dinoSvg(V, { uso: op.uso || [], diabo: op.diabo, vb: '395 40 200 170' }).replace('<svg class="dv"', '<svg x="94" y="20" width="88" height="76"').replace(/ style="--vermelho:[^"]*"/, '') : '';
-    const dente = '<path d="M542 116 Q539 134 549 137 Q561 134 558 116 Z" fill="#fffdf6" stroke="#3b1111" stroke-width="2.2" stroke-linejoin="round"/><path d="M547 121 Q546 129 549 130" stroke="#e5ddc8" stroke-width="1.6" fill="none" stroke-linecap="round"/>';
-    const dino = op.dentro ? dino0.replace(/<\/svg>\s*$/, dente + '</svg>') : '';
-    // rabinho: sai de trás da cabine, passa por cima da deriva e termina em ponta com espinhos
-    const rabo = op.dentro ? `<g stroke="#3b1111" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M114 74 Q86 70 56 54 Q32 42 14 22 Q12 17 20 17 Q48 22 72 34 Q100 44 124 54 Z" fill="${cor}"/><path d="M66 34 L64 25 L74 31 M46 27 L43 18 L53 24 M30 21 L26 12 L37 18" fill="${cor}" stroke-width="1.5"/><path d="M70 50 Q92 56 110 62" stroke="#0f5c30" stroke-width="1.6" fill="none" opacity=".45"/></g>` : '';
-    const helice = op.helice === false ? '' : '<g class="helice"><rect x="243" y="46" width="8" height="76" rx="4" fill="#3a3733"/><rect x="243" y="46" width="8" height="12" rx="4" fill="#d9a62e"/><rect x="243" y="110" width="8" height="12" rx="4" fill="#d9a62e"/></g><circle cx="247" cy="84" r="4.6" fill="#e9dfc6" stroke="#4a3a2a" stroke-width="1.4"/>';
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 14 270 136"><style>.v-red{fill:${cor};stroke:none}.v-traco{fill:none;stroke:#111}@keyframes h{50%{transform:scaleY(.18)}}.helice{transform-box:fill-box;transform-origin:center;animation:h .09s linear infinite}</style>
-      <defs>
-        <linearGradient id="gR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e5423b"/><stop offset=".55" stop-color="#bf2227"/><stop offset="1" stop-color="#8c1a1d"/></linearGradient>
-        <linearGradient id="gW" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cf2f2d"/><stop offset="1" stop-color="#7d171a"/></linearGradient>
-        <linearGradient id="gC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6eed9"/><stop offset="1" stop-color="#cfc3a4"/></linearGradient>
-        <clipPath id="fin"><path d="M14 76 L20 40 Q40 42 56 72 Z"/></clipPath>
-      </defs>
-      <g stroke="#3b1111" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round">
-        <path d="M148 104 L160 132 M176 104 L166 132" fill="none" stroke="#6a645a" stroke-width="3"/>
-        <path d="M14 76 L20 40 Q40 42 56 72 Z" fill="url(#gC)"/>
-        <g clip-path="url(#fin)" stroke="none"><path d="M10 50 L60 50 L60 56 L10 56 Z M10 62 L60 62 L60 68 L10 68 Z" fill="#c0262d"/></g>
-        <path d="M10 86 L46 78 L62 87 L26 95 Z" fill="url(#gW)"/>
-        <path d="M62 111 Q130 103 214 107 L206 120 Q130 123 52 122 Z" fill="url(#gW)"/>
-      </g>${rabo}${dino}
-      <g stroke="#3b1111" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round">
-        <path d="M36 86 Q40 68 82 63 L170 59 Q198 57 208 72 L210 100 Q192 108 160 108 L70 108 Q42 104 36 86 Z" fill="url(#gR)"/>
-        <path d="M60 78 Q96 68 150 66" stroke="#f08a7e" stroke-width="2.4" fill="none" opacity=".6"/>
-        <path d="M50 99 Q110 106 190 100" stroke="#5e1012" stroke-width="2" fill="none" opacity=".35"/>
-        <path d="M200 62 Q240 60 244 84 Q240 108 200 108 Q214 84 200 62 Z" fill="url(#gC)"/>
-        <ellipse cx="236" cy="84" rx="8" ry="18" fill="#3d3b38" stroke="none"/>
-        <path d="M236 68 L236 100 M230 74 L242 94 M230 94 L242 74" stroke="#7a756c" stroke-width="1.2" fill="none"/>
-        <circle cx="128" cy="86" r="14" fill="url(#gC)"/>
-        <path d="M128 76 L131 83 L139 84 L133 89 L135 97 L128 93 L121 97 L123 89 L117 84 L125 83 Z" fill="#2a1a1a" stroke="none"/>
-        <path d="M108 63 Q134 54 162 61" fill="none" stroke="#efe6cf" stroke-width="4.5"/>
-        <circle cx="163" cy="134" r="11" fill="#2d2b28" stroke="none"/><circle cx="163" cy="134" r="4.4" fill="#e9dfc6" stroke="none"/>
+    const dino0 = op.dentro ? dinoSvg(V, { uso: op.uso || [], diabo: op.diabo, vb: '395 40 200 170' }).replace('<svg class="dv"', '<svg x="78" y="1" width="120" height="102"').replace(/ style="--vermelho:[^"]*"/, '') : '';
+    // duas presinhas brancas saindo da boca
+    const dentes = '<path d="M528 119 Q525 133 531 135 Q539 132 537 119 Z" fill="#fffdf6" stroke="#111" stroke-width="2" stroke-linejoin="round"/><path d="M547 117 Q544 132 550 135 Q559 132 557 117 Z" fill="#fffdf6" stroke="#111" stroke-width="2" stroke-linejoin="round"/>';
+    const dino = op.dentro ? dino0.replace(/<\/svg>\s*$/, dentes + '</svg>') : '';
+    const helice = op.helice === false ? '' : '<g class="helice"><path d="M243 52 Q250 50 253 56 L251 86 L245 86 Z" fill="#e0b96a" stroke="#111" stroke-width="2"/><path d="M245 86 L251 86 L253 118 Q250 124 243 120 Z" fill="#161616"/></g>';
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -12 270 168"><style>.v-red{fill:${cor};stroke:none}.v-traco{fill:none;stroke:#111}@keyframes h{50%{transform:scaleY(.18)}}.helice{transform-box:fill-box;transform-origin:center;animation:h .09s linear infinite}</style>
+      <defs><linearGradient id="gR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8362f"/><stop offset="1" stop-color="#ab1f1d"/></linearGradient></defs>
+      <g stroke="#111" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M168 110 L188 140 M192 110 L192 140" fill="none" stroke-width="4"/>
+        <path d="M22 100 L22 104" stroke-width="5" fill="none"/><circle cx="22" cy="106" r="3.4" fill="#161616"/>
+        <path d="M30 70 L26 34 Q42 34 60 66 Z" fill="url(#gR)"/><path d="M33 62 L31 42 M38 62 L36 48 M44 62 L42 52" stroke="#7a1212" stroke-width="1.4" fill="none"/>
+        <path d="M2 92 Q26 83 60 88 L60 95 Q26 99 2 96 Z" fill="url(#gR)"/>
+      </g>${dino}
+      <g stroke="#111" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M12 82 Q30 66 76 62 L150 58 Q184 54 206 62 L208 104 Q190 114 150 114 L72 110 Q30 104 12 90 Z" fill="url(#gR)"/>
+        <path d="M30 86 L90 82 M44 98 L120 104 M110 70 L170 66" stroke="#7a1212" stroke-width="1.5" fill="none" opacity=".55"/>
+        <path d="M96 66 Q130 54 170 60" fill="none" stroke="#161616" stroke-width="3.4"/>
+        <path d="M168 58 L178 48 L186 58 Z" fill="#2b2b2b" stroke-width="2"/>
+        <circle cx="120" cy="90" r="18" fill="#efe6cf"/>
+        <path d="M120 78 L123.5 86 L132 86.6 L125.4 92 L127.6 100 L120 95.4 L112.4 100 L114.6 92 L108 86.6 L116.5 86 Z" fill="#1d1d2b" stroke="none"/>
+        <path d="M200 60 Q242 58 248 86 Q242 114 200 114 Q214 88 200 60 Z" fill="#efe6cf"/>
+        <ellipse cx="238" cy="86" rx="9" ry="22" fill="#161616" stroke="none"/>
+        <path d="M238 66 L238 106 M231 72 L245 100 M231 100 L245 72" stroke="#6b665c" stroke-width="1.2" fill="none"/>
+        <path d="M92 110 Q150 103 214 107 Q219 114 210 118 Q150 122 88 118 Q82 113 92 110 Z" fill="url(#gR)"/>
+        <circle cx="192" cy="142" r="13" fill="#161616"/><circle cx="192" cy="142" r="7" fill="#efe6cf" stroke-width="1.6"/><circle cx="192" cy="142" r="2.6" fill="#161616" stroke="none"/>
+        <path d="M66 -2 Q150 -12 234 -6 Q240 2 230 6 Q150 12 60 8 Q54 2 66 -2 Z" fill="url(#gR)"/>
+        <path d="M80 2 Q150 -4 222 -2" fill="none" stroke="#7a1212" stroke-width="1.4" opacity=".6"/>
+        <path d="M90 8 L104 60 M112 8 L126 58 M204 4 L190 62 M184 6 L150 58" fill="none" stroke-width="4.2"/>
       </g>${helice}
-      <rect id="cab" x="94" y="20" width="88" height="76" fill="none"/></svg>`;
+      <circle cx="249" cy="86" r="5" fill="#efe6cf" stroke="#111" stroke-width="2"/>
+      <rect id="cab" x="78" y="1" width="120" height="102" fill="none"/></svg>`;
   };
   const estadoDino = (V) => ({ uso: lerAcess().uso, diabo: guarda.ler('atlas.carinhos', 0) === DIABO });
 
@@ -875,7 +873,7 @@
     if (!gsap || reduzido || !caixa || fechaVooAtual) { abreVoo(V, true); return; }
     const W = innerWidth, H = innerHeight, r = caixa.getBoundingClientRect();
     const st = document.createElement('div'); st.className = 'voo-cena';
-    const pw = Math.min(W * 0.78, 300), ph = pw * (136 / 270);
+    const pw = Math.min(W * 0.78, 300), ph = pw * (168 / 270);
     st.innerHTML = `<div class="vc-fundo"></div><div class="vc-aviao" style="width:${pw}px;height:${ph}px"><div class="vc-sem">${aviaoSvg(V, { dentro: false })}</div><div class="vc-com" style="opacity:0">${aviaoSvg(V, { dentro: true, ...estadoDino(V) })}</div></div><div class="vc-dino" style="left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px">${dinoSvg(V, estadoDino(V))}</div>`;
     document.body.appendChild(st);
     caixa.style.visibility = 'hidden';
@@ -917,7 +915,7 @@
     const ajusta = () => { W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
     ajusta(); addEventListener('resize', ajusta);
     // sprite rasterizado uma única vez, já no tamanho final e na densidade da tela: bem mais nítido e leve do que redesenhar o SVG a cada quadro
-    const SW = 270, SH = 136, ESC = Math.min(0.62, innerWidth / 560);
+    const SW = 270, SH = 168, ESC = Math.min(0.56, innerWidth / 620);
     let sprite = null;
     const img = new Image();
     img.onload = () => { const c = document.createElement('canvas'); c.width = Math.round(SW * ESC * dpr); c.height = Math.round(SH * ESC * dpr); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); sprite = c; };
@@ -1010,7 +1008,7 @@
         const w = SW * ESC, h = SH * ESC;
         c.save(); c.translate(bird.x, bird.y); c.rotate(ang); c.drawImage(sprite, -w * 0.5, -h * 0.52, w, h); c.restore();
         // hélice: disco translúcido + duas pás que giram (a largura de cada pá varia com o ângulo, como em perspectiva)
-        c.save(); c.translate(bird.x, bird.y); c.rotate(ang); c.translate(112 * ESC, 0);
+        c.save(); c.translate(bird.x, bird.y); c.rotate(ang); c.translate(113 * ESC, 10.6 * ESC);
         c.fillStyle = 'rgba(70,64,56,.14)'; c.beginPath(); c.ellipse(0, 0, 4.5 * ESC, 38 * ESC, 0, 0, 7); c.fill();
         const th = agora / 55, k = Math.abs(Math.cos(th)); c.fillStyle = '#3a3733';
         for (const sg of [1, -1]) { c.beginPath(); c.ellipse(0, sg * 19 * ESC * k, 2.6 * ESC, 19 * ESC * Math.max(0.12, k), 0, 0, 7); c.fill(); c.fillStyle = '#d9a62e'; c.beginPath(); c.arc(0, sg * 36 * ESC * k, 2.6 * ESC, 0, 7); c.fill(); c.fillStyle = '#3a3733'; }
