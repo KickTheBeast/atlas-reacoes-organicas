@@ -2,7 +2,7 @@
 // Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
 (() => {
   'use strict';
-  const BUILD = '8ba0590dcc';
+  const BUILD = '8c2a4cf617';
   const $ = (s) => document.querySelector(s);
   const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
   const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
@@ -761,13 +761,17 @@
       <path d="M465 146 L482 146 L479 154 L468 154 Z" fill="#d93a2f" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
       <path d="M470 166 L479 163 M468 176 L482 172" stroke="#111" stroke-width="2.2" stroke-linecap="round" opacity=".5"/></g>`,
   }, {
-    id: 'aviador', slot: 'cabeca', secreto: true, nome: 'Chapéu de aviador', como: 'Voe com o Mutaninho', vb: '432 36 110 80',
-    arte: `<path d="M451 90 Q448 56 486 50 Q526 50 523 90 Z" fill="#8a5426" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
-      <path d="M451 88 Q440 100 446 118 Q458 112 462 96 Z" fill="#6f4120" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
-      <path d="M452 76 Q487 66 522 74" stroke="#111" stroke-width="6" fill="none" stroke-linecap="round"/>
-      <circle cx="469" cy="68" r="10" fill="#9fd3f2" stroke="#111" stroke-width="3.2"/><circle cx="500" cy="66" r="10" fill="#9fd3f2" stroke="#111" stroke-width="3.2"/>
-      <path d="M464 64 L469 61 M495 62 L500 59" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
-      <path d="M470 54 Q486 50 502 54" stroke="#b97a3d" stroke-width="2.4" fill="none" stroke-linecap="round"/>`,
+    id: 'aviador', slot: 'cabeca', secreto: true, nome: 'Chapéu de aviador', como: 'Voe com o Mutaninho', vb: '380 40 170 120',
+    arte: `<path d="M436 120 Q404 108 388 122 L400 128 L386 138 L402 141 L390 153 Q420 142 442 132 Z" fill="#c0262d" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M436 118 Q474 130 522 112 L524 124 Q476 142 434 132 Z" fill="#c0262d" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M447 96 Q438 66 476 54 Q518 47 532 80 L528 94 Q500 86 447 96 Z" fill="#8a5428" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M476 55 Q486 74 484 90 M498 52 Q508 66 510 84" stroke="#4f2c12" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      <path d="M447 94 Q434 112 445 134 Q460 137 470 120 Q472 104 463 91 Z" fill="#7b4723" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M458 108 L465 128" stroke="#3a1f0c" stroke-width="3" stroke-linecap="round"/>
+      <rect x="459" y="126" width="11" height="11" rx="1.5" fill="none" stroke="#d9a83a" stroke-width="3"/>
+      <path d="M446 82 Q488 69 530 80" stroke="#111" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+      <circle cx="483" cy="72" r="12" fill="#161616" stroke="#cfc6b0" stroke-width="3.4"/><circle cx="511" cy="74" r="11" fill="#161616" stroke="#cfc6b0" stroke-width="3.4"/>
+      <path d="M476 66 L482 62 M505 69 L510 65" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>`,
   }];
   const lerAcess = () => { const a = guarda.ler('atlas.acessorios', null); return a && Array.isArray(a.tem) ? a : { tem: [], uso: [] }; };
   function ganhaAcessorio(id) {
@@ -896,88 +900,116 @@
     let W = 0, H = 0; const dpr = Math.min(devicePixelRatio || 1, 2);
     const ajusta = () => { W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
     ajusta(); addEventListener('resize', ajusta);
-    const img = new Image(); let pronta = false;
-    img.onload = () => { pronta = true; };
+    // sprite rasterizado uma única vez, já no tamanho final e na densidade da tela: bem mais nítido e leve do que redesenhar o SVG a cada quadro
+    const SW = 270, SH = 150, ESC = Math.min(0.8, innerWidth / 430);
+    let sprite = null;
+    const img = new Image();
+    img.onload = () => { const c = document.createElement('canvas'); c.width = Math.round(SW * ESC * dpr); c.height = Math.round(SH * ESC * dpr); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); sprite = c; };
     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(aviaoSvg(V, { dentro: true, ...estadoDino(V) }));
-    const SW = 270, SH = 150, ESC = 0.78;
     const REC = 'atlas.voo';
-    let melhor = guarda.ler(REC, 0), estado = intro ? 'intro' : 'espera', ultimo = performance.now(), pontos = 0, tubos = [], dist = 0, tempoIntro = 0, fimT = 0, ang = 0;
-    const bird = { x: 0, y: 0, vy: 0, r: 26 }, fumacas = [];
+    let melhor = guarda.ler(REC, 0), estado = intro ? 'intro' : 'espera', ultimo = performance.now(), pontos = 0, tubos = [], dist = 0, tempoIntro = 0, fimT = 0, ang = 0, tremor = 0, flash = 0, deriva = 0, popPt = 0;
+    const bird = { x: 0, y: 0, vy: 0 }, fumacas = [];
     const msg = ov.querySelector('#voo-msg'), pt = ov.querySelector('#voo-pt'), rec = ov.querySelector('#voo-rec');
     const mostraRec = () => { rec.textContent = melhor ? 'recorde ' + melhor : ''; };
-    const GAP = () => Math.max(176, Math.min(214, H * 0.28)), TW = 64, VEL = 160, ESPACO = 250;
-    const G = 1250, PULO = -400, QUEDA_MAX = 560; // gravidade mais suave e velocidade de queda limitada: o voo parece um planeio, não um pulo seco
-    const reinicia = () => { bird.x = W * 0.3; bird.y = H * 0.46; bird.vy = 0; ang = 0; tubos = []; dist = ESPACO * 0.35; pontos = 0; pt.textContent = '0'; mostraRec(); };
+    // Constantes na escala do clássico (0,45 de gravidade, pulo de −7,5 e queda máxima de 10 a 60 quadros por segundo), passadas para segundos;
+    // a inclinação do nariz acompanha a velocidade (−25° subindo, 70° caindo) com interpolação — a mesma ideia de vários clones livres (ex.: Serkanbyx/flappy-bird, MIT)
+    const G = 1620, PULO = -440, QUEDA_MAX = 600, TW = 66, ESPACO = 230;
+    const GAP = () => Math.max(168, Math.min(206, H * 0.26));
+    const VEL = () => 150 + Math.min(70, pontos * 3.5); // acelera de leve com o placar
+    const reinicia = () => { bird.x = W * 0.3; bird.y = H * 0.46; bird.vy = 0; ang = 0; tubos = []; dist = ESPACO * 0.45; pontos = 0; pt.textContent = '0'; mostraRec(); tremor = 0; flash = 0; };
     reinicia(); if (!intro) msg.textContent = 'TOQUE PARA VOAR';
-    const nuvens = Array.from({ length: 7 }, () => ({ x: Math.random() * W, y: 40 + Math.random() * H * 0.55, s: 0.6 + Math.random() * 0.9, v: 8 + Math.random() * 14 }));
+    const nuvens = Array.from({ length: 9 }, (_, i) => ({ x: Math.random() * W, y: 30 + Math.random() * H * 0.6, s: 0.5 + Math.random() * 1.0, camada: i % 3 }));
+    const colinas = Array.from({ length: 6 }, (_, i) => ({ x: i * 150, h: 60 + (i * 53) % 70 }));
     const pula = () => {
       if (estado === 'intro') return;
       if (estado === 'espera') { estado = 'jogo'; msg.textContent = ''; }
       if (estado === 'jogo') {
-        bird.vy = PULO; navigator.vibrate && navigator.vibrate(5);
-        for (let i = 0; i < 3; i++) fumacas.push({ x: bird.x - 62, y: bird.y + 8 + Math.random() * 8, r: 5 + Math.random() * 4, vida: 1, vx: -50 - Math.random() * 30, vy: 10 + Math.random() * 30 });
-      } else if (estado === 'fim' && performance.now() - fimT > 500) { reinicia(); estado = 'espera'; msg.textContent = 'TOQUE PARA VOAR'; }
+        bird.vy = PULO; ang = Math.min(ang, -0.2); navigator.vibrate && navigator.vibrate(5);
+        for (let i = 0; i < 3; i++) fumacas.push({ x: bird.x - 62 * ESC / 0.6, y: bird.y + 6 + Math.random() * 8, r: 4 + Math.random() * 4, vida: 1, vx: -60 - Math.random() * 40, vy: 8 + Math.random() * 24 });
+      } else if (estado === 'fim' && performance.now() - fimT > 600) { reinicia(); estado = 'espera'; msg.textContent = 'TOQUE PARA VOAR'; }
     };
     const morre = () => {
-      estado = 'fim'; fimT = performance.now();
+      estado = 'fim'; fimT = performance.now(); tremor = 1; flash = 1;
       const novo = pontos > melhor; if (novo) { melhor = pontos; guarda.gravar(REC, melhor); }
       mostraRec(); navigator.vibrate && navigator.vibrate([20, 30, 60]);
+      for (let i = 0; i < 10; i++) fumacas.push({ x: bird.x, y: bird.y, r: 5 + Math.random() * 6, vida: 1, vx: (Math.random() - 0.5) * 260, vy: (Math.random() - 0.7) * 220 });
       msg.innerHTML = `${novo && pontos ? 'NOVO RECORDE!<br>' : ''}FIM DE VOO<small>${pontos} ${pontos === 1 ? 'ponto' : 'pontos'} · toque para tentar de novo</small>`;
     };
     ov.addEventListener('pointerdown', (e) => { if (e.target.closest('.voo-x')) return; e.preventDefault(); pula(); });
     const tecla = (e) => { if (e.code === 'Space' || e.key === 'ArrowUp') { e.preventDefault(); pula(); } };
     addEventListener('keydown', tecla);
     let raf = 0, vivo = true;
-    // colisão com dois círculos (corpo e nariz) e uma folga de 4 px, para não punir por rente
+    // colisão: dois círculos (corpo e nariz) contra retângulos dos tubos
+    const circRet = (cx, cy, r, x, y, w, h) => Math.hypot(cx - Math.max(x, Math.min(cx, x + w)), cy - Math.max(y, Math.min(cy, y + h))) < r;
     const colide = () => {
-      if (bird.y - 16 < 0 || bird.y + 18 > H) return true;
-      const pts = [[bird.x - 14, bird.y, 20], [bird.x + 26, bird.y + 2, 14]];
-      for (const t of tubos) for (const [cx, cy, rr] of pts) {
-        const nx = Math.max(t.x, Math.min(cx, t.x + TW)), g = GAP();
-        if (Math.hypot(cx - nx, cy - Math.min(cy, t.g)) < rr - 4 && cy < t.g + rr) return true;
-        if (Math.hypot(cx - nx, cy - Math.max(cy, t.g + g)) < rr - 4 && cy > t.g + g - rr) return true;
-      }
+      if (bird.y - 18 < 0 || bird.y + 22 > H - 22) return true; // teto e chão
+      const pts = [[bird.x - 12, bird.y, 17], [bird.x + 28, bird.y + 3, 11]], g = GAP();
+      for (const t of tubos) for (const [cx, cy, rr] of pts) if (circRet(cx, cy, rr, t.x, -20, TW, t.g + 20) || circRet(cx, cy, rr, t.x, t.g + g, TW, H)) return true;
       return false;
     };
     const passo = (dt, agora) => {
-      nuvens.forEach((n) => { n.x -= n.v * dt * (estado === 'jogo' ? 3 : 1); if (n.x < -120) { n.x = W + 60; n.y = 40 + Math.random() * H * 0.55; } });
-      if (estado === 'intro') { tempoIntro += dt; const u = Math.min(1, tempoIntro / 1.1), e = 1 - Math.pow(1 - u, 3); bird.x = -SW * ESC + (W * 0.3 + SW * ESC) * e; bird.y = H * 0.46 + Math.sin(u * 6) * 8; if (u >= 1) { estado = 'espera'; msg.textContent = 'TOQUE PARA VOAR'; } }
-      else if (estado === 'espera') { bird.y = H * 0.46 + Math.sin(agora / 300) * 9; ang += (Math.sin(agora / 300) * 0.05 - ang) * 0.1; }
+      const v = estado === 'jogo' ? VEL() : estado === 'fim' ? 0 : 60;
+      deriva += v * dt;
+      nuvens.forEach((n) => { n.x -= (6 + n.camada * 7) * dt * (estado === 'jogo' ? 3.2 : 1); if (n.x < -140) { n.x = W + 80; n.y = 30 + Math.random() * H * 0.6; } });
+      if (estado === 'intro') { tempoIntro += dt; const u = Math.min(1, tempoIntro / 1.1), e = 1 - Math.pow(1 - u, 3); bird.x = -SW * ESC + (W * 0.3 + SW * ESC) * e; bird.y = H * 0.46 + Math.sin(u * 6) * 8; ang = -0.08 * (1 - u); if (u >= 1) { estado = 'espera'; msg.textContent = 'TOQUE PARA VOAR'; } }
+      else if (estado === 'espera') { bird.y = H * 0.46 + Math.sin(agora / 320) * 9; ang += (Math.sin(agora / 320 + 1) * 0.06 - ang) * Math.min(1, dt * 6); }
       else if (estado === 'jogo') {
         bird.vy = Math.min(QUEDA_MAX, bird.vy + G * dt); bird.y += bird.vy * dt;
-        const alvo = Math.max(-0.45, Math.min(0.75, bird.vy / 620)); ang += (alvo - ang) * Math.min(1, dt * 9); // inclinação suavizada
-        dist += VEL * dt;
-        if (dist >= ESPACO) { dist -= ESPACO; const gp = GAP(), min = 80, max = H - gp - 80; tubos.push({ x: W + 20, g: min + Math.random() * Math.max(10, max - min), ok: false }); }
-        tubos.forEach((t) => { t.x -= VEL * dt; if (!t.ok && t.x + TW < bird.x - bird.r) { t.ok = true; pontos++; pt.textContent = pontos; navigator.vibrate && navigator.vibrate(4); } });
-        tubos = tubos.filter((t) => t.x > -TW - 10);
+        // −25° subindo → 70° caindo, interpolado pela velocidade
+        const alvo = bird.vy < 0 ? Math.max(-0.436, bird.vy / 900) : Math.min(1.22, 0.1 + bird.vy / 520);
+        ang += (alvo - ang) * Math.min(1, dt * (bird.vy < 0 ? 16 : 6));
+        dist += VEL() * dt;
+        if (dist >= ESPACO) { dist -= ESPACO; const gp = GAP(), min = 90, max = H - gp - 110; tubos.push({ x: W + 24, g: min + Math.random() * Math.max(10, max - min), ok: false }); }
+        tubos.forEach((t) => { t.x -= VEL() * dt; if (!t.ok && t.x + TW < bird.x - 20) { t.ok = true; pontos++; pt.textContent = pontos; popPt = 1; navigator.vibrate && navigator.vibrate(4); } });
+        tubos = tubos.filter((t) => t.x > -TW - 14);
         if (colide()) morre();
-      } else if (estado === 'fim') { bird.vy = Math.min(900, bird.vy + G * dt); bird.y = Math.min(H + 120, bird.y + bird.vy * dt); ang += (1.1 - ang) * Math.min(1, dt * 5); }
-      fumacas.forEach((f) => { f.x += f.vx * dt; f.y += f.vy * dt; f.vida -= dt * 1.8; f.r += dt * 14; });
+      } else if (estado === 'fim') {
+        bird.vy = Math.min(800, bird.vy + G * dt); bird.y = Math.min(H + 140, bird.y + bird.vy * dt); ang += (1.35 - ang) * Math.min(1, dt * 4);
+      }
+      fumacas.forEach((f) => { f.x += f.vx * dt; f.y += f.vy * dt; f.vida -= dt * 1.7; f.r += dt * 16; });
       while (fumacas.length && fumacas[0].vida <= 0) fumacas.shift();
+      tremor = Math.max(0, tremor - dt * 3); flash = Math.max(0, flash - dt * 3.5); popPt = Math.max(0, popPt - dt * 5);
+      pt.style.transform = popPt ? `scale(${1 + popPt * 0.28})` : '';
     };
     const desenha = (agora) => {
-      const c = ctx; c.clearRect(0, 0, W, H);
-      const ceu = c.createLinearGradient(0, 0, 0, H); ceu.addColorStop(0, '#f6f3ec'); ceu.addColorStop(1, '#e3efe8'); c.fillStyle = ceu; c.fillRect(0, 0, W, H);
-      c.fillStyle = 'rgba(255,255,255,.9)'; c.strokeStyle = '#111'; c.lineWidth = 2.5;
-      nuvens.forEach((n) => { c.save(); c.translate(n.x, n.y); c.scale(n.s, n.s); c.beginPath(); c.arc(0, 0, 20, 0, 7); c.arc(24, -8, 26, 0, 7); c.arc(52, 2, 20, 0, 7); c.fill(); c.restore(); });
+      const c = ctx; c.save();
+      if (tremor) c.translate((Math.random() - 0.5) * 14 * tremor, (Math.random() - 0.5) * 14 * tremor);
+      c.clearRect(-20, -20, W + 40, H + 40);
+      const ceu = c.createLinearGradient(0, 0, 0, H); ceu.addColorStop(0, '#f6f3ec'); ceu.addColorStop(1, '#e3efe8'); c.fillStyle = ceu; c.fillRect(-20, -20, W + 40, H + 40);
+      // colinas ao fundo (parallax lento)
+      c.fillStyle = 'rgba(31,158,90,.16)'; c.strokeStyle = 'rgba(17,17,17,.25)'; c.lineWidth = 2;
+      const off = (deriva * 0.25) % 900;
+      for (let k = -1; k < Math.ceil(W / 900) + 2; k++) { c.beginPath(); c.moveTo(k * 900 - off, H - 22); colinas.forEach((h) => { c.quadraticCurveTo(k * 900 - off + h.x + 75, H - 22 - h.h * 1.7, k * 900 - off + h.x + 150, H - 22); }); c.fill(); c.stroke(); }
+      nuvens.forEach((n) => { c.save(); c.globalAlpha = 0.6 + n.camada * 0.2; c.fillStyle = '#fff'; c.strokeStyle = '#111'; c.lineWidth = 2.2; c.translate(n.x, n.y); c.scale(n.s, n.s); c.beginPath(); c.arc(0, 0, 20, 0, 7); c.arc(24, -8, 26, 0, 7); c.arc(52, 2, 20, 0, 7); c.fill(); c.restore(); });
       tubos.forEach((t) => {
         c.fillStyle = '#1f9e5a'; c.lineWidth = 4; c.strokeStyle = '#111';
         const g = GAP(), b = t.g + g;
         c.fillRect(t.x, -6, TW, t.g + 6); c.strokeRect(t.x, -6, TW, t.g + 6);
-        c.fillRect(t.x - 6, t.g - 26, TW + 12, 26); c.strokeRect(t.x - 6, t.g - 26, TW + 12, 26);
-        c.fillRect(t.x, b, TW, H - b + 6); c.strokeRect(t.x, b, TW, H - b + 6);
-        c.fillRect(t.x - 6, b, TW + 12, 26); c.strokeRect(t.x - 6, b, TW + 12, 26);
-        c.strokeStyle = 'rgba(255,255,255,.45)'; c.lineWidth = 3; c.beginPath(); c.moveTo(t.x + 14, 4); c.lineTo(t.x + 14, t.g - 30); c.moveTo(t.x + 14, b + 32); c.lineTo(t.x + 14, H - 4); c.stroke();
+        c.fillRect(t.x - 6, t.g - 28, TW + 12, 28); c.strokeRect(t.x - 6, t.g - 28, TW + 12, 28);
+        c.fillRect(t.x, b, TW, H - b); c.strokeRect(t.x, b, TW, H - b);
+        c.fillRect(t.x - 6, b, TW + 12, 28); c.strokeRect(t.x - 6, b, TW + 12, 28);
+        c.strokeStyle = 'rgba(255,255,255,.45)'; c.lineWidth = 3; c.beginPath(); c.moveTo(t.x + 14, 4); c.lineTo(t.x + 14, t.g - 34); c.moveTo(t.x + 14, b + 34); c.lineTo(t.x + 14, H - 28); c.stroke();
       });
+      // chão que corre
+      c.fillStyle = '#d9d1bb'; c.fillRect(-20, H - 22, W + 40, 40); c.strokeStyle = '#111'; c.lineWidth = 4; c.beginPath(); c.moveTo(-20, H - 22); c.lineTo(W + 20, H - 22); c.stroke();
+      c.lineWidth = 3; c.strokeStyle = 'rgba(17,17,17,.4)'; c.beginPath(); const co = deriva % 26; for (let x = -26 - co; x < W + 26; x += 26) { c.moveTo(x, H - 22); c.lineTo(x - 12, H); } c.stroke();
       fumacas.forEach((f) => { c.fillStyle = `rgba(255,255,255,${Math.max(0, f.vida) * 0.85})`; c.strokeStyle = `rgba(17,17,17,${Math.max(0, f.vida) * 0.5})`; c.lineWidth = 2; c.beginPath(); c.arc(f.x, f.y, f.r, 0, 7); c.fill(); c.stroke(); });
-      if (pronta) {
-        c.save(); c.translate(bird.x, bird.y); c.rotate(ang); c.scale(ESC, ESC); c.drawImage(img, -SW * 0.5, -SH * 0.52, SW, SH); c.restore();
+      if (sprite) {
+        const w = SW * ESC, h = SH * ESC;
+        c.save(); c.translate(bird.x, bird.y); c.rotate(ang); c.drawImage(sprite, -w * 0.5, -h * 0.52, w, h); c.restore();
+        // hélice em movimento: um borrão que pulsa no nariz
+        c.save(); c.translate(bird.x, bird.y); c.rotate(ang); c.fillStyle = 'rgba(17,17,17,.22)'; c.beginPath(); c.ellipse(w * 0.5 - 4 * ESC, (-0.52 * h) + h * 0.7, 3 * ESC + 1, (26 + 10 * Math.abs(Math.sin(agora / 30))) * ESC, 0, 0, 7); c.fill(); c.restore();
       }
+      c.restore();
+      if (flash) { ctx.fillStyle = `rgba(214,40,40,${flash * 0.35})`; ctx.fillRect(0, 0, W, H); }
     };
+    // passos fixos de 1/120 s: a física fica igual em telas de 60, 90 ou 120 Hz
+    let acum = 0;
     const quadro = (agora) => {
       if (!vivo) return;
-      const dt = Math.min(0.033, (agora - ultimo) / 1000); ultimo = agora;
-      passo(dt, agora); desenha(agora);
+      acum += Math.min(0.05, (agora - ultimo) / 1000); ultimo = agora;
+      while (acum >= 1 / 120) { passo(1 / 120, agora); acum -= 1 / 120; }
+      desenha(agora);
       raf = requestAnimationFrame(quadro);
     };
     raf = requestAnimationFrame(quadro);
