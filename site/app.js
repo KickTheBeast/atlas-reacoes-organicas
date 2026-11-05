@@ -2,7 +2,7 @@
 // Dados: dados.json (reações + tags) e svgs.json (estruturas desenhadas no build com RDKit).
 (() => {
   'use strict';
-  const BUILD = '0a4e065be7';
+  const BUILD = '59e1dc2e26';
   const $ = (s) => document.querySelector(s);
   const tela = $('#tela'), titulo = $('#titulo'), voltar = $('#voltar'), abas = $('#abas'), pilula = $('#pilula');
   const aviso = $('#aviso'), avisoTexto = $('#aviso-texto'), avisoOk = $('#aviso-ok'), avisoX = $('#aviso-x');
@@ -834,34 +834,33 @@
   const aviaoSvg = (V, op = {}) => {
     const cor = op.diabo ? VERMELHO : V.cor;
     const dino = op.dentro ? dinoSvg(V, { uso: op.uso || [], diabo: op.diabo, vb: '395 40 200 170' }).replace('<svg class="dv"', '<svg x="94" y="20" width="88" height="76"').replace(/ style="--vermelho:[^"]*"/, '') : '';
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 150"><style>.v-red{fill:${cor};stroke:none}.v-traco{fill:none;stroke:#111}@keyframes h{50%{transform:scaleY(.18)}}.helice{transform-box:fill-box;transform-origin:center;animation:h .09s linear infinite}</style>
-      <defs><clipPath id="fin"><path d="M14 76 L20 40 Q40 42 56 72 Z"/></clipPath></defs>
-      <g stroke="#111" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
-        <path d="M150 104 L162 134 M176 104 L166 134" fill="none" stroke-width="4"/>
-        <path d="M14 76 L20 40 Q40 42 56 72 Z" fill="#efe6cf"/>
+    const helice = op.helice === false ? '' : '<g class="helice"><rect x="243" y="46" width="8" height="76" rx="4" fill="#3a3733"/><rect x="243" y="46" width="8" height="12" rx="4" fill="#d9a62e"/><rect x="243" y="110" width="8" height="12" rx="4" fill="#d9a62e"/></g><circle cx="247" cy="84" r="4.6" fill="#e9dfc6" stroke="#4a3a2a" stroke-width="1.4"/>';
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 14 270 136"><style>.v-red{fill:${cor};stroke:none}.v-traco{fill:none;stroke:#111}@keyframes h{50%{transform:scaleY(.18)}}.helice{transform-box:fill-box;transform-origin:center;animation:h .09s linear infinite}</style>
+      <defs>
+        <linearGradient id="gR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e5423b"/><stop offset=".55" stop-color="#bf2227"/><stop offset="1" stop-color="#8c1a1d"/></linearGradient>
+        <linearGradient id="gW" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cf2f2d"/><stop offset="1" stop-color="#7d171a"/></linearGradient>
+        <linearGradient id="gC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6eed9"/><stop offset="1" stop-color="#cfc3a4"/></linearGradient>
+        <clipPath id="fin"><path d="M14 76 L20 40 Q40 42 56 72 Z"/></clipPath>
+      </defs>
+      <g stroke="#3b1111" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M148 104 L160 132 M176 104 L166 132" fill="none" stroke="#6a645a" stroke-width="3"/>
+        <path d="M14 76 L20 40 Q40 42 56 72 Z" fill="url(#gC)"/>
         <g clip-path="url(#fin)" stroke="none"><path d="M10 50 L60 50 L60 56 L10 56 Z M10 62 L60 62 L60 68 L10 68 Z" fill="#c0262d"/></g>
-        <path d="M14 76 L20 40 Q40 42 56 72 Z" fill="none"/>
-        <path d="M10 86 L46 78 L62 87 L26 95 Z" fill="#a81c1c"/>
-        <path d="M96 24 L104 62 M184 20 L178 60 M118 24 L124 62 M164 22 L160 60" fill="none" stroke-width="3.2"/>
-        <path d="M100 110 L108 106 M184 110 L178 106" fill="none" stroke-width="3.2"/>
-        <path d="M62 112 Q130 104 208 108 L202 119 Q130 122 54 121 Z" fill="#a81c1c"/>
+        <path d="M10 86 L46 78 L62 87 L26 95 Z" fill="url(#gW)"/>
+        <path d="M62 111 Q130 103 214 107 L206 120 Q130 123 52 122 Z" fill="url(#gW)"/>
       </g>${dino}
-      <g stroke="#111" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
-        <path d="M36 86 Q40 68 82 63 L170 59 Q198 57 208 72 L210 100 Q192 108 160 108 L70 108 Q42 104 36 86 Z" fill="#c9262b"/>
-        <path d="M60 78 Q96 68 150 66" stroke="#ef7468" stroke-width="3" fill="none" opacity=".7"/>
-        <path d="M200 62 Q240 60 244 84 Q240 108 200 108 Q214 84 200 62 Z" fill="#efe6cf"/>
-        <ellipse cx="236" cy="84" rx="9" ry="19" fill="#161616"/>
-        <path d="M236 68 L236 100 M229 74 L243 94 M229 94 L243 74" stroke="#4a4a4a" stroke-width="1.6" fill="none"/>
-        <circle cx="128" cy="86" r="14" fill="#efe6cf"/>
-        <path d="M128 76 L131 83 L139 84 L133 89 L135 97 L128 93 L121 97 L123 89 L117 84 L125 83 Z" fill="#161616" stroke="none"/>
-        <path d="M108 63 Q134 54 162 61" fill="none" stroke="#efe6cf" stroke-width="5"/>
-        <path d="M96 24 Q150 10 216 16 L210 28 Q150 24 90 34 Z" fill="#c9262b"/>
-        <path d="M110 24 Q150 18 196 20" fill="none" stroke="#ef7468" stroke-width="2.4" opacity=".75"/>
-        <circle cx="162" cy="134" r="11" fill="#161616"/><circle cx="162" cy="134" r="4.4" fill="#efe6cf" stroke="none"/>
-        <path d="M162 134 L174 134" stroke-width="3.4" fill="none"/>
-      </g>
-      <g class="helice"><rect x="243" y="38" width="9" height="92" rx="4.5" fill="#161616"/><rect x="243" y="38" width="9" height="14" rx="4.5" fill="#e0a82e"/><rect x="243" y="116" width="9" height="14" rx="4.5" fill="#e0a82e"/></g>
-      <circle cx="247" cy="84" r="5" fill="#efe6cf" stroke="#111" stroke-width="2.4"/>
+      <g stroke="#3b1111" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M36 86 Q40 68 82 63 L170 59 Q198 57 208 72 L210 100 Q192 108 160 108 L70 108 Q42 104 36 86 Z" fill="url(#gR)"/>
+        <path d="M60 78 Q96 68 150 66" stroke="#f08a7e" stroke-width="2.4" fill="none" opacity=".6"/>
+        <path d="M50 99 Q110 106 190 100" stroke="#5e1012" stroke-width="2" fill="none" opacity=".35"/>
+        <path d="M200 62 Q240 60 244 84 Q240 108 200 108 Q214 84 200 62 Z" fill="url(#gC)"/>
+        <ellipse cx="236" cy="84" rx="8" ry="18" fill="#3d3b38" stroke="none"/>
+        <path d="M236 68 L236 100 M230 74 L242 94 M230 94 L242 74" stroke="#7a756c" stroke-width="1.2" fill="none"/>
+        <circle cx="128" cy="86" r="14" fill="url(#gC)"/>
+        <path d="M128 76 L131 83 L139 84 L133 89 L135 97 L128 93 L121 97 L123 89 L117 84 L125 83 Z" fill="#2a1a1a" stroke="none"/>
+        <path d="M108 63 Q134 54 162 61" fill="none" stroke="#efe6cf" stroke-width="4.5"/>
+        <circle cx="163" cy="134" r="11" fill="#2d2b28" stroke="none"/><circle cx="163" cy="134" r="4.4" fill="#e9dfc6" stroke="none"/>
+      </g>${helice}
       <rect id="cab" x="94" y="20" width="88" height="76" fill="none"/></svg>`;
   };
   const estadoDino = (V) => ({ uso: lerAcess().uso, diabo: guarda.ler('atlas.carinhos', 0) === DIABO });
@@ -872,7 +871,7 @@
     if (!gsap || reduzido || !caixa || fechaVooAtual) { abreVoo(V, true); return; }
     const W = innerWidth, H = innerHeight, r = caixa.getBoundingClientRect();
     const st = document.createElement('div'); st.className = 'voo-cena';
-    const pw = Math.min(W * 0.86, 340), ph = pw * (150 / 270);
+    const pw = Math.min(W * 0.78, 300), ph = pw * (136 / 270);
     st.innerHTML = `<div class="vc-fundo"></div><div class="vc-aviao" style="width:${pw}px;height:${ph}px"><div class="vc-sem">${aviaoSvg(V, { dentro: false })}</div><div class="vc-com" style="opacity:0">${aviaoSvg(V, { dentro: true, ...estadoDino(V) })}</div></div><div class="vc-dino" style="left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px">${dinoSvg(V, estadoDino(V))}</div>`;
     document.body.appendChild(st);
     caixa.style.visibility = 'hidden';
@@ -914,11 +913,11 @@
     const ajusta = () => { W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
     ajusta(); addEventListener('resize', ajusta);
     // sprite rasterizado uma única vez, já no tamanho final e na densidade da tela: bem mais nítido e leve do que redesenhar o SVG a cada quadro
-    const SW = 270, SH = 150, ESC = Math.min(0.8, innerWidth / 430);
+    const SW = 270, SH = 136, ESC = Math.min(0.62, innerWidth / 560);
     let sprite = null;
     const img = new Image();
     img.onload = () => { const c = document.createElement('canvas'); c.width = Math.round(SW * ESC * dpr); c.height = Math.round(SH * ESC * dpr); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); sprite = c; };
-    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(aviaoSvg(V, { dentro: true, ...estadoDino(V) }));
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(aviaoSvg(V, { dentro: true, helice: false, ...estadoDino(V) }));
     const REC = 'atlas.voo';
     let melhor = guarda.ler(REC, 0), estado = intro ? 'intro' : 'espera', ultimo = performance.now(), pontos = 0, tubos = [], dist = 0, tempoIntro = 0, fimT = 0, ang = 0, tremor = 0, flash = 0, deriva = 0, popPt = 0;
     const bird = { x: 0, y: 0, vy: 0 }, fumacas = [];
@@ -1006,8 +1005,13 @@
       if (sprite) {
         const w = SW * ESC, h = SH * ESC;
         c.save(); c.translate(bird.x, bird.y); c.rotate(ang); c.drawImage(sprite, -w * 0.5, -h * 0.52, w, h); c.restore();
-        // hélice em movimento: um borrão que pulsa no nariz
-        c.save(); c.translate(bird.x, bird.y); c.rotate(ang); c.fillStyle = 'rgba(17,17,17,.22)'; c.beginPath(); c.ellipse(112 * ESC, 6 * ESC, 3 * ESC + 1, (36 + 8 * Math.abs(Math.sin(agora / 30))) * ESC, 0, 0, 7); c.fill(); c.restore();
+        // hélice: disco translúcido + duas pás que giram (a largura de cada pá varia com o ângulo, como em perspectiva)
+        c.save(); c.translate(bird.x, bird.y); c.rotate(ang); c.translate(112 * ESC, 0);
+        c.fillStyle = 'rgba(70,64,56,.14)'; c.beginPath(); c.ellipse(0, 0, 4.5 * ESC, 38 * ESC, 0, 0, 7); c.fill();
+        const th = agora / 55, k = Math.abs(Math.cos(th)); c.fillStyle = '#3a3733';
+        for (const sg of [1, -1]) { c.beginPath(); c.ellipse(0, sg * 19 * ESC * k, 2.6 * ESC, 19 * ESC * Math.max(0.12, k), 0, 0, 7); c.fill(); c.fillStyle = '#d9a62e'; c.beginPath(); c.arc(0, sg * 36 * ESC * k, 2.6 * ESC, 0, 7); c.fill(); c.fillStyle = '#3a3733'; }
+        c.fillStyle = '#e9dfc6'; c.strokeStyle = '#4a3a2a'; c.lineWidth = 1.2; c.beginPath(); c.arc(0, 0, 4 * ESC, 0, 7); c.fill(); c.stroke();
+        c.restore();
       }
       c.restore();
       if (flash) { ctx.fillStyle = `rgba(214,40,40,${flash * 0.35})`; ctx.fillRect(0, 0, W, H); }
