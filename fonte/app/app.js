@@ -850,24 +850,43 @@
     gsap.set(dn, { transformOrigin: '0 0' });
     const fim = () => { caixa.style.visibility = ''; st.remove(); };
     const tl = gsap.timeline({ onComplete: fim });
-    tl.fromTo(fundo, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.inOut' })
-      .to(av, { x: ax, y: ay, rotation: 0, duration: 0.9, ease: 'power3.out' }, 0.35)
-      .to(dn, { scaleY: 0.92, scaleX: 1.04, duration: 0.18, yoyo: true, repeat: 1, ease: 'power1.inOut' }, 1.2);
-    // pulo: posição final calculada pela cabine do avião
-    tl.add(() => {
-      const m = av.getBoundingClientRect(), f = m.width / 560, u0 = r.width / 600; // f: pixels por unidade do PNG; u0: o mesmo no desenho do Mutaninho
+    const inner = dn.querySelector('svg');
+    gsap.set(inner, { transformOrigin: '50% 100%' });
+    // o pulo é uma parábola calculada quadro a quadro: x e escala avançam suavemente, y sobe e desce, e o corpo estica no ar e amassa ao pousar
+    const pulo = { p: 0 };
+    const salto = (m) => {
+      const f = m.width / 560, u0 = r.width / 600; // f: pixels por unidade do PNG; u0: o mesmo no desenho do Mutaninho
       const k = (85 * f) / (140 * u0); // a cabeça do piloto no PNG tem ~85 unidades; a do Mutaninho, ~140
       const tx = m.left + 300 * f - 500 * u0 * k - r.left, ty = m.top + 102 * f - 110 * u0 * k - r.top; // centro da cabeça do piloto no PNG ↔ centro da cabeça do Mutaninho
-      gsap.to(dn, { x: tx, duration: 0.8, ease: 'power1.inOut' });
-      gsap.to(dn, { scale: k, duration: 0.8, ease: 'power2.inOut' });
-      gsap.timeline().to(dn, { y: Math.min(0, ty) - 130, duration: 0.4, ease: 'power2.out' }).to(dn, { y: ty, duration: 0.4, ease: 'power2.in' });
-    }, 1.55)
-    .add(() => { gsap.set(com, { opacity: 1 }); gsap.set(sem, { opacity: 0 }); gsap.to(dn, { opacity: 0, duration: 0.15 }); navigator.vibrate && navigator.vibrate(18); }, 2.4)
-    .to(av, { y: '+=10', scaleY: 0.96, duration: 0.14, yoyo: true, repeat: 1 }, 2.4)
-    .to(av, { rotation: -10, y: ay - 40, duration: 0.45, ease: 'power2.out' }, 2.75)
-    .add(() => abreVoo(V, true), 3.0)
-    .to(av, { x: W + 120, y: ay - 190, rotation: -14, duration: 0.75, ease: 'power2.in' }, 3.1)
-    .to(st, { opacity: 0, duration: 0.3 }, 3.6);
+      const h = 0.5 * Math.abs(ty) + 110; // altura da parábola: o pulo sobe antes de descer na cabine (ty é só a distância até lá)
+      return { k, tx, ty, h };
+    };
+    let J = null;
+    tl.fromTo(fundo, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.inOut' })
+      .to(av, { x: ax, y: ay, rotation: 0, duration: 0.9, ease: 'power3.out' }, 0.35)
+      .add(() => { J = salto(av.getBoundingClientRect()); }, 1.26)
+      // agacha antes de saltar
+      .to(inner, { scaleY: 0.84, scaleX: 1.1, duration: 0.24, ease: 'power2.out' }, 1.25)
+      // decola: estica no impulso e vai subindo e atravessando
+      .to(inner, { scaleY: 1.1, scaleX: 0.94, duration: 0.16, ease: 'power2.out' }, 1.5)
+      .to(pulo, {
+        p: 1, duration: 1.0, ease: 'none', // tempo linear: o y vira uma parábola de verdade (sobe desacelerando e cai acelerando)
+        onUpdate: () => {
+          const p = pulo.p, q = p * p * (3 - 2 * p);
+          gsap.set(dn, { x: J.tx * q + Math.sin(p * Math.PI) * -34, y: J.ty * p - 4 * J.h * p * (1 - p), scale: 1 + (J.k - 1) * q, rotation: Math.sin(p * Math.PI) * (p < 0.5 ? -9 : 7) });
+        },
+      }, 1.5)
+      .to(inner, { scaleY: 1, scaleX: 1, duration: 0.45, ease: 'sine.inOut' }, 1.7)
+      // pousa na cabine: amassa um pouco, o avião cede e a imagem do piloto assume o lugar
+      .to(inner, { scaleY: 0.82, scaleX: 1.12, duration: 0.09, ease: 'power2.in' }, 2.43)
+      .add(() => { gsap.set(com, { opacity: 1 }); gsap.set(sem, { opacity: 0 }); gsap.to(dn, { opacity: 0, duration: 0.12 }); navigator.vibrate && navigator.vibrate(18); }, 2.47)
+      .to(av, { y: ay + 12, rotation: 2.5, duration: 0.1, ease: 'power2.out' }, 2.45)
+      .to(av, { y: ay, rotation: 0, duration: 0.55, ease: 'elastic.out(1,0.35)' }, 2.55)
+      // o avião encosta o nariz para cima e arranca
+      .to(av, { rotation: -10, y: ay - 40, duration: 0.45, ease: 'power2.out' }, 3.2)
+      .add(() => abreVoo(V, true), 3.45)
+      .to(av, { x: W + 120, y: ay - 190, rotation: -14, duration: 0.75, ease: 'power2.in' }, 3.55)
+      .to(st, { opacity: 0, duration: 0.3 }, 4.05);
   }
 
   let fechaVooAtual = null;
