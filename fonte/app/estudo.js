@@ -529,7 +529,8 @@
   }
   const revTotal = () => revBlocos().reduce((t, b) => { const c = revConta(b); return { ok: t.ok + c.ok, no: t.no + c.no, n: t.n + c.n }; }, { ok: 0, no: 0, n: 0 });
   const revLista = (itens) => `<ul>${itens.map((x) => `<li>${x}</li>`).join('')}</ul>`;
-  const revTabela = (t, cols) => `<div class="cartao tabela sobe"><div class="tb-wrap"><table class="tb"><thead><tr>${cols.map((c) => `<th>${c}</th>`).join('')}</tr></thead><tbody>${t.map((l) => `<tr>${l.map((c, i) => (i === 0 ? '<th scope="row">' : '<td>') + c + (i === 0 ? '</th>' : '</td>')).join('')}</tr>`).join('')}</tbody></table></div></div>`;
+  const revTabela = (t, cols, titulo) => `<div class="cartao tabela sobe">${titulo ? `<h3 class="tb-titulo">${titulo}</h3>` : ''}<div class="tb-wrap"><table class="tb"><thead><tr>${cols.map((c) => `<th>${c}</th>`).join('')}</tr></thead><tbody>${t.map((l) => `<tr>${l.map((c, i) => (i === 0 ? '<th scope="row">' : '<td>') + c + (i === 0 ? '</th>' : '</td>')).join('')}</tr>`).join('')}</tbody></table></div></div>`;
+  const revTabelas = (b) => [].concat(b.tabela || [], b.tabelas || []).map((x) => revTabela(x.linhas, x.cab, x.t)).join('');
   const revPergunta = (b, i) => {
     const id = revId(b, i), q = b.qs[i], m = revMarcas[id] || '';
     return `<details class="rev-q sobe" style="--i:${i + 3}" data-rq="${id}"${m ? ` data-m="${m}"` : ''}><summary><span>${q[0]}</span><i class="rev-chip">${m === 'ok' ? 'Acertei' : m === 'no' ? 'Errei' : 'Pergunta'}</i></summary>
@@ -565,9 +566,9 @@
     return {
       titulo: b.nome, aba: 'estudar', prof: 2,
       html: `<article class="det guia rev-bloco"><h2 class="sobe">${esc(b.nome)}</h2><p class="origem sobe" style="--i:1">${esc(b.aulas)}</p><p class="intro sobe" style="--i:2">${b.res}</p>
-        ${b.tabela ? revTabela(b.tabela.linhas, b.tabela.cab) : ''}
         <div class="cartao dicas sobe"><h3 class="tb-titulo">Essencial</h3>${revLista(b.essencial)}</div>
         <div class="cartao dicas rev-atencao sobe"><h3 class="tb-titulo">Atenção</h3>${revLista(b.atencao)}</div>
+        ${revTabelas(b) ? `<div class="sec"><h3>Tabelas de reagentes</h3><span>${[].concat(b.tabela || [], b.tabelas || []).length}</span></div>${revTabelas(b)}` : ''}
         <div class="sec"><h3>Responda antes de abrir</h3>${revSoErradas ? '<button class="chip on" data-rev-f="0">Só as que errei · ver todas</button>' : `<span>${b.qs.length} perguntas</span>`}</div>
         ${idx.length ? idx.map((i) => revPergunta(b, i)).join('') : '<p class="sub-lista">Nenhuma errada neste bloco.</p>'}
         ${nav}</article>`,

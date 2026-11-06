@@ -17,6 +17,7 @@ const BLOCOS = [
   atencao:[
     'Hidrogenação libera −127 kJ/mol (but-1-eno), −120 (cis-but-2-eno) e −115 (trans-but-2-eno). Menos calor liberado significa alceno mais estável.',
     'Lei de velocidade não sai da equação global. Leia a etapa lenta.'],
+  tabelas:[{"t": "Pista experimental → o que indica", "cab": ["Observação", "Conclusão"], "linhas": [["v = k[RX] (1ª ordem)", "etapa lenta unimolecular, a ionização (SN1, E1)"], ["v = k[RX][Nu] ou k[RX][B] (2ª ordem)", "etapa concertada bimolecular (SN2, E2)"], ["kH/kD ≈ 6–7", "a ligação C–H se rompe na etapa lenta"], ["kH/kD ≈ 1", "a ligação C–H não se rompe na etapa lenta"], ["troca de ¹⁸O com o solvente (Bender)", "intermediário tetraédrico (adição–eliminação)"], ["velocidade independe de [Br₂] na bromação de cetona", "a etapa lenta é a enolização"], ["inversão de configuração", "SN2: ataque pela retaguarda"], ["racemização", "intermediário plano: carbocátion (SN1) ou enol/enolato"], ["produto com esqueleto rearranjado", "carbocátion intermediário (deslocamento 1,2 de H ou CH₃)"], ["velocidade sobe em solvente polar prótico", "estado de transição com carga: SN1 ou E1 (Hammond)"]]}],
   qs:[
   ['Hidrogenar but-1-eno, cis-but-2-eno e trans-but-2-eno libera −127, −120 e −115 kJ/mol. Qual é o mais estável e por quê?','O <b>trans-but-2-eno</b>. Os três dão o mesmo butano, então o que libera menos calor parte de um nível de energia mais baixo.'],
   ['Por que a hidrólise básica de um éster vai até o fim, enquanto a esterificação de Fischer é um equilíbrio?','Na base, o ácido formado vira <b>carboxilato</b>, que HO⁻ e RO⁻ não atacam: o equilíbrio é puxado para o produto. Em Fischer K ≈ 1, e se desloca com excesso de álcool ou removendo água (Dean–Stark).'],
@@ -43,6 +44,7 @@ const BLOCOS = [
     'Duas SN2 seguidas devolvem a configuração original.',
     'Metila e 1º não fazem SN1. Haleto terciário não faz SN2.',
     'Sempre pergunte se o cátion pode rearranjar antes de escolher o produto.'],
+  tabelas:[{"t": "Álcool → haleto, ou ativação do OH", "cab": ["Reagente", "Mecanismo", "Estereoquímica e detalhe"], "linhas": [["HBr, HCl, ZnCl₂", "SN1 (3º) ou SN2 (1º)", "cátion pode rearranjar; 3º racemiza"], ["PBr₃", "SN2", "<b>inversão</b>; sem rearranjo"], ["SOCl₂ (sem base)", "SNi", "<b>retenção</b>"], ["SOCl₂, piridina", "SN2", "<b>inversão</b>"], ["TsCl, piridina", "O-sulfonilação", "<b>retenção</b> (a ligação C–O não quebra); o OTs vira bom grupo abandonador"], ["NaI, acetona (Finkelstein)", "SN2", "troca Cl ou Br por I, com inversão"]]}, {"t": "Nucleófilo + R–X primário (SN2)", "cab": ["Nucleófilo", "Produto", "Observação"], "linhas": [["NaOH", "álcool", ""], ["NaOR (Williamson)", "éter", "RX primário; 2º e 3º eliminam"], ["NaCN", "nitrila", "+1 carbono; hidrolisa a ácido"], ["NaN₃", "azida", "reduz a amina"], ["NaSH, NaSR", "tiol, sulfeto", "nucleófilo excelente, base fraca"], ["NH₃ em excesso", "amina 1ª", "há polialquilação"], ["HC≡C⁻ Na⁺", "alcino", "alonga a cadeia"], ["R′CO₂Na", "éster", ""], ["PPh₃", "sal de fosfônio", "depois Wittig"]]}],
   qs:[
   ['(R)-2-bromo-octano + HO⁻ em DMSO. Qual o produto?','(S)-octan-2-ol. SN2 com inversão.'],
   ['(R)-octan-2-ol reage com TsCl/piridina e depois com EtO⁻. Qual a configuração do éter?','O tosilato mantém (R), porque a ligação C–O não é quebrada. O EtO⁻ inverte por SN2, e o éter é (S).'],
@@ -70,6 +72,7 @@ const BLOCOS = [
   atencao:[
     'Zaitsev e Hofmann não são “regras de sempre”: dependem da base e do grupo abandonador.',
     'E2 estereoespecífica: o diastereômero do haleto decide se sai alceno E ou Z.'],
+  tabelas:[{"t": "Substrato + reagente → produto principal", "cab": ["Substrato", "Reagente", "Produto principal"], "linhas": [["1º", "HO⁻, EtO⁻", "SN2 (E2 minoritário)"], ["1º", "t-BuOK", "E2, Hofmann (alceno terminal)"], ["2º", "I⁻, CN⁻, N₃⁻", "SN2"], ["2º", "EtO⁻, calor", "E2 (Zaitsev) com SN2 concorrente"], ["3º", "EtO⁻, HO⁻", "E2 (Zaitsev)"], ["3º", "H₂O, ROH (solvólise)", "SN1 + E1"], ["RX com H β", "DBU, DBN, LDA", "E2, base volumosa (sem substituição)"], ["álcool 2º ou 3º", "H₂SO₄ ou H₃PO₄, calor", "E1 (Zaitsev); rearranjo possível"], ["sal de amônio quaternário", "HO⁻ (Ag₂O), calor", "Hofmann: alceno <b>menos</b> substituído"], ["β-hidroxicarbonila", "base ou H⁺, calor", "E1cB: enona"]]}, {"t": "Como se geram carbenos", "cab": ["Reagente", "Espécie", "Uso"], "linhas": [["CHCl₃ + t-BuOK (ou HO⁻)", ":CCl₂", "gem-diclorociclopropano"], ["CHBr₃ + t-BuOK", ":CBr₂", "gem-dibromociclopropano"], ["Cl₃CCO₂⁻, calor", ":CCl₂", "eliminação α por descarboxilação"], ["CH₂N₂ (hν)", ":CH₂ + N₂", "ciclopropano; inserção em O–H e C–H"], ["CH₂N₂ + ácido carboxílico ou fenol", "metila o oxigênio", "éster metílico, anisol (sem carbeno livre)"], ["CH₂I₂ + Zn(Cu) (Simmons–Smith)", "ICH₂ZnI (carbenoide)", "ciclopropano sin; OH alílico dirige"]]}],
   qs:[
   ['Brometo de terc-butila + EtONa a 25 °C. O que se forma?','2-metilpropeno por <b>E2</b> (≈ 91%) e um pouco de éter por SN1. Base forte e 3º: eliminação.'],
   ['1-bromo-octano + KOH e 1-bromo-octano + t-BuOK. Compare.','KOH: SN2, octan-1-ol (nucleófilo pequeno). t-BuOK: E2, oct-1-eno. A base volumosa não alcança o carbono e retira o H.'],
@@ -86,7 +89,7 @@ const BLOCOS = [
 
 { id:'adicao', nome:'Alcenos e alcinos', aulas:'Aulas 9 a 11',
   res:'Cada reagente muda a regiosseletividade, a estereoquímica ou o risco de rearranjo. Memorize o quadro e treine as sínteses.',
-  tabela:{cab:['Alceno + reagente','Produto e detalhe'],linhas:[
+  tabela:{t:'Alceno + reagente',cab:['Alceno + reagente','Produto e detalhe'],linhas:[
     ['H₂, Pt ou Pd','alcano; adição sin'],
     ['HX','Markovnikov; carbocátion pode rearranjar; produto racêmico'],
     ['HBr, ROOR','anti-Markovnikov (radical); só vale para HBr'],
@@ -114,6 +117,7 @@ const BLOCOS = [
     '(E)-but-2-eno + Br₂ → meso; (Z)-but-2-eno + Br₂ → par de enantiômeros.',
     'Quer evitar rearranjo? Use oximercuração ou hidroboração, não H₃O⁺.',
     'Síntese em muitas etapas: escreva cada intermediário com a estereoquímica.'],
+  tabelas:[{"t": "Alcino + reagente", "cab": ["Reagente", "Produto e detalhe"], "linhas": [["H₂, Lindlar", "alceno <b>cis</b> (adição sin)"], ["Na ou Li, NH₃(l)", "alceno <b>trans</b> (adição anti)"], ["H₂, Pt ou Pd", "alcano (consome 2 H₂)"], ["1 HX", "haleto vinílico (Markovnikov)"], ["2 HX", "gem-di-haleto"], ["HBr, ROOR", "brometo vinílico anti-Markovnikov (radical)"], ["1 Br₂ ou Cl₂", "di-haloalceno, adição anti"], ["2 Br₂ ou Cl₂", "tetra-haleto"], ["H₂O, H₂SO₄, HgSO₄", "cetona (Markovnikov, via enol); alcino terminal dá metilcetona"]]}, {"t": "Acetileto (alcino terminal + NaNH₂ ou BuLi) + eletrófilo", "cab": ["Eletrófilo", "Produto"], "linhas": [["R–X primário ou CH₃–X", "alcino interno (SN2)"], ["R–X terciário", "E2, não alquila"], ["aldeído ou cetona", "álcool propargílico"], ["CO₂; depois H₃O⁺", "ácido alquinoico"], ["ClCOOR′", "éster alquinoico"], ["R₃SiCl", "alquinilsilano"], ["H₂O", "alcino terminal (protona)"]]}],
   qs:[
   ['(E)- e (Z)-but-2-eno reagem com Br₂. Quais os produtos?','Adição anti via bromônio. (E) → (2R,3S)-2,3-dibromobutano, <b>meso</b>. (Z) → mistura racêmica (2R,3R) + (2S,3S).'],
   ['3,3-dimetilbut-1-eno + HCl. Qual o produto principal? E com 1) Hg(OAc)₂, H₂O 2) NaBH₄?','HCl: 2-cloro-2,3-dimetilbutano (o cátion 2º rearranja por deslocamento de metila). Oximercuração: 3,3-dimetilbutan-2-ol, sem rearranjo.'],
@@ -143,6 +147,7 @@ const BLOCOS = [
   atencao:[
     'Cl₂, FeCl₃ no escuro é SEAr; Cl₂ com luz é radical benzílico.',
     'Em síntese, a ordem decide o isômero: nitrar antes ou depois de oxidar muda orto/para por meta.'],
+  tabelas:[{"t": "SEAr: reagente → eletrófilo → produto", "cab": ["Reagentes", "Eletrófilo", "Produto e detalhe"], "linhas": [["HNO₃, H₂SO₄", "NO₂⁺", "nitroareno"], ["Br₂, FeBr₃ (ou Cl₂, FeCl₃)", "Br⁺ polarizado", "haloareno"], ["SO₃, H₂SO₄", "SO₃", "ácido sulfônico; reversível (H₂SO₄ dil., calor)"], ["R–Cl, AlCl₃", "R⁺", "alquilbenzeno; <b>rearranja</b> e polialquila"], ["alceno, H₂SO₄", "carbocátion", "alquilbenzeno (ex.: ciclo-hexilbenzeno)"], ["RCOCl, AlCl₃", "RC≡O⁺ (acílio)", "cetona aromática; <b>sem rearranjo</b>, só uma vez"], ["(RCO)₂O, AlCl₃", "íon acílio", "cetona + ácido carboxílico"]]}, {"t": "Orientação dos substituintes", "cab": ["Grupo", "Efeito no anel", "Orienta para"], "linhas": [["OH, OR, NH₂, NHCOR, alquil", "ativadores", "orto e para"], ["F, Cl, Br, I", "desativadores fracos", "orto e para"], ["NO₂, CF₃, COR, COOH, SO₃H, CN, NR₃⁺", "desativadores", "meta"]]}, {"t": "Transformações da cadeia lateral e do anel", "cab": ["Reagente", "Efeito"], "linhas": [["KMnO₄ ou Na₂Cr₂O₇, H₂SO₄", "carbono benzílico → COOH (exige H benzílico)"], ["NBS, hν", "bromação benzílica"], ["Zn(Hg), HCl", "Clemmensen: Ar–CO–R → Ar–CH₂–R"], ["Fe/HCl, Sn/HCl ou H₂/Pd", "ArNO₂ → ArNH₂"], ["(CH₃CO)₂O", "ArNH₂ → acetanilida (protege e modera)"], ["H₃O⁺ ou HO⁻, calor", "hidrolisa a acetanilida de volta à amina"], ["Na, NH₃(l), CH₃OH", "Birch: 1,4-ciclo-hexadieno"], ["H₂, Ni, 100 atm, 150 °C", "benzeno → ciclo-hexano"], ["H₂SO₄ diluído, calor", "remove o SO₃H (dessulfonação)"]]}],
   qs:[
   ['terc-butilbenzeno + KMnO₄ quente. O que acontece? E butilbenzeno?','terc-butilbenzeno não reage: não tem H benzílico. Butilbenzeno → ácido benzoico.'],
   ['Tolueno → ácido p-nitrobenzoico e → ácido m-nitrobenzoico. Qual a ordem das etapas?','Para: nitre primeiro (CH₃ é o/p), depois oxide. Meta: oxide primeiro (COOH é meta), depois nitre.'],
@@ -176,6 +181,7 @@ const BLOCOS = [
   atencao:[
     'Diazônio acima de 5 °C se decompõe. Sempre escreva 0–5 °C.',
     'Em síntese de poli-substituídos, use o NH₂ como “alavanca”: ativa, orienta e depois sai com H₃PO₂.'],
+  tabelas:[{"t": "Sal de diazônio + reagente", "cab": ["ArN₂⁺ + reagente", "Produto"], "linhas": [["CuCl, CuBr ou CuCN", "ArCl, ArBr, ArCN (Sandmeyer)"], ["KI", "ArI (sem cobre)"], ["HBF₄; depois calor", "ArF (Schiemann)"], ["H₂O, calor", "ArOH (fenol)"], ["H₃PO₂", "ArH (desaminação)"], ["fenol ou fenolato, meio levemente básico", "azo-fenol, em para"], ["ArNR₂ (anilina), meio levemente ácido", "corante azo, em para"]]}, {"t": "NaNO₂, HCl conforme a amina", "cab": ["Amina", "Produto"], "linhas": [["ArNH₂ a 0–5 °C", "sal de diazônio estável"], ["RNH₂ alifática primária", "diazônio instável → carbocátion + N₂ (mistura de produtos)"], ["R₂NH", "N-nitrosamina"], ["ArNR₂ (N,N-dimetilanilina)", "p-nitroso (SEAr no anel)"]]}, {"t": "Reações do fenol", "cab": ["Reagente", "Produto"], "linhas": [["NaOH", "fenolato (pKa do fenol ≈ 10)"], ["R–X primário, K₂CO₃ (Williamson)", "éter alquil aril"], ["RCOCl ou anidrido", "éster de fenila"], ["CO₂ (125 °C, 100 atm); depois H₃O⁺", "ácido salicílico (Kolbe–Schmitt), orto"], ["CHCl₃, NaOH", "salicilaldeído (Reimer–Tiemann), orto"], ["Br₂, HOAc", "poli-bromação (anel muito ativado)"], ["Na₂Cr₂O₇ (hidroquinona ou catecol)", "quinona"]]}, {"t": "Éteres e epóxidos", "cab": ["Reagente", "Resultado"], "linhas": [["HI ou HBr, calor (éter alquílico)", "clivagem SN2 no carbono menos impedido"], ["HBr (éter aril alquil)", "fenol + R–Br (o carbono arílico não faz SN2)"], ["epóxido + H₃O⁺ ou ROH/H⁺", "Nu no carbono <b>mais</b> substituído; trans"], ["epóxido + RMgX, LiAlH₄, CN⁻, RS⁻, RO⁻", "Nu no carbono <b>menos</b> substituído (SN2)"], ["éter + O₂, luz", "hidroperóxido (explosivo)"]]}, {"t": "Grupos protetores de OH", "cab": ["Proteção", "Desproteção"], "linhas": [["TMSCl, Et₃N", "TBAF ou LiF"], ["TBSCl, imidazol, DMF", "TBAF, THF"], ["isobutileno, H₂SO₄ (cat.)", "H₃O⁺"]]}],
   qs:[
   ['Anilina + NaNO₂/HCl a 0–5 °C. Que produtos se obtêm com CuCl, CuCN, KI, HBF₄ (calor), H₂O (calor) e H₃PO₂?','ArN₂⁺ → clorobenzeno, benzonitrila (Sandmeyer), iodobenzeno, fluorobenzeno (Schiemann), fenol e benzeno.'],
   ['Benzeno → m-dibromobenzeno.','1) HNO₃/H₂SO₄  2) Br₂/FeBr₃ (meta)  3) Fe/HCl ou H₂, Pd/C  4) NaNO₂/HBr, 0 °C  5) CuBr.'],
@@ -204,6 +210,7 @@ const BLOCOS = [
   atencao:[
     'Meta-bromotolueno com NaNH₂ dá três toluidinas (o, m, p).',
     'Quando há dois halogênios, sai o que está orto/para ao NO₂.'],
+  tabelas:[{"t": "Condição → mecanismo", "cab": ["Substrato e condição", "Mecanismo", "Resultado"], "linhas": [["ArX simples + HO⁻, condição branda", "nenhum", "não reage"], ["ArX com NO₂ (ou outro sacador) em orto ou para + Nu", "adição–eliminação (Meisenheimer)", "Nu entra no lugar do X; F &gt; Cl &gt; Br &gt; I"], ["ArX sem sacador + NaNH₂, NH₃(l)", "eliminação–adição (benzino)", "mistura de isômeros"], ["ArX + NaOH, 340 °C, 170 atm", "benzino", "fenol (processo Dow)"], ["ácido antranílico + RONO", "diazotação; perde CO₂ e N₂", "benzino"], ["2,4,6-trinitroclorobenzeno + HO⁻", "SNAr", "ácido pícrico (depois H₃O⁺)"]]}],
   qs:[
   ['Bromobenzeno + HO⁻ em condições brandas. Reage?','Não. O carbono é sp²: SN2 não tem retaguarda e SN1 exigiria um cátion arílico muito instável.'],
   ['p-fluoronitrobenzeno + CH₃O⁻ → p-nitroanisol. Qual o mecanismo e por que F sai mais rápido que Cl?','Adição–eliminação via Meisenheimer. A etapa lenta é a adição do Nu, e o F (muito eletronegativo) torna o carbono mais δ+. A saída do F⁻ é etapa rápida.'],
@@ -228,6 +235,7 @@ const BLOCOS = [
   atencao:[
     'Escreva sempre o enolato intermediário da adição 1,4 e depois a protonação (tautomeria para a cetona).',
     'Se a pergunta fala em temperatura, é cinético × termodinâmico.'],
+  tabelas:[{"t": "Nucleófilo → tipo de adição a enonas", "cab": ["Nucleófilo", "Adição", "Produto"], "linhas": [["RLi, RMgX", "1,2", "álcool alílico terciário"], ["LiAlH₄, NaBH₄ (aldeído conjugado)", "1,2", "álcool alílico (cinamaldeído → álcool cinamílico)"], ["NaCN, HCN a 5–10 °C", "1,2 (cinético)", "cianidrina"], ["NaCN, HCN a 80 °C", "1,4 (termodinâmico)", "4-oxonitrila"], ["R₂CuLi (Gilman)", "1,4", "cetona β-alquilada"], ["RMgX + CuCl (cat.)", "1,4", "cetona β-alquilada"], ["R₂NH, RNH₂, NH₃", "1,4", "β-aminocarbonila"], ["RO⁻, ROH com base", "1,4", "β-alcoxicarbonila"], ["RSH, RS⁻", "1,4", "β-tioéter"], ["enolato (Michael)", "1,4", "1,5-dicarbonila"], ["HCl (meio ácido)", "1,4", "β-cloro-cetona (O protonado)"], ["cloreto de acriloíla + NH₃", "substituição acílica", "acrilamida"]]}],
   qs:[
   ['Ciclo-hex-2-enona + CH₃MgBr e + (CH₃)₂CuLi. Compare.','CH₃MgBr: 1,2, 1-metilciclo-hex-2-en-1-ol. (CH₃)₂CuLi: 1,4, 3-metilciclo-hexanona.'],
   ['But-3-en-2-ona + NaCN/HCN a 5–10 °C e a 80 °C.','5–10 °C: cianidrina (1,2, cinético). 80 °C: 4-oxopentanonitrila (1,4, termodinâmico).'],
@@ -254,6 +262,7 @@ const BLOCOS = [
   atencao:[
     'Se o enunciado pede “carbono menos substituído”, é LDA a −78 °C. “Mais substituído” é meio ácido ou NaH, 25 °C.',
     'Éster precisa de LDA; β-cetoéster basta NaOEt.'],
+  tabelas:[{"t": "Reagente → produto no carbono α", "cab": ["Reagente", "Produto", "Detalhe"], "linhas": [["Br₂, H₃O⁺", "α-bromocetona (mono)", "enol mais substituído"], ["Br₂, HO⁻ em excesso", "CHBr₃ + carboxilato", "haloformio (metilcetona)"], ["Br₂, PBr₃ (cat.); depois H₂O", "α-bromoácido", "Hell–Volhard–Zelinsky"], ["piridina, calor (em α-bromocetona)", "enona", "E2"], ["Nu⁻ em α-halocarbonila", "substituição", "SN2 (ex.: α-aminoácido)"], ["LDA, −78 °C; R–X", "alquila o C α menos substituído", "enolato cinético"], ["NaH, 25 °C; R–X", "alquila o C α mais substituído", "enolato termodinâmico"], ["base; RCOCl", "éster de enol (O-acilação)", "acetato de isopropenila"], ["R₂NH, H⁺ (−H₂O)", "enamina", "nucleófila no C α"], ["NaNO₂, HCl", "α-oxima", "depois α-dicetona"]]}],
   qs:[
   ['2-metilciclo-hexanona: (a) LDA, −78 °C, depois CH₃I; (b) NaH, 25 °C, depois CH₃I.','(a) 2,6-dimetilciclo-hexanona (cinético, C menos substituído). (b) 2,2-dimetilciclo-hexanona (termodinâmico).'],
   ['2-metilciclo-hexanona + Br₂ em meio ácido. Principal?','2-bromo-2-metilciclo-hexanona, pelo enol mais substituído.'],
@@ -282,6 +291,7 @@ const BLOCOS = [
   atencao:[
     'Enolato de cetona ataca aldeído (aldol); enolato de éster ataca éster (Claisen).',
     'Cada reação do enolato começa pelo desenho do enolato e do eletrófilo.'],
+  tabelas:[{"t": "Condensações", "cab": ["Reação", "Reagentes", "Produto"], "linhas": [["Aldol", "RCH₂CHO ou cetona, NaOH", "β-hidroxicarbonila; com calor, enona"], ["Aldol cruzada", "ArCHO (sem α-H) + cetona, NaOH", "enona (benzalacetona, chalcona)"], ["Claisen", "éster com α-H, NaOEt (≥ 1 equiv.)", "β-cetoéster"], ["Claisen cruzada", "éster + éster sem α-H, ou LDA", "β-cetoéster"], ["Dieckmann", "diéster 1,6 ou 1,7, NaOEt", "β-cetoéster cíclico (anel de 5 ou 6)"], ["Perkin", "ArCHO + anidrido, RCO₂Na, calor", "ácido cinâmico; salicilaldeído → cumarina"], ["Cannizzaro", "ArCHO sem α-H, NaOH concentrado", "carboxilato + álcool"], ["Stork", "enamina + enona; depois H₃O⁺", "1,5-dicarbonila"]]}, {"t": "Sínteses acetoacética e malônica", "cab": ["Partida", "Sequência", "Produto"], "linhas": [["acetoacetato de etila", "1) NaOEt  2) RX  3) HO⁻, calor  4) H₃O⁺, calor", "metilcetona R–CH₂–CO–CH₃"], ["malonato de dietila", "1) NaOEt  2) RX  3) HO⁻  4) H₃O⁺, calor", "ácido R–CH₂–COOH"], ["malonato + 1,3-dibromopropano", "NaOEt (2 vezes); hidrólise; calor", "ácido ciclobutanocarboxílico"], ["acetoacetato + BrCH₂COR", "NaOEt; hidrólise; calor", "γ-dicetona"], ["acetoacetato + BrCH₂CO₂Et", "NaOEt; hidrólise; calor", "ácido 4-oxopentanoico (γ-cetoácido)"]]}],
   qs:[
   ['Prepare pentan-2-ona a partir de acetoacetato de etila.','1) NaOEt  2) EtBr  3) NaOH diluído, calor  4) H₃O⁺, calor (−CO₂).'],
   ['Como obter ácido 2-metildodecanoico pela síntese malônica?','Malonato de dietila: NaOEt/CH₃Br; NaOEt/1-bromodecano; KOH; H⁺ e calor (−CO₂).'],
