@@ -714,3 +714,32 @@ html.mo .item,html.mo .aula,html.mo .ficha,html.mo .guia-link,html.mo .nav-det a
 .vc-aviao img{position:absolute;inset:0;width:100%;height:100%;display:block}
 .vc-clip{position:absolute;inset:0;z-index:2}
 .vc-clip .vc-dino{z-index:auto}
+
+/* ===== Revisão da prova ===== */
+.m-revisao{grid-column:1/-1}
+.m-revisao .md-ic{background:var(--ink);color:var(--card)}
+.rev-resumo{display:grid;gap:12px}
+.rev-num b{font-size:1.35rem;letter-spacing:-.02em}
+.rev-num small{display:block;color:var(--mut);font-size:.85rem;margin-top:2px}
+.rev-barra{height:6px;border-radius:3px;background:var(--bd);overflow:hidden}
+.rev-barra i{display:block;height:100%;background:var(--ac);border-radius:3px}
+.rev-resumo .filtros{margin:0}
+.rev-atencao{background:color-mix(in srgb,var(--el) 9%,var(--card))}
+.rev-atencao .tb-titulo{color:var(--el)}
+.rev-bloco .dicas ul{padding-top:2px}
+.rev-q{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:9px;box-shadow:var(--sombra)}
+.rev-q[data-m="ok"]{border-left:4px solid var(--c-adicao-alcenos)}
+.rev-q[data-m="no"]{border-left:4px solid var(--c-e1)}
+.rev-q summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start;padding:14px;font-weight:600;font-size:.94rem;line-height:1.45}
+.rev-q summary::-webkit-details-marker{display:none}
+.rev-chip{font-style:normal;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 7px;border-radius:6px;background:var(--bg);color:var(--mut);white-space:nowrap}
+.rev-q[data-m="ok"] .rev-chip{background:color-mix(in srgb,var(--c-adicao-alcenos) 16%,var(--card));color:var(--c-adicao-alcenos)}
+.rev-q[data-m="no"] .rev-chip{background:color-mix(in srgb,var(--c-e1) 16%,var(--card));color:var(--c-e1)}
+.rev-q[open] summary{border-bottom:1px solid var(--bd)}
+.rev-resp{padding:12px 14px 14px;display:grid;gap:12px}
+.rev-resp p{margin:0;font-size:.93rem;line-height:1.55}
+.rev-marca{display:flex;gap:8px}
+.rev-marca .btn{height:40px;flex:1}
+.rev-marca .rev-ok.on{background:color-mix(in srgb,var(--c-adicao-alcenos) 16%,var(--card));border-color:var(--c-adicao-alcenos);color:var(--c-adicao-alcenos)}
+.rev-marca .rev-no.on{background:color-mix(in srgb,var(--c-e1) 16%,var(--card));border-color:var(--c-e1);color:var(--c-e1)}
+.rev-bloco .nav-det{margin-top:18px}

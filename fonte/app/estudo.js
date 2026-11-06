@@ -138,6 +138,7 @@
           <button class="modo sobe m-jogo" style="--i:6" data-ir="#/jogo"><span class="md-ic">${IC.jogo}</span><b>Reagentes</b><small>preencha as setas</small></button>
           <button class="modo sobe m-mapas" style="--i:7" data-ir="#/mec"><span class="md-ic">${IC.mapa}</span><b>Mapas</b><small>diagramas de reações</small></button>
           <button class="modo sobe m-salvos" style="--i:8" data-ir="#/salvos"><span class="md-ic">${IC.salvos}</span><b>Salvos</b><small>${plural(salvos.size, 'reação', 'reações')}</small></button>
+          <button class="modo sobe m-revisao" style="--i:4" data-ir="#/revisao"><span class="md-ic">${IC.guia}</span><b>Revisão da prova</b><small>resumo, perguntas e reagentes das aulas 1 a 23</small></button>
           <button class="modo sobe m-notas" style="--i:9" data-ir="#/notas"><span class="md-ic">${IC.notas}</span><b>Anotações</b><small>${plural(D.reacoes.filter((r) => comNota(r.i)).length, 'anotação', 'anotações')}</small></button>
         </div>
         <div class="sec"><h3>Progresso por aula</h3><span>dominadas</span></div><div class="prog">${barras}</div>`,
@@ -513,6 +514,80 @@
     pinta();
     mo(banco.querySelectorAll('.mp-chip'), { opacity: [0, 1], y: [10, 0], scale: [0.9, 1] }, { type: 'spring', stiffness: 320, damping: 22, delay: M && M.stagger ? M.stagger(0.03) : 0 });
   }
+
+
+  // ---------- Revisão da prova: resumo por bloco, perguntas com resposta escondida e tabela de reagentes ----------
+  const REV_KEY = 'atlas.revisao';
+  let revMarcas = guarda.ler(REV_KEY, {});   // { 'bloco-índice': 'ok' | 'no' }
+  let revSoErradas = false;
+  const revBlocos = () => (D.revisao ? D.revisao.blocos : []);
+  const revId = (b, i) => b.id + '-' + i;
+  function revConta(b) {
+    let ok = 0, no = 0;
+    b.qs.forEach((_, i) => { const m = revMarcas[revId(b, i)]; if (m === 'ok') ok++; else if (m === 'no') no++; });
+    return { ok, no, n: b.qs.length };
+  }
+  const revTotal = () => revBlocos().reduce((t, b) => { const c = revConta(b); return { ok: t.ok + c.ok, no: t.no + c.no, n: t.n + c.n }; }, { ok: 0, no: 0, n: 0 });
+  const revLista = (itens) => `<ul>${itens.map((x) => `<li>${x}</li>`).join('')}</ul>`;
+  const revTabela = (t, cols) => `<div class="cartao tabela sobe"><div class="tb-wrap"><table class="tb"><thead><tr>${cols.map((c) => `<th>${c}</th>`).join('')}</tr></thead><tbody>${t.map((l) => `<tr>${l.map((c, i) => (i === 0 ? '<th scope="row">' : '<td>') + c + (i === 0 ? '</th>' : '</td>')).join('')}</tr>`).join('')}</tbody></table></div></div>`;
+  const revPergunta = (b, i) => {
+    const id = revId(b, i), q = b.qs[i], m = revMarcas[id] || '';
+    return `<details class="rev-q sobe" style="--i:${i + 3}" data-rq="${id}"${m ? ` data-m="${m}"` : ''}><summary><span>${q[0]}</span><i class="rev-chip">${m === 'ok' ? 'Acertei' : m === 'no' ? 'Errei' : 'Pergunta'}</i></summary>
+      <div class="rev-resp"><p>${q[1]}</p><div class="rev-marca"><button class="btn rev-ok${m === 'ok' ? ' on' : ''}" data-rev-m="ok" data-rev-id="${id}">Acertei</button><button class="btn rev-no${m === 'no' ? ' on' : ''}" data-rev-m="no" data-rev-id="${id}">Errei</button></div></div></details>`;
+  };
+
+  function telaRevisao(id) {
+    if (!D.revisao) return null;
+    if (!id) {
+      const T = revTotal(), pct = T.n ? Math.round(((T.ok + T.no) / T.n) * 100) : 0;
+      const chipF = (v, rot) => `<button class="chip${revSoErradas === v ? ' on' : ''}" data-rev-f="${v ? 1 : 0}">${rot}</button>`;
+      return {
+        titulo: 'Revisão da prova', aba: 'estudar', prof: 1,
+        html: `<h2 class="titulo-lista sobe">Revisão da prova</h2><p class="sub-lista sobe" style="--i:1">Aulas 1 a 23 em dez blocos: leia o resumo, responda de cabeça, abra a resposta e marque.</p>
+          <div class="cartao rev-resumo sobe" style="--i:2"><div class="rev-num"><b>${T.ok + T.no} de ${T.n}</b> respondidas<small>${plural(T.ok, 'acerto', 'acertos')} · ${plural(T.no, 'erro', 'erros')}</small></div><div class="rev-barra"><i style="width:${pct}%"></i></div>
+            <div class="filtros">${chipF(false, 'Todas')}${chipF(true, 'Só as que errei')}</div></div>
+          <div class="sec"><h3>Blocos</h3><span>${revBlocos().length} blocos</span></div>
+          ${revBlocos().map((b, i) => { const c = revConta(b); return `<a class="aula sobe" style="--i:${i + 3}" href="#/revisao/${b.id}"><div class="num jogo-ic">${IC.guia}</div><div class="tx"><b>${esc(b.nome)}</b><small>${esc(b.aulas)} · ${c.ok + c.no}/${c.n} respondidas${c.no ? ` · ${c.no} p/ refazer` : ''}</small></div>${SETA_IR}</a>`; }).join('')}
+          <div class="sec"><h3>Consulta rápida</h3></div>
+          <a class="aula sobe" style="--i:14" href="#/revisao/reagentes"><div class="num jogo-ic">${IC.transforma}</div><div class="tx"><b>Reagentes numa linha</b><small>${D.revisao.reagentes.length} reagentes e o que cada um faz</small></div>${SETA_IR}</a>`,
+      };
+    }
+    if (id === 'reagentes') {
+      return {
+        titulo: 'Reagentes', aba: 'estudar', prof: 2,
+        html: `<h2 class="titulo-lista sobe">Reagentes numa linha</h2><p class="sub-lista sobe" style="--i:1">Releia por último, antes de entrar na prova.</p>${revTabela(D.revisao.reagentes, ['Reagente', 'O que faz'])}`,
+      };
+    }
+    const bi = revBlocos().findIndex((b) => b.id === id); if (bi < 0) return null;
+    const b = revBlocos()[bi], ant = revBlocos()[bi - 1], prox = revBlocos()[bi + 1];
+    const idx = b.qs.map((_, i) => i).filter((i) => !revSoErradas || revMarcas[revId(b, i)] === 'no');
+    const nav = `<div class="nav-det">${ant ? `<a href="#/revisao/${ant.id}"><small>← anterior</small><b>${esc(ant.nome)}</b></a>` : '<span></span>'}${prox ? `<a href="#/revisao/${prox.id}"><small>próximo →</small><b>${esc(prox.nome)}</b></a>` : '<a href="#/revisao/reagentes"><small>por último →</small><b>Reagentes numa linha</b></a>'}</div>`;
+    return {
+      titulo: b.nome, aba: 'estudar', prof: 2,
+      html: `<article class="det guia rev-bloco"><h2 class="sobe">${esc(b.nome)}</h2><p class="origem sobe" style="--i:1">${esc(b.aulas)}</p><p class="intro sobe" style="--i:2">${b.res}</p>
+        ${b.tabela ? revTabela(b.tabela.linhas, b.tabela.cab) : ''}
+        <div class="cartao dicas sobe"><h3 class="tb-titulo">Essencial</h3>${revLista(b.essencial)}</div>
+        <div class="cartao dicas rev-atencao sobe"><h3 class="tb-titulo">Atenção</h3>${revLista(b.atencao)}</div>
+        <div class="sec"><h3>Responda antes de abrir</h3>${revSoErradas ? '<button class="chip on" data-rev-f="0">Só as que errei · ver todas</button>' : `<span>${b.qs.length} perguntas</span>`}</div>
+        ${idx.length ? idx.map((i) => revPergunta(b, i)).join('') : '<p class="sub-lista">Nenhuma errada neste bloco.</p>'}
+        ${nav}</article>`,
+    };
+  }
+
+  function revMarca(btn) {
+    const id = btn.dataset.revId, m = btn.dataset.revM;
+    if (revMarcas[id] === m) delete revMarcas[id]; else revMarcas[id] = m;
+    guarda.gravar(REV_KEY, revMarcas);
+    const d = btn.closest('.rev-q'), v = revMarcas[id] || '';
+    if (v) d.dataset.m = v; else delete d.dataset.m;
+    d.querySelector('.rev-chip').textContent = v === 'ok' ? 'Acertei' : v === 'no' ? 'Errei' : 'Pergunta';
+    d.querySelectorAll('.rev-marca .btn').forEach((b) => b.classList.toggle('on', b.dataset.revM === v));
+    if (navigator.vibrate) navigator.vibrate(8);
+  }
+  document.addEventListener('click', (e) => {
+    const m = e.target.closest('[data-rev-m]'); if (m) { revMarca(m); return; }
+    const f = e.target.closest('[data-rev-f]'); if (f) { revSoErradas = f.dataset.revF === '1'; mostra(); }
+  });
 
   // ---------- cliques do estudo ----------
   document.addEventListener('click', (e) => {

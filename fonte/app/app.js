@@ -582,6 +582,7 @@
     if (a === 'todas') return telaLista('todas');
     if (a === 'salvos') return telaLista('salvos');
     if (a === 'estudar') return telaEstudar();
+    if (a === 'revisao') return telaRevisao(b);
     if (a === 'cartoes') return telaCartoes();
     if (a === 'simulado') return telaSimulado();
     if (a === 'notas') return telaNotas();

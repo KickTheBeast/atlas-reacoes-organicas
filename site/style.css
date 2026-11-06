@@ -4677,6 +4677,160 @@ html.mo .item, html.mo .aula, html.mo .ficha, html.mo .guia-link, html.mo .nav-d
   z-index: auto;
 }
 
+.m-revisao {
+  grid-column: 1 / -1;
+}
+
+.m-revisao .md-ic {
+  background: var(--ink);
+  color: var(--card);
+}
+
+.rev-resumo {
+  gap: 12px;
+  display: grid;
+}
+
+.rev-num b {
+  letter-spacing: -.02em;
+  font-size: 1.35rem;
+}
+
+.rev-num small {
+  color: var(--mut);
+  margin-top: 2px;
+  font-size: .85rem;
+  display: block;
+}
+
+.rev-barra {
+  background: var(--bd);
+  border-radius: 3px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.rev-barra i {
+  background: var(--ac);
+  border-radius: 3px;
+  height: 100%;
+  display: block;
+}
+
+.rev-resumo .filtros {
+  margin: 0;
+}
+
+.rev-atencao {
+  background: color-mix(in srgb,var(--el) 9%,var(--card));
+}
+
+.rev-atencao .tb-titulo {
+  color: var(--el);
+}
+
+.rev-bloco .dicas ul {
+  padding-top: 2px;
+}
+
+.rev-q {
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  box-shadow: var(--sombra);
+  margin-bottom: 9px;
+}
+
+.rev-q[data-m="ok"] {
+  border-left: 4px solid var(--c-adicao-alcenos);
+}
+
+.rev-q[data-m="no"] {
+  border-left: 4px solid var(--c-e1);
+}
+
+.rev-q summary {
+  cursor: pointer;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 12px;
+  padding: 14px;
+  font-size: .94rem;
+  font-weight: 600;
+  line-height: 1.45;
+  list-style: none;
+  display: grid;
+}
+
+.rev-q summary::-webkit-details-marker {
+  display: none;
+}
+
+.rev-chip {
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  background: var(--bg);
+  color: var(--mut);
+  white-space: nowrap;
+  border-radius: 6px;
+  padding: 4px 7px;
+  font-size: .68rem;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.rev-q[data-m="ok"] .rev-chip {
+  background: color-mix(in srgb,var(--c-adicao-alcenos) 16%,var(--card));
+  color: var(--c-adicao-alcenos);
+}
+
+.rev-q[data-m="no"] .rev-chip {
+  background: color-mix(in srgb,var(--c-e1) 16%,var(--card));
+  color: var(--c-e1);
+}
+
+.rev-q[open] summary {
+  border-bottom: 1px solid var(--bd);
+}
+
+.rev-resp {
+  gap: 12px;
+  padding: 12px 14px 14px;
+  display: grid;
+}
+
+.rev-resp p {
+  margin: 0;
+  font-size: .93rem;
+  line-height: 1.55;
+}
+
+.rev-marca {
+  gap: 8px;
+  display: flex;
+}
+
+.rev-marca .btn {
+  flex: 1;
+  height: 40px;
+}
+
+.rev-marca .rev-ok.on {
+  background: color-mix(in srgb,var(--c-adicao-alcenos) 16%,var(--card));
+  border-color: var(--c-adicao-alcenos);
+  color: var(--c-adicao-alcenos);
+}
+
+.rev-marca .rev-no.on {
+  background: color-mix(in srgb,var(--c-e1) 16%,var(--card));
+  border-color: var(--c-e1);
+  color: var(--c-e1);
+}
+
+.rev-bloco .nav-det {
+  margin-top: 18px;
+}
+
 :root[data-visual="vidro"] {
   --bg: #f2f4f3;
   --card: #ffffff94;

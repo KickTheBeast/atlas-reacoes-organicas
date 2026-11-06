@@ -7,11 +7,11 @@
 // 3. `versao.json` nunca é guardado: é por ele que o app descobre que saiu
 //    versão nova e mostra o botão Atualizar.
 //
-// `858ce79842` vira a marca do build em tools/build.mjs, então este arquivo muda
+// `421aab9a9b` vira a marca do build em tools/build.mjs, então este arquivo muda
 // a cada publicação, o navegador instala o worker novo e o `activate` apaga o
 // cache do anterior. O worker novo assume sem esperar; quem recarrega a tela é o
 // botão Atualizar, nunca o worker.
-const BUILD = '858ce79842';
+const BUILD = '421aab9a9b';
 const CACHE = 'atlas-' + BUILD;
 const V = '?v=' + BUILD;
 const PRE = ['./', 'motion.js' + V, 'app.js' + V, 'style.css' + V, 'dados.json' + V, 'svgs.json' + V,

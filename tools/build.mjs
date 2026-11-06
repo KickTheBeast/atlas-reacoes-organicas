@@ -39,6 +39,10 @@ const ctxD = { window: {} };
 vm.createContext(ctxD);
 vm.runInContext(fs.readFileSync(path.join(FONTE, 'diagramas/diagramas.js'), 'utf8'), ctxD, { filename: 'diagramas.js' });
 const DIAGRAMAS = ctxD.window.DIAGRAMAS;
+const ctxR = { window: {} };
+vm.createContext(ctxR);
+vm.runInContext(fs.readFileSync(path.join(FONTE, 'revisao/revisao.js'), 'utf8'), ctxR, { filename: 'revisao.js' });
+const REVISAO = ctxR.window.REVISAO;
 
 const AULAS = {
   '00': 'Exemplos básicos (meus)',
@@ -399,6 +403,7 @@ const dados = {
   grupos: GRUPOS.filter((g) => reacoes.some((x) => x.gs.includes(g.id) || x.gp.includes(g.id))).map((g) => ({ id: g.id, nome: g.nome })),
   mapas,
   guias,
+  revisao: REVISAO,
   reacoes,
 };
 const dadosTxt = JSON.stringify(dados);
